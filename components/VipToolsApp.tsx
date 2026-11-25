@@ -36,12 +36,25 @@ export default function VipToolsApp() {
           <source src="https://c.termai.cc/v131/H4vF9D.mp4" type="video/mp4" />
         </video>
         <div id="bgOverlay" />
+        <div className="anime-orbs">
+          <div className="anime-orb orb-1" />
+          <div className="anime-orb orb-2" />
+          <div className="anime-orb orb-3" />
+        </div>
+        <div className="anime-grid-3d" />
         <canvas id="animeParticles" width={1280} height={720} />
       </div>
 
       <div id="loader" role="status" aria-live="polite">
-        <div className="loader-crest-3d mecha-cut" aria-hidden="true">
-          <span className="brand-monogram">MLM</span>
+        <div className="loader-stage-3d" aria-hidden="true">
+          <div className="loader-ring-3d">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="loader-crest-3d mecha-cut">
+            <span className="brand-monogram">MLM</span>
+          </div>
         </div>
         <div className="loader-title">MATTZLM</div>
         <div className="loader-sub">KURO-MECHA 3D DECK</div>
