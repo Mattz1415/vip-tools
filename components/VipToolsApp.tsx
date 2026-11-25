@@ -580,6 +580,243 @@ export default function VipToolsApp() {
                 </button>
               </div>
 
+              <div
+                id="ownerPanel"
+                style={{
+                  display: "none",
+                  marginTop: "20px",
+                  borderTop: "1px solid var(--theme-border-color)",
+                  paddingTop: "16px",
+                  textAlign: "left",
+                }}
+              >
+                <h3
+                  style={{
+                    marginBottom: "12px",
+                    fontSize: "0.95rem",
+                    color: "#f59e0b",
+                  }}
+                >
+                  <i className="fas fa-crown" /> Panel Owner (Full Akses)
+                </h3>
+
+                <div style={{ marginBottom: "14px" }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "var(--theme-text-muted)",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Tema Website
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {["biru", "merah", "hitam", "putih", "silver"].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        className="category-tab"
+                        style={{ padding: "6px 12px", fontSize: "0.7rem" }}
+                        onClick={() => callGlobal("applyTheme", t)}
+                      >
+                        {t.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "14px",
+                    borderTop: "1px solid var(--theme-border-color)",
+                    paddingTop: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <i className="fas fa-plus-circle" /> Tambah Tool Custom
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-tag" />
+                    <input
+                      type="text"
+                      id="ownerToolName"
+                      placeholder="Nama tool"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-link" />
+                    <input
+                      type="text"
+                      id="ownerToolUrl"
+                      placeholder="URL tool (https://...)"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-align-left" />
+                    <input
+                      type="text"
+                      id="ownerToolDesc"
+                      placeholder="Deskripsi singkat"
+                    />
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="btn-auth"
+                      onClick={() => callGlobal("ownerAddTool")}
+                      style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
+                    >
+                      <i className="fas fa-plus" /> Tambah Tool
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-auth"
+                      onClick={() => callGlobal("ownerRestoreTools")}
+                      style={{
+                        padding: "10px",
+                        fontSize: "0.75rem",
+                        flex: 1,
+                        background: "rgba(50,100,255,0.2)",
+                      }}
+                    >
+                      <i className="fas fa-rotate-left" /> Restore Tools
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "14px",
+                    borderTop: "1px solid var(--theme-border-color)",
+                    paddingTop: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <i className="fas fa-users-cog" /> Kelola Akun &amp; Role
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-user" />
+                    <input
+                      type="text"
+                      id="ownerAccUser"
+                      placeholder="Username"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-lock" />
+                    <input
+                      type="password"
+                      id="ownerAccPass"
+                      placeholder="Password"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-shield-halved" />
+                    <select
+                      id="ownerAccRole"
+                      defaultValue="member"
+                      style={{
+                        width: "100%",
+                        background: "transparent",
+                        border: "none",
+                        color: "var(--theme-text-primary)",
+                        outline: "none",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      <option value="member" style={{ color: "#000" }}>
+                        member
+                      </option>
+                      <option value="admin" style={{ color: "#000" }}>
+                        admin
+                      </option>
+                      <option value="owner" style={{ color: "#000" }}>
+                        owner
+                      </option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-auth"
+                    onClick={() => callGlobal("ownerSaveAccount")}
+                    style={{ padding: "10px", fontSize: "0.75rem" }}
+                  >
+                    <i className="fas fa-user-check" /> Simpan / Update Akun
+                  </button>
+                  <div
+                    id="ownerUsersList"
+                    style={{
+                      marginTop: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                    }}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "14px",
+                    borderTop: "1px solid var(--theme-border-color)",
+                    paddingTop: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <i className="fas fa-comment-dots" /> Balas Chat &amp; Reset Limit
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-reply" />
+                    <input
+                      type="text"
+                      id="ownerReplyInput"
+                      placeholder="Tulis balasan sebagai Owner..."
+                    />
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="btn-auth"
+                      onClick={() => callGlobal("ownerReplyChat")}
+                      style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
+                    >
+                      <i className="fas fa-paper-plane" /> Kirim Balasan
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-auth"
+                      onClick={() => callGlobal("ownerResetChatLimits")}
+                      style={{
+                        padding: "10px",
+                        fontSize: "0.75rem",
+                        flex: 1,
+                        background: "rgba(34,197,94,0.2)",
+                      }}
+                    >
+                      <i className="fas fa-unlock" /> Reset Limit Chat
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={() => callGlobal("doLogout")}
                 style={{
