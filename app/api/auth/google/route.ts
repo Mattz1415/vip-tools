@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const idToken = String(body?.idToken || "").trim();
     if (!idToken) {
       return NextResponse.json(
-        { ok: false, error: "Firebase ID token tidak ditemukan." },
+        { ok: false, error: "Token login Google tidak ditemukan." },
         { status: 400 }
       );
     }
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const fbCfg = getEffectiveFirebaseConfig(currentStore);
     if (!isFirebaseReady(fbCfg)) {
       return NextResponse.json(
-        { ok: false, error: "Firebase belum dikonfigurasi di VPS. Hubungi Owner (/owner)." },
+        { ok: false, error: "Login Google belum diaktifkan." },
         { status: 503 }
       );
     }

@@ -672,40 +672,8 @@ select:disabled,
   color: var(--text-muted);
 }
 
-.auth-feature-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 0.86rem;
-  color: var(--text-primary);
-}
-
-.auth-feature-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.auth-feature-list i {
-  color: var(--accent-hallmark-fg);
-}
-
 .auth-form-side {
   padding: 32px 28px;
-}
-
-.auth-form-heading {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.45rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.auth-form-sub {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  margin-bottom: 18px;
 }
 
 .auth-mode {
@@ -2596,17 +2564,6 @@ body.motion-paused .anime-emblem-3d {
 .btn-google-auth:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-.google-pill {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 8px;
-  background: var(--surface-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
 }
 
 .owner-panel-head-row {

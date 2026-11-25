@@ -145,10 +145,8 @@ function formatUptime(sec: number): string {
 
 export default function OwnerPanelClient({
   initialUser,
-  firebaseReady,
 }: {
   initialUser: { username: string; role: "owner" | "admin" | "member"; email?: string } | null;
-  firebaseReady: boolean;
 }) {
   const [user, setUser] = useState(initialUser);
   const [tab, setTab] = useState<TabKey>("overview");
@@ -325,7 +323,7 @@ export default function OwnerPanelClient({
             <span className="owner-monogram">MLM</span>
             <div>
               <h1 className="owner-title">Owner Control Panel</h1>
-              <p className="owner-sub">Area khusus akun Owner (/owner)</p>
+              <p className="owner-sub">Khusus akun Owner</p>
             </div>
           </div>
 
@@ -358,10 +356,6 @@ export default function OwnerPanelClient({
             </div>
           ) : (
             <>
-              <p className="owner-sub" style={{ marginBottom: "16px" }}>
-                Masuk dengan akun Owner untuk memantau server VPS, mengatur akun, mengisi
-                konfigurasi Firebase Google Login, dan mengubah pengaturan situs.
-              </p>
               <form onSubmit={handleOwnerLocalLogin}>
                 <label htmlFor="gateUser" className="v-label">
                   Username Owner
@@ -404,8 +398,7 @@ export default function OwnerPanelClient({
                 disabled={authBusy}
               >
                 <i className="fab fa-google" aria-hidden="true" />
-                <span>Masuk Owner via Google Firebase</span>
-                <span className="google-pill">{firebaseReady ? "Aktif" : "Belum Setup"}</span>
+                <span>Masuk dengan Google</span>
               </button>
 
               <div style={{ marginTop: "16px", textAlign: "center" }}>

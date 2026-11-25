@@ -53,7 +53,7 @@ export async function signInWithGoogleFirebase() {
   const cfg = await fetchFirebaseWebConfig();
   if (!cfg || !cfg.apiKey || !cfg.authDomain || !cfg.projectId || !cfg.appId) {
     throw new Error(
-      "Firebase belum dikonfigurasi. Owner dapat mengisi Firebase Web Config di halaman /owner (tab Firebase) atau file .env.local."
+      "Login Google belum tersedia saat ini. Masuk pakai username dan password."
     );
   }
 
@@ -68,7 +68,7 @@ export async function signInWithGoogleFirebase() {
   }
 
   if (!cachedAuth) {
-    throw new Error("Gagal menginisialisasi Firebase Auth.");
+    throw new Error("Gagal menyiapkan login Google.");
   }
 
   const provider = new GoogleAuthProvider();
@@ -84,7 +84,7 @@ export async function signInWithGoogleFirebase() {
   });
   const data = await res.json();
   if (!res.ok || !data.ok) {
-    throw new Error(data.error || "Verifikasi login Google gagal di server VPS.");
+    throw new Error(data.error || "Verifikasi login Google gagal.");
   }
   return data.user as {
     username: string;

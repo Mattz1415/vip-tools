@@ -64,12 +64,12 @@ export default function VipToolsApp() {
           </div>
         </div>
         <div className="loader-title">MATTZLM</div>
-        <div className="loader-sub">WEB TOOLS &amp; VPS</div>
+        <div className="loader-sub">WEB TOOLS</div>
         <div className="loader-bar-wrap" aria-hidden="true">
           <div className="loader-bar" />
         </div>
         <div className="loader-status" id="ldStatus">
-          MEMUAT APLIKASI...
+          MEMUAT...
         </div>
       </div>
 
@@ -122,35 +122,14 @@ export default function VipToolsApp() {
               <span className="brand-monogram">MLM</span>
             </div>
             <h1 className="auth-brand-title" id="authHeading">
-              MattzLM Web Tools
+              MattzLM
             </h1>
             <p className="auth-brand-desc">
-              45 tool harian, pengunduh media, maker gambar, dan cek jaringan yang berjalan langsung di server VPS.
+              Unduh video, olah gambar, buat shortlink, dan cek DNS atau port langsung dari browser.
             </p>
-            <ul className="auth-feature-list">
-              <li>
-                <i className="fas fa-check" aria-hidden="true" />
-                <span>45 tool aktif: jaringan VPS, downloader, maker gambar, &amp; XVIP</span>
-              </li>
-              <li>
-                <i className="fas fa-check" aria-hidden="true" />
-                <span>3 tema monokrom (Hitam, Abu, Putih) dengan kontras terbaca jelas</span>
-              </li>
-              <li>
-                <i className="fas fa-check" aria-hidden="true" />
-                <span>Login lokal atau Google, cari cepat ⌘K / Ctrl+K, &amp; panel /owner</span>
-              </li>
-            </ul>
           </div>
 
           <div className="auth-form-side">
-            <h2 className="auth-form-heading" id="authFormTitle">
-              Masuk Akun
-            </h2>
-            <p className="auth-form-sub">
-              Gunakan akun lokal atau Google untuk masuk.
-            </p>
-
             <div className="auth-mode" role="tablist" aria-label="Mode autentikasi">
               <button
                 type="button"
@@ -160,7 +139,7 @@ export default function VipToolsApp() {
                 className="mode-btn active"
                 onClick={() => callGlobal("switchAuthMode", "login")}
               >
-                LOGIN
+                Masuk
               </button>
               <button
                 type="button"
@@ -170,7 +149,7 @@ export default function VipToolsApp() {
                 className="mode-btn"
                 onClick={() => callGlobal("switchAuthMode", "register")}
               >
-                DAFTAR
+                Daftar
               </button>
             </div>
 
@@ -228,7 +207,7 @@ export default function VipToolsApp() {
               <div id="loginError" className="inline-error" role="alert" aria-live="polite" />
 
               <button type="submit" id="loginSubmitBtn" className="btn-auth mecha-cut-sm">
-                <i className="fas fa-right-to-bracket" aria-hidden="true" /> MASUK
+                <i className="fas fa-right-to-bracket" aria-hidden="true" /> Masuk
               </button>
             </form>
 
@@ -243,7 +222,7 @@ export default function VipToolsApp() {
             >
               <div className="field-stack">
                 <label htmlFor="regUser" className="field-label">
-                  Username Baru
+                  Username
                 </label>
                 <div className="input-group" id="regUserGroup">
                   <i className="fas fa-user" aria-hidden="true" />
@@ -252,7 +231,7 @@ export default function VipToolsApp() {
                     id="regUser"
                     autoComplete="username"
                     aria-describedby="regError"
-                    placeholder="Pilih username unik"
+                    placeholder="Masukkan username"
                     required
                   />
                 </div>
@@ -313,7 +292,7 @@ export default function VipToolsApp() {
               <div id="regError" className="inline-error" role="alert" aria-live="polite" />
 
               <button type="submit" id="regSubmitBtn" className="btn-auth mecha-cut-sm">
-                <i className="fas fa-user-plus" aria-hidden="true" /> BUAT AKUN
+                <i className="fas fa-user-plus" aria-hidden="true" /> Daftar
               </button>
             </form>
 
@@ -328,8 +307,7 @@ export default function VipToolsApp() {
               onClick={() => callGlobal("doGoogleLogin")}
             >
               <i className="fab fa-google" aria-hidden="true" />
-              <span id="googleLoginLabel">Masuk dengan Google (Firebase)</span>
-              <span className="google-pill" id="googleAuthStatus">Firebase</span>
+              <span id="googleLoginLabel">Masuk dengan Google</span>
             </button>
           </div>
         </div>
@@ -412,7 +390,7 @@ export default function VipToolsApp() {
               <span className="brand-name">
                 Mattz<span>LM</span>
               </span>
-              <span className="brand-tagline">WEB TOOLS VPS</span>
+              <span className="brand-tagline">WEB TOOLS</span>
             </div>
           </div>
 
@@ -537,8 +515,8 @@ export default function VipToolsApp() {
                 </div>
                 <div className="visor-hud-overlay">
                   <div className="visor-meta">
-                    <span className="visor-badge">MATTZLM // VPS</span>
-                    <span className="visor-caption">Server aktif</span>
+                    <span className="visor-badge">MATTZLM</span>
+                    <span className="visor-caption">Online</span>
                   </div>
                   <div className="visor-actions">
                     <button
