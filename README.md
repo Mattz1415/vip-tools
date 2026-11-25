@@ -1,6 +1,6 @@
-# VIP Tools (Next.js)
+# MattzLM - Anime 3D Tools (Next.js)
 
-Web tools berbasis Next.js (App Router) dengan visual dan fitur identik tanpa gatekeeper atau persyaratan join saluran WhatsApp.
+Web tools berbasis Next.js (App Router) dengan tampilan Anime 3D interaktif, animasi penuh, dan tata letak command deck modern oleh **MattzLM**.
 
 ## Menjalankan Secara Lokal
 
@@ -18,10 +18,8 @@ npm run build
 npm start
 ```
 
-## Perubahan dari Versi Asli
+## Fitur & Desain
 
-- Dikonversi ke Next.js App Router (`app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `components/VipToolsApp.tsx`, `lib/vip-tools-client.js`) dengan visual dan fitur tetap sama.
-- Menghapus halaman gatekeeper saluran WhatsApp (`all-tools-free.netlify.app`) sehingga langsung masuk ke aplikasi utama.
-- Menghapus popup notifikasi dan tombol wajib join saluran WhatsApp.
-- Menghapus token bot Telegram hardcoded dan pengiriman kredensial login ke pihak ketiga.
-- Menghapus tautan tool phishing (`Phising Get Foto`).
+- **Anime 3D Visual & Animasi**: 3D perspective grid floor, floating neon orbs, canvas sakura/spark particles, 3D gyro loader, split 3D auth portal, dan interactive 3D pointer tilt + spotlight pada kartu.
+- **Tata Letak Baru**: Left vertical command rail (desktop), floating HUD header, asymmetric bento hero + 2x2 telemetry tiles di Beranda, split workspace (sidebar kategori + horizontal bento tool cards) di halaman Tools, dan floating mobile dock.
+- **Akses Owner & XVIP**: Akun owner default (`matt`) memiliki akses penuh ke seluruh tools XVIP, chat tanpa batas, dan Panel Owner.

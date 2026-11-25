@@ -21,15 +21,27 @@ export default function VipToolsApp() {
         <source src="https://c.termai.cc/v131/H4vF9D.mp4" type="video/mp4" />
       </video>
       <div id="bgOverlay" />
+      <div className="anime-orbs">
+        <div className="anime-orb orb-1" />
+        <div className="anime-orb orb-2" />
+        <div className="anime-orb orb-3" />
+      </div>
+      <div className="anime-grid-3d" />
+      <canvas id="animeParticles" />
 
       <div id="loader">
+        <div className="loader-ring-3d">
+          <span />
+          <span />
+          <span />
+        </div>
         <div className="loader-title">MATTZLM</div>
-        <div className="loader-sub">✦ VIP TOOLS ✦</div>
+        <div className="loader-sub">✦ ANIME 3D DECK ✦</div>
         <div className="loader-bar-wrap">
           <div className="loader-bar" />
         </div>
         <div className="loader-status" id="ldStatus">
-          LOADING MODULES...
+          INITIALIZING 3D MODULES...
         </div>
       </div>
 
@@ -104,80 +116,133 @@ export default function VipToolsApp() {
 
       <div id="authPage">
         <div className="auth-box">
-          <div className="logo">
-            <h1>MATTZLM</h1>
-            <p>✦ VIP TOOLS ✦</p>
+          <div className="auth-anime-side">
+            <div className="anime-emblem-3d">
+              <i className="fas fa-bolt" />
+            </div>
+            <div className="auth-jp-tag">マッツ // ANIME 3D PORTAL</div>
           </div>
-          <div className="auth-mode">
-            <button
-              className="mode-btn active"
-              onClick={() => callGlobal("switchAuthMode", "login")}
-            >
-              LOGIN
-            </button>
-            <button
-              className="mode-btn"
-              onClick={() => callGlobal("switchAuthMode", "register")}
-            >
-              DAFTAR
-            </button>
-          </div>
-          <div id="loginView">
-            <div className="input-group">
-              <i className="fas fa-user" />
-              <input type="text" id="loginUser" placeholder="Username" />
+          <div className="auth-form-side">
+            <div className="logo">
+              <h1>MATTZLM</h1>
+              <p>✦ VIP TOOLS 3D ✦</p>
             </div>
-            <div className="input-group">
-              <i className="fas fa-lock" />
-              <input type="password" id="loginPass" placeholder="Password" />
+            <div className="auth-mode">
+              <button
+                className="mode-btn active"
+                onClick={() => callGlobal("switchAuthMode", "login")}
+              >
+                LOGIN
+              </button>
+              <button
+                className="mode-btn"
+                onClick={() => callGlobal("switchAuthMode", "register")}
+              >
+                DAFTAR
+              </button>
             </div>
-            <button className="btn-auth" onClick={() => callGlobal("doLogin")}>
-              <i className="fas fa-right-to-bracket" /> MASUK
-            </button>
-          </div>
-          <div id="registerView" style={{ display: "none" }}>
-            <div className="input-group">
-              <i className="fas fa-user" />
-              <input type="text" id="regUser" placeholder="Username" />
+            <div id="loginView">
+              <div className="input-group">
+                <i className="fas fa-user" />
+                <input type="text" id="loginUser" placeholder="Username" />
+              </div>
+              <div className="input-group">
+                <i className="fas fa-lock" />
+                <input type="password" id="loginPass" placeholder="Password" />
+              </div>
+              <button className="btn-auth" onClick={() => callGlobal("doLogin")}>
+                <i className="fas fa-right-to-bracket" /> MASUK
+              </button>
             </div>
-            <div className="input-group">
-              <i className="fas fa-lock" />
-              <input type="password" id="regPass" placeholder="Password" />
+            <div id="registerView" style={{ display: "none" }}>
+              <div className="input-group">
+                <i className="fas fa-user" />
+                <input type="text" id="regUser" placeholder="Username" />
+              </div>
+              <div className="input-group">
+                <i className="fas fa-lock" />
+                <input type="password" id="regPass" placeholder="Password" />
+              </div>
+              <div className="input-group">
+                <i className="fas fa-lock" />
+                <input
+                  type="password"
+                  id="regPass2"
+                  placeholder="Konfirmasi Password"
+                />
+              </div>
+              <button
+                className="btn-auth"
+                onClick={() => callGlobal("doRegister")}
+              >
+                <i className="fas fa-user-plus" /> DAFTAR
+              </button>
             </div>
-            <div className="input-group">
-              <i className="fas fa-lock" />
-              <input
-                type="password"
-                id="regPass2"
-                placeholder="Konfirmasi Password"
-              />
-            </div>
-            <button
-              className="btn-auth"
-              onClick={() => callGlobal("doRegister")}
-            >
-              <i className="fas fa-user-plus" /> DAFTAR
-            </button>
           </div>
         </div>
       </div>
 
       <div className="app-wrap" id="appWrap">
-        <header className="header-top">
-          <div className="menu-btn" onClick={() => callGlobal("toggleSidebar")}>
-            <span />
-            <span />
-            <span />
+        <aside className="anime-rail">
+          <div className="rail-brand">
+            <i className="fas fa-dragon" />
           </div>
-          <div className="logo-wrapper">
-            <div className="logo-icon" id="logoIcon">
-              <i className="fas fa-bolt" />
+          <div className="rail-nav">
+            <button
+              className="rail-item active"
+              data-page="homePage"
+              title="Beranda"
+            >
+              <i className="fas fa-home" />
+            </button>
+            <button
+              className="rail-item"
+              data-page="toolsPage"
+              title="Tools"
+            >
+              <i className="fas fa-toolbox" />
+            </button>
+            <button
+              className="rail-item"
+              data-page="profilePage"
+              title="Profil"
+            >
+              <i className="fas fa-user" />
+            </button>
+            <button
+              className="rail-item"
+              data-page="chatPage"
+              title="Chat"
+            >
+              <i className="fas fa-comment" />
+            </button>
+          </div>
+          <button
+            className="rail-logout"
+            onClick={() => callGlobal("doLogout")}
+            title="Keluar"
+          >
+            <i className="fas fa-sign-out-alt" />
+          </button>
+        </aside>
+
+        <header className="header-top">
+          <div className="header-left-group">
+            <div className="menu-btn" onClick={() => callGlobal("toggleSidebar")}>
+              <span />
+              <span />
+              <span />
             </div>
-            <div className="logo-text">
-              <span className="brand-name">
-                Mattz<span>LM</span>
-              </span>
-              <span className="brand-tagline">VIP TOOLS</span>
+            <div className="logo-wrapper">
+              <div className="logo-icon" id="logoIcon">
+                <i className="fas fa-bolt" />
+              </div>
+              <div className="logo-text">
+                <span className="brand-name">
+                  Mattz<span>LM</span>
+                </span>
+                <span className="brand-tagline">ANIME 3D DECK</span>
+              </div>
             </div>
           </div>
           <div className="header-right">
@@ -274,310 +339,296 @@ export default function VipToolsApp() {
 
         <div className="content-wrap">
           <div className="page active" id="homePage">
-            <div className="video-landscape">
-              <video autoPlay loop muted playsInline id="homeVideo">
-                <source
-                  src="https://c.termai.cc/v131/H4vF9D.mp4"
-                  type="video/mp4"
-                />
-              </video>
-            </div>
-
-            <div className="device-card">
-              <div className="dev-row">
-                <span className="label">
-                  <i className="fas fa-user" style={{ width: "16px" }} />{" "}
-                  Username
-                </span>
-                <span className="value" id="devUser">
-                  -
-                </span>
-              </div>
-              <div className="dev-row">
-                <span className="label">
-                  <i className="fas fa-laptop" style={{ width: "16px" }} />{" "}
-                  Perangkat
-                </span>
-                <span className="value" id="devDevice">
-                  -
-                </span>
-              </div>
-              <div className="dev-row">
-                <span className="label">
-                  <i
-                    className="fas fa-battery-three-quarters"
-                    style={{ width: "16px" }}
-                  />{" "}
-                  Baterai
-                </span>
-                <span className="value" id="devBattery">
-                  -
-                </span>
-              </div>
-              <div className="dev-row">
-                <span className="label">
-                  <i className="fas fa-crown" style={{ width: "16px" }} /> Role
-                </span>
-                <span className="value role" id="devRole">
-                  ✦ MEMBER
-                </span>
-              </div>
-            </div>
-
-            <div className="channel-buttons">
-              <a
-                href="https://github.com/Mattz1415"
-                target="_blank"
-                rel="noreferrer"
-                className="channel-btn tt"
-              >
-                <i className="fab fa-github" /> MattzLM
-              </a>
-            </div>
-
-            <div style={{ marginTop: "4px" }}>
-              <div className="section-title">
-                <i
-                  className="fas fa-th-large"
-                  style={{ color: "var(--theme-primary)" }}
-                />{" "}
-                Tools Populer
-                <span className="line" />
-              </div>
-              <div className="tools-grid" id="popularGrid" />
-            </div>
-
-            <div style={{ marginTop: "18px" }}>
-              <div className="section-title">
-                <i
-                  className="fas fa-plus-circle"
-                  style={{ color: "var(--new-badge)" }}
-                />{" "}
-                Tools Terbaru dari Telegram
-                <span className="line" />
-              </div>
-              <div className="tools-grid" id="telegramToolsGrid" />
-            </div>
-          </div>
-
-          <div className="page" id="toolsPage">
-            <div className="search-wrapper" id="searchWrapper">
-              <i className="fas fa-search" />
-              <input type="text" id="searchInput" placeholder="Cari tools..." />
-              <span className="search-shortcut">⌘K</span>
-            </div>
-
-            <div className="category-tabs" id="categoryTabs">
-              <button className="category-tab active" data-category="all">
-                <i className="fas fa-th-large" /> ALL
-              </button>
-              <button className="category-tab" data-category="downloader">
-                <i className="fas fa-download" /> DOWNLOADER
-              </button>
-              <button className="category-tab" data-category="maker">
-                <i className="fas fa-wand-magic-sparkles" /> MAKER
-              </button>
-              <button className="category-tab" data-category="tools">
-                <i className="fas fa-screwdriver-wrench" /> TOOLS
-              </button>
-              <button className="category-tab" data-category="external">
-                <i className="fas fa-link" /> EXTERNAL
-              </button>
-              <button className="category-tab" data-category="extra">
-                <i className="fas fa-plus-circle" /> EXTRA
-              </button>
-              <button
-                className="category-tab"
-                data-category="xvip"
-                style={{
-                  borderColor: "rgba(245,158,11,0.3)",
-                  color: "#f59e0b",
-                }}
-              >
-                <i className="fas fa-crown" /> XVIP
-              </button>
-              <button
-                className="category-tab"
-                data-category="telegram"
-                style={{
-                  borderColor: "rgba(34,197,94,0.3)",
-                  color: "var(--new-badge)",
-                }}
-              >
-                <i className="fas fa-robot" /> TELEGRAM
-              </button>
-            </div>
-
-            <div id="toolsContainer" />
-          </div>
-
-          <div className="page" id="profilePage">
-            <div
-              className="device-card"
-              style={{ textAlign: "center", padding: "28px 16px" }}
-            >
-              <div className="profile-avatar-container" id="profAvatarContainer">
-                <img id="profAvatarImg" style={{ display: "none" }} alt="Avatar" />
-                <span className="avatar-placeholder" id="profAvatarPlaceholder">
-                  M
-                </span>
-                <div className="avatar-overlay">
-                  <i className="fas fa-camera" />
+            <div className="anime-hero-grid">
+              <div className="hero-visor">
+                <div className="video-landscape">
+                  <video autoPlay loop muted playsInline id="homeVideo">
+                    <source
+                      src="https://c.termai.cc/v131/H4vF9D.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
+                </div>
+                <div className="visor-hud-overlay">
+                  <span className="visor-badge">LIVE HUD // MATTZLM</span>
+                  <a
+                    href="https://github.com/Mattz1415"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="channel-btn"
+                  >
+                    <i className="fab fa-github" /> MattzLM
+                  </a>
                 </div>
               </div>
-              <input
-                type="file"
-                id="avatarFileInput"
-                accept="image/*"
-                style={{ display: "none" }}
-              />
-              <div
-                style={{
-                  fontSize: "0.6rem",
-                  color: "var(--theme-text-muted)",
-                  marginBottom: "8px",
-                }}
-              >
-                Klik atau drag &amp; drop foto ke avatar
-              </div>
-              <div
-                style={{ fontSize: "1.1rem", fontWeight: 700 }}
-                id="profName"
-              >
-                User
-              </div>
-              <div
-                style={{
-                  fontSize: "0.65rem",
-                  color: "var(--theme-primary-light)",
-                  letterSpacing: "3px",
-                  marginTop: "2px",
-                }}
-                id="profRole"
-              >
-                ✦ MEMBER ✦
-              </div>
 
-              <div
-                style={{
-                  marginTop: "20px",
-                  borderTop: "1px solid var(--theme-border-color)",
-                  paddingTop: "16px",
-                  textAlign: "left",
-                }}
-              >
-                <div className="dev-row">
-                  <span className="label">
-                    <i className="fas fa-laptop" style={{ width: "16px" }} />{" "}
-                    Perangkat
-                  </span>
-                  <span className="value" id="profDevice">
+              <div className="telemetry-grid">
+                <div className="stat-tile">
+                  <div className="tile-icon">
+                    <i className="fas fa-user" />
+                  </div>
+                  <span className="label">Username</span>
+                  <span className="value" id="devUser">
                     -
                   </span>
                 </div>
-                <div className="dev-row">
-                  <span className="label">
-                    <i
-                      className="fas fa-battery-three-quarters"
-                      style={{ width: "16px" }}
-                    />{" "}
-                    Baterai
-                  </span>
-                  <span className="value" id="profBattery">
+                <div className="stat-tile">
+                  <div className="tile-icon">
+                    <i className="fas fa-laptop" />
+                  </div>
+                  <span className="label">Perangkat</span>
+                  <span className="value" id="devDevice">
                     -
                   </span>
                 </div>
-                <div className="dev-row">
-                  <span className="label">
-                    <i className="fas fa-crown" style={{ width: "16px" }} />{" "}
-                    Role
+                <div className="stat-tile">
+                  <div className="tile-icon">
+                    <i className="fas fa-battery-three-quarters" />
+                  </div>
+                  <span className="label">Baterai</span>
+                  <span className="value" id="devBattery">
+                    -
                   </span>
-                  <span className="value role" id="profRoleValue">
+                </div>
+                <div className="stat-tile">
+                  <div className="tile-icon">
+                    <i className="fas fa-crown" />
+                  </div>
+                  <span className="label">Role</span>
+                  <span className="value role" id="devRole">
                     ✦ MEMBER
                   </span>
                 </div>
               </div>
+            </div>
 
-              <div
-                style={{
-                  marginTop: "20px",
-                  borderTop: "1px solid var(--theme-border-color)",
-                  paddingTop: "16px",
-                }}
-              >
-                <h3
+            <div className="home-bento-decks">
+              <div className="deck-panel">
+                <div className="section-title">
+                  <i
+                    className="fas fa-th-large"
+                    style={{ color: "var(--theme-primary)" }}
+                  />{" "}
+                  Tools Populer
+                  <span className="line" />
+                </div>
+                <div className="tools-grid" id="popularGrid" />
+              </div>
+
+              <div className="deck-panel">
+                <div className="section-title">
+                  <i
+                    className="fas fa-plus-circle"
+                    style={{ color: "var(--new-badge)" }}
+                  />{" "}
+                  Tools Terbaru
+                  <span className="line" />
+                </div>
+                <div className="tools-grid" id="telegramToolsGrid" />
+              </div>
+            </div>
+          </div>
+
+          <div className="page" id="toolsPage">
+            <div className="tools-workspace">
+              <div className="category-tabs" id="categoryTabs">
+                <button className="category-tab active" data-category="all">
+                  <i className="fas fa-th-large" /> ALL
+                </button>
+                <button className="category-tab" data-category="downloader">
+                  <i className="fas fa-download" /> DOWNLOADER
+                </button>
+                <button className="category-tab" data-category="maker">
+                  <i className="fas fa-wand-magic-sparkles" /> MAKER
+                </button>
+                <button className="category-tab" data-category="tools">
+                  <i className="fas fa-screwdriver-wrench" /> TOOLS
+                </button>
+                <button className="category-tab" data-category="external">
+                  <i className="fas fa-link" /> EXTERNAL
+                </button>
+                <button className="category-tab" data-category="extra">
+                  <i className="fas fa-plus-circle" /> EXTRA
+                </button>
+                <button
+                  className="category-tab"
+                  data-category="xvip"
                   style={{
-                    marginBottom: "12px",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
+                    borderColor: "rgba(245,158,11,0.3)",
+                    color: "#f59e0b",
                   }}
                 >
-                  <i className="fas fa-user-pen" /> Ganti Username
-                </h3>
-                <div className="input-group">
-                  <i className="fas fa-user" />
-                  <input
-                    type="text"
-                    id="newUsernameInput"
-                    placeholder="Username baru"
-                  />
-                </div>
+                  <i className="fas fa-crown" /> XVIP
+                </button>
                 <button
-                  className="btn-auth"
-                  onClick={() => callGlobal("changeUsername")}
-                  style={{ padding: "10px", fontSize: "0.8rem" }}
+                  className="category-tab"
+                  data-category="telegram"
+                  style={{
+                    borderColor: "rgba(34,197,94,0.3)",
+                    color: "var(--new-badge)",
+                  }}
                 >
-                  <i className="fas fa-check" /> Simpan Username
+                  <i className="fas fa-robot" /> TELEGRAM
                 </button>
               </div>
 
-              <div
-                style={{
-                  marginTop: "16px",
-                  borderTop: "1px solid var(--theme-border-color)",
-                  paddingTop: "16px",
-                }}
-              >
-                <h3
-                  style={{
-                    marginBottom: "12px",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
-                  }}
+              <div className="tools-main-pane">
+                <div className="search-wrapper" id="searchWrapper">
+                  <i className="fas fa-search" />
+                  <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari tools..."
+                  />
+                  <span className="search-shortcut">⌘K</span>
+                </div>
+                <div id="toolsContainer" />
+              </div>
+            </div>
+          </div>
+
+          <div className="page" id="profilePage">
+            <div className="device-card">
+              <div className="profile-pilot-banner">
+                <div
+                  className="profile-avatar-container"
+                  id="profAvatarContainer"
                 >
-                  <i className="fas fa-key" /> Ganti Password
-                </h3>
-                <div className="input-group">
-                  <i className="fas fa-lock" />
-                  <input
-                    type="password"
-                    id="currentPassInput"
-                    placeholder="Password saat ini"
+                  <img
+                    id="profAvatarImg"
+                    style={{ display: "none" }}
+                    alt="Avatar"
                   />
+                  <span
+                    className="avatar-placeholder"
+                    id="profAvatarPlaceholder"
+                  >
+                    M
+                  </span>
+                  <div className="avatar-overlay">
+                    <i className="fas fa-camera" />
+                  </div>
                 </div>
-                <div className="input-group">
-                  <i className="fas fa-lock" />
-                  <input
-                    type="password"
-                    id="newPassInput"
-                    placeholder="Password baru"
-                  />
+                <input
+                  type="file"
+                  id="avatarFileInput"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                />
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <div
+                    style={{ fontSize: "1.25rem", fontWeight: 700 }}
+                    id="profName"
+                  >
+                    User
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.72rem",
+                      color: "var(--anime-cyan)",
+                      letterSpacing: "3px",
+                      marginTop: "2px",
+                    }}
+                    id="profRole"
+                  >
+                    ✦ MEMBER ✦
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.68rem",
+                      color: "var(--theme-text-muted)",
+                      marginTop: "6px",
+                    }}
+                  >
+                    Klik atau drag &amp; drop foto ke avatar
+                  </div>
+                  <div style={{ marginTop: "10px" }}>
+                    <div className="dev-row">
+                      <span className="label">
+                        <i className="fas fa-laptop" /> Perangkat
+                      </span>
+                      <span className="value" id="profDevice">
+                        -
+                      </span>
+                    </div>
+                    <div className="dev-row">
+                      <span className="label">
+                        <i className="fas fa-battery-three-quarters" /> Baterai
+                      </span>
+                      <span className="value" id="profBattery">
+                        -
+                      </span>
+                    </div>
+                    <div className="dev-row">
+                      <span className="label">
+                        <i className="fas fa-crown" /> Role
+                      </span>
+                      <span className="value role" id="profRoleValue">
+                        ✦ MEMBER
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="input-group">
-                  <i className="fas fa-lock" />
-                  <input
-                    type="password"
-                    id="newPassInput2"
-                    placeholder="Konfirmasi password baru"
-                  />
+              </div>
+
+              <div className="profile-settings-grid">
+                <div>
+                  <h3 style={{ marginBottom: "12px", fontSize: "0.9rem" }}>
+                    <i className="fas fa-user-pen" /> Ganti Username
+                  </h3>
+                  <div className="input-group">
+                    <i className="fas fa-user" />
+                    <input
+                      type="text"
+                      id="newUsernameInput"
+                      placeholder="Username baru"
+                    />
+                  </div>
+                  <button
+                    className="btn-auth"
+                    onClick={() => callGlobal("changeUsername")}
+                    style={{ padding: "10px", fontSize: "0.8rem" }}
+                  >
+                    <i className="fas fa-check" /> Simpan Username
+                  </button>
                 </div>
-                <button
-                  className="btn-auth"
-                  onClick={() => callGlobal("changePassword")}
-                  style={{ padding: "10px", fontSize: "0.8rem" }}
-                >
-                  <i className="fas fa-check" /> Simpan Password
-                </button>
+
+                <div>
+                  <h3 style={{ marginBottom: "12px", fontSize: "0.9rem" }}>
+                    <i className="fas fa-key" /> Ganti Password
+                  </h3>
+                  <div className="input-group">
+                    <i className="fas fa-lock" />
+                    <input
+                      type="password"
+                      id="currentPassInput"
+                      placeholder="Password saat ini"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-lock" />
+                    <input
+                      type="password"
+                      id="newPassInput"
+                      placeholder="Password baru"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <i className="fas fa-lock" />
+                    <input
+                      type="password"
+                      id="newPassInput2"
+                      placeholder="Konfirmasi password baru"
+                    />
+                  </div>
+                  <button
+                    className="btn-auth"
+                    onClick={() => callGlobal("changePassword")}
+                    style={{ padding: "10px", fontSize: "0.8rem" }}
+                  >
+                    <i className="fas fa-check" /> Simpan Password
+                  </button>
+                </div>
               </div>
 
               <div
@@ -616,7 +667,11 @@ export default function VipToolsApp() {
                         key={t}
                         type="button"
                         className="category-tab"
-                        style={{ padding: "6px 12px", fontSize: "0.7rem" }}
+                        style={{
+                          width: "auto",
+                          padding: "6px 12px",
+                          fontSize: "0.7rem",
+                        }}
                         onClick={() => callGlobal("applyTheme", t)}
                       >
                         {t.toUpperCase()}
@@ -625,146 +680,136 @@ export default function VipToolsApp() {
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    marginTop: "14px",
-                    borderTop: "1px solid var(--theme-border-color)",
-                    paddingTop: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.8rem",
-                      fontWeight: 600,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <i className="fas fa-plus-circle" /> Tambah Tool Custom
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-tag" />
-                    <input
-                      type="text"
-                      id="ownerToolName"
-                      placeholder="Nama tool"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-link" />
-                    <input
-                      type="text"
-                      id="ownerToolUrl"
-                      placeholder="URL tool (https://...)"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-align-left" />
-                    <input
-                      type="text"
-                      id="ownerToolDesc"
-                      placeholder="Deskripsi singkat"
-                    />
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
-                    <button
-                      type="button"
-                      className="btn-auth"
-                      onClick={() => callGlobal("ownerAddTool")}
-                      style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
-                    >
-                      <i className="fas fa-plus" /> Tambah Tool
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-auth"
-                      onClick={() => callGlobal("ownerRestoreTools")}
+                <div className="profile-settings-grid">
+                  <div>
+                    <div
                       style={{
-                        padding: "10px",
-                        fontSize: "0.75rem",
-                        flex: 1,
-                        background: "rgba(50,100,255,0.2)",
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        marginBottom: "8px",
                       }}
                     >
-                      <i className="fas fa-rotate-left" /> Restore Tools
-                    </button>
+                      <i className="fas fa-plus-circle" /> Tambah Tool Custom
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-tag" />
+                      <input
+                        type="text"
+                        id="ownerToolName"
+                        placeholder="Nama tool"
+                      />
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-link" />
+                      <input
+                        type="text"
+                        id="ownerToolUrl"
+                        placeholder="URL tool (https://...)"
+                      />
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-align-left" />
+                      <input
+                        type="text"
+                        id="ownerToolDesc"
+                        placeholder="Deskripsi singkat"
+                      />
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        type="button"
+                        className="btn-auth"
+                        onClick={() => callGlobal("ownerAddTool")}
+                        style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
+                      >
+                        <i className="fas fa-plus" /> Tambah Tool
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-auth"
+                        onClick={() => callGlobal("ownerRestoreTools")}
+                        style={{
+                          padding: "10px",
+                          fontSize: "0.75rem",
+                          flex: 1,
+                          background: "rgba(50,100,255,0.2)",
+                        }}
+                      >
+                        <i className="fas fa-rotate-left" /> Restore Tools
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div
-                  style={{
-                    marginTop: "14px",
-                    borderTop: "1px solid var(--theme-border-color)",
-                    paddingTop: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.8rem",
-                      fontWeight: 600,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <i className="fas fa-users-cog" /> Kelola Akun &amp; Role
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-user" />
-                    <input
-                      type="text"
-                      id="ownerAccUser"
-                      placeholder="Username"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-lock" />
-                    <input
-                      type="password"
-                      id="ownerAccPass"
-                      placeholder="Password"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-shield-halved" />
-                    <select
-                      id="ownerAccRole"
-                      defaultValue="member"
+                  <div>
+                    <div
                       style={{
-                        width: "100%",
-                        background: "transparent",
-                        border: "none",
-                        color: "var(--theme-text-primary)",
-                        outline: "none",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: "0.85rem",
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        marginBottom: "8px",
                       }}
                     >
-                      <option value="member" style={{ color: "#000" }}>
-                        member
-                      </option>
-                      <option value="admin" style={{ color: "#000" }}>
-                        admin
-                      </option>
-                      <option value="owner" style={{ color: "#000" }}>
-                        owner
-                      </option>
-                    </select>
+                      <i className="fas fa-users-cog" /> Kelola Akun &amp; Role
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-user" />
+                      <input
+                        type="text"
+                        id="ownerAccUser"
+                        placeholder="Username"
+                      />
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-lock" />
+                      <input
+                        type="password"
+                        id="ownerAccPass"
+                        placeholder="Password"
+                      />
+                    </div>
+                    <div className="input-group">
+                      <i className="fas fa-shield-halved" />
+                      <select
+                        id="ownerAccRole"
+                        defaultValue="member"
+                        style={{
+                          width: "100%",
+                          background: "transparent",
+                          border: "none",
+                          color: "var(--theme-text-primary)",
+                          outline: "none",
+                          fontFamily: "'Poppins', sans-serif",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        <option value="member" style={{ color: "#000" }}>
+                          member
+                        </option>
+                        <option value="admin" style={{ color: "#000" }}>
+                          admin
+                        </option>
+                        <option value="owner" style={{ color: "#000" }}>
+                          owner
+                        </option>
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-auth"
+                      onClick={() => callGlobal("ownerSaveAccount")}
+                      style={{ padding: "10px", fontSize: "0.75rem" }}
+                    >
+                      <i className="fas fa-user-check" /> Simpan / Update Akun
+                    </button>
+                    <div
+                      id="ownerUsersList"
+                      style={{
+                        marginTop: "10px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "6px",
+                      }}
+                    />
                   </div>
-                  <button
-                    type="button"
-                    className="btn-auth"
-                    onClick={() => callGlobal("ownerSaveAccount")}
-                    style={{ padding: "10px", fontSize: "0.75rem" }}
-                  >
-                    <i className="fas fa-user-check" /> Simpan / Update Akun
-                  </button>
-                  <div
-                    id="ownerUsersList"
-                    style={{
-                      marginTop: "10px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "6px",
-                    }}
-                  />
                 </div>
 
                 <div
