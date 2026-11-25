@@ -390,10 +390,10 @@ export default function VipToolsApp() {
               id="themeToggleBtn"
               onClick={() => callGlobal("toggleSpecialTheme")}
               aria-pressed="false"
-              aria-label="Ganti tema antara mode standar dan silver"
+              aria-label="Ganti palet warna antara Hitam, Abu, dan Putih"
             >
               <i className="fas fa-circle-half-stroke" aria-hidden="true" />
-              <span className="header-btn-text">Tema</span>
+              <span className="header-btn-text" id="themeToggleLabel">Hitam</span>
             </button>
 
             <button
@@ -857,15 +857,15 @@ export default function VipToolsApp() {
                 </h2>
 
                 <div className="field-stack">
-                  <span className="field-label">Pilih Tema Website</span>
-                  <div className="owner-theme-row" role="group" aria-label="Pilihan tema website">
-                    {["biru", "merah", "hitam", "putih", "silver"].map((t) => (
+                  <span className="field-label">Pilih Palet Warna (Hitam / Abu / Putih)</span>
+                  <div className="owner-theme-row" role="group" aria-label="Pilihan palet tema website">
+                    {["hitam", "abu", "putih"].map((t) => (
                       <button
                         key={t}
                         type="button"
                         className="theme-chip-btn"
                         data-theme-btn={t}
-                        aria-pressed="false"
+                        aria-pressed={t === "hitam" ? "true" : "false"}
                         onClick={() => callGlobal("applyTheme", t)}
                       >
                         {t.toUpperCase()}
