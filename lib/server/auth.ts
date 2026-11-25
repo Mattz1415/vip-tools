@@ -117,6 +117,33 @@ export async function requireAuthUser() {
   return { user, error: null };
 }
 
+export function hasXvipRole(role: string | undefined | null): boolean {
+  return role === "owner" || role === "admin" || role === "xvip";
+}
+
+export async function requireXvipUser() {
+  const user = await getCurrentSessionUser();
+  if (!user) {
+    return {
+      user: null,
+      error: NextResponse.json(
+        { ok: false, error: "Sesi tidak aktif. Masuk dengan akun XVIP, Admin, atau Owner." },
+        { status: 401 }
+      ),
+    };
+  }
+  if (!hasXvipRole(user.role)) {
+    return {
+      user: null,
+      error: NextResponse.json(
+        { ok: false, error: "Akses ditolak. Fitur XVIP khusus role XVIP, Admin, atau Owner." },
+        { status: 403 }
+      ),
+    };
+  }
+  return { user, error: null };
+}
+
 export async function requireOwnerUser() {
   const user = await getCurrentSessionUser();
   if (!user) {

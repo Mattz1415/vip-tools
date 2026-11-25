@@ -7,7 +7,7 @@ import {
   type UserRole,
 } from "@/lib/server/store";
 
-const VALID_ROLES: UserRole[] = ["member", "admin", "owner"];
+const VALID_ROLES: UserRole[] = ["member", "xvip", "admin", "owner"];
 
 export async function POST(req: NextRequest) {
   const { user: actor, error } = await requireOwnerUser();

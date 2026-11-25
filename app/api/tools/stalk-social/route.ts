@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireXvipUser } from "@/lib/server/auth";
 
 function decodeEntities(str: string): string {
   return str
@@ -175,6 +176,9 @@ async function stalkInstagram(user: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const { error } = await requireXvipUser();
+  if (error) return error;
+
   try {
     const body = await req.json();
     const platform = String(body?.platform || "github").toLowerCase();

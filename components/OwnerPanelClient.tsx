@@ -6,7 +6,7 @@ import { signInWithGoogleFirebase, signOutFirebaseQuietly } from "@/lib/firebase
 
 interface PublicUser {
   username: string;
-  role: "owner" | "admin" | "member";
+  role: "owner" | "admin" | "xvip" | "member";
   provider: "local" | "google";
   email: string;
   displayName: string;
@@ -113,11 +113,29 @@ const BUILTIN_TOOL_IDS = [
   { id: "vps_paste", name: "VPS Code Paste" },
   { id: "vps_imgconv", name: "Image Compressor & Converter (VPS)" },
   { id: "vps_status", name: "VPS Server Telemetry" },
+  { id: "vps_seo", name: "SEO & OpenGraph Inspector (VPS)" },
+  { id: "vps_secheaders", name: "Security Headers Grader (VPS)" },
+  { id: "vps_redirect", name: "Redirect & Link Checker (VPS)" },
+  { id: "vps_sitemap", name: "Robots & Sitemap Parser (VPS)" },
+  { id: "vps_emailcheck", name: "Email MX / SPF / DMARC Check (VPS)" },
+  { id: "vps_uptime", name: "HTTP Latency & Uptime Probe (VPS)" },
+  { id: "vps_techstack", name: "Web Tech Stack Detector (VPS)" },
+  { id: "vps_markdown", name: "Webpage to Markdown (VPS)" },
+  { id: "vps_rss", name: "RSS & Atom Feed Reader (VPS)" },
+  { id: "vps_currency", name: "Live Currency Converter (VPS)" },
   { id: "iqc", name: "IQC Generator" },
   { id: "tanyaustadz", name: "Tanya Ustadz Meme" },
   { id: "sertifikat", name: "Sertifikat Lucu" },
   { id: "brat", name: "BRAT Generator" },
   { id: "fakeig", name: "Fake IG Post" },
+  { id: "img_exif", name: "EXIF Inspector & Stripper (VPS)" },
+  { id: "img_watermark", name: "Image Watermark Studio (VPS)" },
+  { id: "img_socialcrop", name: "Social Media Smart Crop (VPS)" },
+  { id: "img_palette", name: "Color Palette Extractor (VPS)" },
+  { id: "img_favicon", name: "Favicon Pack Generator (VPS)" },
+  { id: "img_filters", name: "Photo Filter & Rotate Studio (VPS)" },
+  { id: "img_svg2png", name: "SVG to PNG Rasterizer (VPS)" },
+  { id: "doc_img2pdf", name: "Images to Multi-Page PDF (VPS)" },
   { id: "qr", name: "QR Generator" },
   { id: "removebg", name: "Remove BG (VPS)" },
   { id: "enhancer", name: "Image Enhancer (VPS)" },
@@ -126,6 +144,18 @@ const BUILTIN_TOOL_IDS = [
   { id: "calc", name: "Calculator" },
   { id: "pwgen", name: "Password Gen" },
   { id: "morse", name: "Morse Code" },
+  { id: "doc_invoice", name: "Invoice PDF Generator (VPS)" },
+  { id: "dev_jwt", name: "JWT Decoder & Signer (VPS)" },
+  { id: "dev_hash", name: "Multi-Hash & File Checksum (VPS)" },
+  { id: "dev_encrypt", name: "AES-256-GCM Encryptor (VPS)" },
+  { id: "dev_uuid", name: "UUID v7 / ULID / NanoID Gen (VPS)" },
+  { id: "dev_compress", name: "Gzip & Brotli Compressor (VPS)" },
+  { id: "qr_pro", name: "QR Pro WiFi / WA / vCard (VPS)" },
+  { id: "dev_csvjson", name: "CSV / JSON / Markdown Table (VPS)" },
+  { id: "dev_diff", name: "Text & Code Diff Checker (VPS)" },
+  { id: "dev_regex", name: "Regex Tester & Replacer (VPS)" },
+  { id: "dev_cron", name: "Cron Schedule Simulator (VPS)" },
+  { id: "net_subnet", name: "IPv4 CIDR Subnet Calc (VPS)" },
   { id: "xvip_unband", name: "XVIP Unban WA" },
   { id: "xvip_getcode", name: "XVIP Get HTML/CSS/JS" },
   { id: "xvip_nglspam", name: "XVIP NGL Sender" },
@@ -146,7 +176,7 @@ function formatUptime(sec: number): string {
 export default function OwnerPanelClient({
   initialUser,
 }: {
-  initialUser: { username: string; role: "owner" | "admin" | "member"; email?: string } | null;
+  initialUser: { username: string; role: "owner" | "admin" | "xvip" | "member"; email?: string } | null;
 }) {
   const [user, setUser] = useState(initialUser);
   const [tab, setTab] = useState<TabKey>("overview");
@@ -162,7 +192,7 @@ export default function OwnerPanelClient({
   // Form states
   const [accUser, setAccUser] = useState("");
   const [accPass, setAccPass] = useState("");
-  const [accRole, setAccRole] = useState<"member" | "admin" | "owner">("member");
+  const [accRole, setAccRole] = useState<"member" | "xvip" | "admin" | "owner">("member");
   const [ownerEmailsText, setOwnerEmailsText] = useState("");
 
   const [toolName, setToolName] = useState("");
@@ -602,11 +632,12 @@ export default function OwnerPanelClient({
                     id="ownAccRole"
                     className="v-input"
                     value={accRole}
-                    onChange={(e) => setAccRole(e.target.value as "member" | "admin" | "owner")}
+                    onChange={(e) => setAccRole(e.target.value as "member" | "xvip" | "admin" | "owner")}
                   >
                     <option value="member">member</option>
-                    <option value="admin">admin</option>
-                    <option value="owner">owner</option>
+                    <option value="xvip">xvip (akses XVIP)</option>
+                    <option value="admin">admin (akses XVIP)</option>
+                    <option value="owner">owner (akses penuh)</option>
                   </select>
                   <button
                     type="button"

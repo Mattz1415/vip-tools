@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireXvipUser } from "@/lib/server/auth";
 import { assertPublicHttpUrl } from "@/lib/server/net-guard";
 
 export async function POST(req: NextRequest) {
+  const { error } = await requireXvipUser();
+  if (error) return error;
+
   try {
     const body = await req.json();
     const rawUrl = String(body?.url || "").trim();

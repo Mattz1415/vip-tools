@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-export type UserRole = "owner" | "admin" | "member";
+export type UserRole = "owner" | "admin" | "xvip" | "member";
 export type ThemeKey = "hitam" | "abu" | "putih";
 export type StorageMode = "vps-disk" | "tmp-disk" | "memory";
 

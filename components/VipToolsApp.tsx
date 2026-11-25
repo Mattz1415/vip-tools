@@ -997,6 +997,7 @@ export default function VipToolsApp() {
                         <i className="fas fa-shield-halved" aria-hidden="true" />
                         <select id="ownerAccRole" defaultValue="member">
                           <option value="member">member</option>
+                          <option value="xvip">xvip</option>
                           <option value="admin">admin</option>
                           <option value="owner">owner</option>
                         </select>

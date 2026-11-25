@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { NextRequest, NextResponse } from "next/server";
+import { requireXvipUser } from "@/lib/server/auth";
 import { assertPublicHttpUrl } from "@/lib/server/net-guard";
 import { getYtCookiesPath, hasYtCookies } from "@/lib/server/store";
 
@@ -205,6 +206,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const rawUrl = String(body?.url || "").trim();
     const platformHint = String(body?.platform || "auto").toLowerCase();
+
+    if (body?.xvip === true || platformHint === "all") {
+      const { error } = await requireXvipUser();
+      if (error) return error;
+    }
 
     if (!rawUrl) {
       return NextResponse.json({ ok: false, error: "URL media wajib diisi." }, { status: 400 });

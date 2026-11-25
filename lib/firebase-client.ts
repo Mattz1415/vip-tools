@@ -88,7 +88,7 @@ export async function signInWithGoogleFirebase() {
   }
   return data.user as {
     username: string;
-    role: "owner" | "admin" | "member";
+    role: "owner" | "admin" | "xvip" | "member";
     email: string;
     displayName: string;
     photoUrl: string;

@@ -1,7 +1,11 @@
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { requireXvipUser } from "@/lib/server/auth";
 
 export async function POST(req: NextRequest) {
+  const { error } = await requireXvipUser();
+  if (error) return error;
+
   try {
     const body = await req.json();
     const username = String(body?.username || "")

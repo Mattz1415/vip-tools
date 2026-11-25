@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireXvipUser } from "@/lib/server/auth";
 
 async function stalkRoblox(username: string) {
   const lookupRes = await fetch("https://users.roblox.com/v1/usernames/users", {
@@ -125,6 +126,9 @@ async function stalkCodashop(game: "ml" | "ff", rawQuery: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const { error } = await requireXvipUser();
+  if (error) return error;
+
   try {
     const body = await req.json();
     const game = String(body?.game || "roblox").toLowerCase();
