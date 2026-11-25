@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
+import { signInWithGoogleFirebase, signOutFirebaseQuietly } from "@/lib/firebase-client";
 import { initVipTools } from "@/lib/vip-tools-client";
 
 function callGlobal(name: string, ...args: unknown[]) {
@@ -14,7 +16,7 @@ function callGlobal(name: string, ...args: unknown[]) {
 
 export default function VipToolsApp() {
   useEffect(() => {
-    initVipTools();
+    initVipTools({ signInWithGoogleFirebase, signOutFirebaseQuietly });
   }, []);
 
   return (
@@ -123,15 +125,15 @@ export default function VipToolsApp() {
             <ul className="auth-feature-list">
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>35 utilitas web &amp; modul XVIP terintegrasi</span>
+                <span>45 utilitas VPS, downloader, jaringan, &amp; modul XVIP</span>
               </li>
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>5 tema kontras terkalibrasi (Biru, Merah, Hitam, Putih, Silver)</span>
+                <span>3 palet monokrom kontras tinggi (Hitam, Abu, Putih)</span>
               </li>
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>Dukungan shortcut keyboard ⌘K / Ctrl+K &amp; panel owner</span>
+                <span>Login Google Firebase, shortcut ⌘K / Ctrl+K, &amp; /owner</span>
               </li>
             </ul>
           </div>
@@ -141,7 +143,7 @@ export default function VipToolsApp() {
               Akses Portal
             </h2>
             <p className="auth-form-sub">
-              Masuk atau daftarkan akun lokal untuk membuka command deck.
+              Masuk akun lokal atau Google Firebase untuk membuka VPS command deck.
             </p>
 
             <div className="auth-mode" role="tablist" aria-label="Mode autentikasi">
@@ -309,6 +311,21 @@ export default function VipToolsApp() {
                 <i className="fas fa-user-plus" aria-hidden="true" /> BUAT AKUN
               </button>
             </form>
+
+            <div className="auth-divider" aria-hidden="true">
+              <span>ATAU</span>
+            </div>
+
+            <button
+              type="button"
+              id="googleLoginBtn"
+              className="btn-google-auth"
+              onClick={() => callGlobal("doGoogleLogin")}
+            >
+              <i className="fab fa-google" aria-hidden="true" />
+              <span id="googleLoginLabel">Masuk dengan Google (Firebase)</span>
+              <span className="google-pill" id="googleAuthStatus">Firebase</span>
+            </button>
           </div>
         </div>
       </section>
@@ -357,6 +374,16 @@ export default function VipToolsApp() {
               <i className="fas fa-comment" aria-hidden="true" />
               <span>Chat</span>
             </button>
+            <Link
+              href="/owner"
+              id="ownerRailLink"
+              className="rail-item owner-only-link"
+              aria-label="Buka Panel Owner"
+              hidden
+            >
+              <i className="fas fa-crown" aria-hidden="true" />
+              <span>Owner</span>
+            </Link>
           </nav>
 
           <button
@@ -384,6 +411,17 @@ export default function VipToolsApp() {
           </div>
 
           <div className="header-right">
+            <Link
+              href="/owner"
+              id="ownerHeaderBtn"
+              className="header-btn owner-only-btn"
+              aria-label="Buka Owner Panel /owner"
+              hidden
+            >
+              <i className="fas fa-crown" aria-hidden="true" />
+              <span className="header-btn-text">Owner</span>
+            </Link>
+
             <button
               type="button"
               className="header-btn"
@@ -448,7 +486,7 @@ export default function VipToolsApp() {
           <div id="warningBanner" className="warning-banner" role="region" aria-label="Pemberitahuan aplikasi gratis">
             <div className="warning-text">
               <i className="fas fa-shield-halved" aria-hidden="true" />
-              <span>
+              <span id="warningBannerText">
                 Aplikasi ini gratis dari MattzLM. Jika ada pihak yang memperjualbelikan akses, segera lapor ke Owner (MattzLM).
               </span>
             </div>
@@ -602,6 +640,12 @@ export default function VipToolsApp() {
                   </span>
                   <span className="category-count" data-count-for="all">0</span>
                 </button>
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="vps">
+                  <span className="category-tab-main">
+                    <i className="fas fa-server" aria-hidden="true" /> VPS
+                  </span>
+                  <span className="category-count" data-count-for="vps">0</span>
+                </button>
                 <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="downloader">
                   <span className="category-tab-main">
                     <i className="fas fa-download" aria-hidden="true" /> DOWNLOADER
@@ -655,7 +699,7 @@ export default function VipToolsApp() {
                   <input
                     type="search"
                     id="searchInput"
-                    placeholder="Ketik nama tool (contoh: TikTok, Fake IG, QR)..."
+                    placeholder="Ketik nama tool (contoh: TikTok, DNS, Shortlink, QR)..."
                   />
                   <span className="search-shortcut" aria-hidden="true">⌘K</span>
                 </div>
@@ -852,9 +896,14 @@ export default function VipToolsApp() {
               </div>
 
               <div id="ownerPanel" className="owner-panel-box" hidden>
-                <h2 className="owner-heading">
-                  <i className="fas fa-crown" aria-hidden="true" /> Panel Owner (Akses Penuh)
-                </h2>
+                <div className="owner-panel-head-row">
+                  <h2 className="owner-heading" style={{ marginBottom: 0 }}>
+                    <i className="fas fa-crown" aria-hidden="true" /> Panel Owner (Akses Penuh)
+                  </h2>
+                  <Link href="/owner" id="ownerFullPanelBtn" className="btn-auth mecha-cut-sm owner-jump-btn">
+                    <i className="fas fa-sliders" aria-hidden="true" /> Buka Console /owner
+                  </Link>
+                </div>
 
                 <div className="field-stack">
                   <span className="field-label">Pilih Palet Warna (Hitam / Abu / Putih)</span>
@@ -1088,6 +1137,16 @@ export default function VipToolsApp() {
             <i className="fas fa-comment" aria-hidden="true" />
             <span>Chat</span>
           </button>
+          <Link
+            href="/owner"
+            id="ownerMobileLink"
+            className="nav-item owner-only-link"
+            aria-label="Panel Owner"
+            hidden
+          >
+            <i className="fas fa-crown" aria-hidden="true" />
+            <span>Owner</span>
+          </Link>
         </nav>
       </div>
 
