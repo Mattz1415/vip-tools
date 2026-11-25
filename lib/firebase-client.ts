@@ -1,11 +1,5 @@
-import { getApps, initializeApp, type FirebaseApp } from "firebase/app";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  type Auth,
-} from "firebase/auth";
+import type { FirebaseApp } from "firebase/app";
+import type { Auth } from "firebase/auth";
 
 export interface PublicFirebaseConfig {
   apiKey: string;
@@ -52,12 +46,19 @@ export async function fetchFirebaseWebConfig(): Promise<PublicFirebaseConfig | n
 }
 
 export async function signInWithGoogleFirebase() {
+  if (typeof window === "undefined") {
+    throw new Error("Login Google hanya tersedia di browser.");
+  }
+
   const cfg = await fetchFirebaseWebConfig();
   if (!cfg || !cfg.apiKey || !cfg.authDomain || !cfg.projectId || !cfg.appId) {
     throw new Error(
       "Firebase belum dikonfigurasi. Owner dapat mengisi Firebase Web Config di halaman /owner (tab Firebase) atau file .env.local."
     );
   }
+
+  const [{ getApps, initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup }] =
+    await Promise.all([import("firebase/app"), import("firebase/auth")]);
 
   if (!cachedApp || cachedProjectId !== cfg.projectId) {
     const existing = getApps().find((a) => a.name === `mattzlm-${cfg.projectId}`);
@@ -96,11 +97,11 @@ export async function signInWithGoogleFirebase() {
 }
 
 export async function signOutFirebaseQuietly() {
-  if (cachedAuth) {
-    try {
-      await signOut(cachedAuth);
-    } catch {
-      // ignore
-    }
+  if (typeof window === "undefined" || !cachedAuth) return;
+  try {
+    const { signOut } = await import("firebase/auth");
+    await signOut(cachedAuth);
+  } catch {
+    // ignore
   }
 }

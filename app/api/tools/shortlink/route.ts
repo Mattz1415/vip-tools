@@ -5,11 +5,16 @@ import { assertPublicHttpUrl } from "@/lib/server/net-guard";
 import { readStore, updateStore } from "@/lib/server/store";
 
 export async function GET() {
-  const store = readStore();
-  return NextResponse.json({
-    ok: true,
-    shortLinks: store.shortLinks.slice(0, 20),
-  });
+  try {
+    const store = readStore();
+    return NextResponse.json({
+      ok: true,
+      shortLinks: store.shortLinks.slice(0, 20),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Gagal memuat daftar shortlink.";
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {

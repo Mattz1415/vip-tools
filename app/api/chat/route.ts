@@ -3,21 +3,26 @@ import { getCurrentSessionUser, requireAuthUser } from "@/lib/server/auth";
 import { readStore, updateStore } from "@/lib/server/store";
 
 export async function GET() {
-  const user = await getCurrentSessionUser();
-  const store = readStore();
-  const isOwner = user?.role === "owner";
-  const chatLimit = isOwner
-    ? 999999
-    : user
-      ? store.users[user.username]?.chatLimit ?? 5
-      : 5;
+  try {
+    const user = await getCurrentSessionUser();
+    const store = readStore();
+    const isOwner = user?.role === "owner";
+    const chatLimit = isOwner
+      ? 999999
+      : user
+        ? store.users[user.username]?.chatLimit ?? 5
+        : 5;
 
-  return NextResponse.json({
-    ok: true,
-    messages: store.chatMessages.slice(-60),
-    chatLimit,
-    isOwner,
-  });
+    return NextResponse.json({
+      ok: true,
+      messages: store.chatMessages.slice(-60),
+      chatLimit,
+      isOwner,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Gagal memuat pesan chat.";
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {

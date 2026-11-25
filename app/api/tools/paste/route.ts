@@ -4,18 +4,23 @@ import { getCurrentSessionUser } from "@/lib/server/auth";
 import { readStore, updateStore } from "@/lib/server/store";
 
 export async function GET() {
-  const store = readStore();
-  return NextResponse.json({
-    ok: true,
-    pastes: store.pastes.slice(0, 15).map((p) => ({
-      id: p.id,
-      title: p.title,
-      lang: p.lang,
-      views: p.views,
-      createdBy: p.createdBy,
-      createdAt: p.createdAt,
-    })),
-  });
+  try {
+    const store = readStore();
+    return NextResponse.json({
+      ok: true,
+      pastes: store.pastes.slice(0, 15).map((p) => ({
+        id: p.id,
+        title: p.title,
+        lang: p.lang,
+        views: p.views,
+        createdBy: p.createdBy,
+        createdAt: p.createdAt,
+      })),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Gagal memuat daftar paste.";
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {

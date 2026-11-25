@@ -44,18 +44,18 @@ export function createSessionToken(username: string): string {
 }
 
 export function verifySessionToken(token: string | undefined): SessionPayload | null {
-  if (!token || !token.includes(".")) return null;
-  const [encoded, sigStr] = token.split(".");
-  if (!encoded || !sigStr) return null;
-  const expectedSig = crypto
-    .createHmac("sha256", getSessionSecret())
-    .update(encoded)
-    .digest();
-  const actualSig = b64urlDecode(sigStr);
-  if (expectedSig.length !== actualSig.length) return null;
-  if (!crypto.timingSafeEqual(expectedSig, actualSig)) return null;
-
   try {
+    if (!token || !token.includes(".")) return null;
+    const [encoded, sigStr] = token.split(".");
+    if (!encoded || !sigStr) return null;
+    const expectedSig = crypto
+      .createHmac("sha256", getSessionSecret())
+      .update(encoded)
+      .digest();
+    const actualSig = b64urlDecode(sigStr);
+    if (expectedSig.length !== actualSig.length) return null;
+    if (!crypto.timingSafeEqual(expectedSig, actualSig)) return null;
+
     const parsed = JSON.parse(b64urlDecode(encoded).toString("utf8")) as SessionPayload;
     if (!parsed.u || !parsed.exp || parsed.exp < Math.floor(Date.now() / 1000)) {
       return null;
@@ -73,7 +73,9 @@ export function attachSessionCookie(res: NextResponse, username: string): NextRe
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_MAX_AGE_SEC,
-    secure: process.env.NODE_ENV === "production" && process.env.COOKIE_SECURE === "1",
+    secure:
+      process.env.COOKIE_SECURE === "1" ||
+      (process.env.NODE_ENV === "production" && process.env.VERCEL === "1"),
   });
   return res;
 }
@@ -89,12 +91,16 @@ export function clearSessionCookie(res: NextResponse): NextResponse {
 }
 
 export async function getCurrentSessionUser(): Promise<StoredUser | null> {
-  const jar = await cookies();
-  const token = jar.get(SESSION_COOKIE_NAME)?.value;
-  const payload = verifySessionToken(token);
-  if (!payload) return null;
-  const store = readStore();
-  return store.users[payload.u] || null;
+  try {
+    const jar = await cookies();
+    const token = jar.get(SESSION_COOKIE_NAME)?.value;
+    const payload = verifySessionToken(token);
+    if (!payload) return null;
+    const store = readStore();
+    return store.users[payload.u] || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function requireAuthUser() {

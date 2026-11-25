@@ -1,9 +1,11 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 export type UserRole = "owner" | "admin" | "member";
 export type ThemeKey = "hitam" | "abu" | "putih";
+export type StorageMode = "vps-disk" | "tmp-disk" | "memory";
 
 export interface StoredUser {
   username: string;
@@ -66,7 +68,7 @@ export interface FirebaseWebConfig {
   appId: string;
 }
 
-export interface SiteSettings {
+export interface GlobalSettings {
   defaultTheme: ThemeKey;
   announcement: string;
   maintenanceMode: boolean;
@@ -77,7 +79,7 @@ export interface SiteSettings {
   telegramChatId: string;
 }
 
-export interface AuditLog {
+export interface AuditLogEntry {
   id: string;
   time: number;
   actor: string;
@@ -93,20 +95,90 @@ export interface VpsStoreData {
   chatMessages: ChatMessage[];
   shortLinks: ShortLink[];
   pastes: PasteEntry[];
-  settings: SiteSettings;
+  settings: GlobalSettings;
   firebaseConfig: FirebaseWebConfig;
-  auditLogs: AuditLog[];
+  auditLogs: AuditLogEntry[];
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const STORE_PATH = path.join(DATA_DIR, "store.json");
-const SECRET_PATH = path.join(DATA_DIR, ".secret");
-const COOKIES_PATH = path.join(DATA_DIR, "yt-cookies.txt");
+interface ResolvedStorage {
+  dir: string | null;
+  mode: StorageMode;
+}
 
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
+interface GlobalStoreRuntime {
+  resolvedStorage: ResolvedStorage | null;
+  memoryStore: VpsStoreData | null;
+  cachedDefaultOwnerHash: string | null;
+  cachedSessionSecret: string | null;
+}
+
+const g = globalThis as unknown as { __mattzlmVpsState?: GlobalStoreRuntime };
+if (!g.__mattzlmVpsState) {
+  g.__mattzlmVpsState = {
+    resolvedStorage: null,
+    memoryStore: null,
+    cachedDefaultOwnerHash: null,
+    cachedSessionSecret: null,
+  };
+}
+const runtimeState = g.__mattzlmVpsState;
+
+function isWritableDir(dir: string): boolean {
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    }
+    const probe = path.join(dir, `.probe.${process.pid}.${Date.now()}`);
+    fs.writeFileSync(probe, "1", { mode: 0o600 });
+    fs.unlinkSync(probe);
+    return true;
+  } catch {
+    return false;
   }
+}
+
+function resolveStorage(): ResolvedStorage {
+  if (runtimeState.resolvedStorage) return runtimeState.resolvedStorage;
+
+  const envDir = (process.env.VPS_DATA_DIR || "").trim();
+  if (envDir && isWritableDir(envDir)) {
+    runtimeState.resolvedStorage = { dir: envDir, mode: "vps-disk" };
+    return runtimeState.resolvedStorage;
+  }
+
+  const cwdData = path.join(process.cwd(), "data");
+  if (isWritableDir(cwdData)) {
+    runtimeState.resolvedStorage = { dir: cwdData, mode: "vps-disk" };
+    return runtimeState.resolvedStorage;
+  }
+
+  const tmpData = path.join(os.tmpdir(), "mattzlm-vip-tools-data");
+  if (isWritableDir(tmpData)) {
+    runtimeState.resolvedStorage = { dir: tmpData, mode: "tmp-disk" };
+    return runtimeState.resolvedStorage;
+  }
+
+  runtimeState.resolvedStorage = { dir: null, mode: "memory" };
+  return runtimeState.resolvedStorage;
+}
+
+export function getStorageMode(): StorageMode {
+  return resolveStorage().mode;
+}
+
+function getStorePath(): string | null {
+  const { dir } = resolveStorage();
+  return dir ? path.join(dir, "store.json") : null;
+}
+
+function getSecretPath(): string | null {
+  const { dir } = resolveStorage();
+  return dir ? path.join(dir, ".secret") : null;
+}
+
+function getCookiesFilePath(): string | null {
+  const { dir } = resolveStorage();
+  return dir ? path.join(dir, "yt-cookies.txt") : null;
 }
 
 export function hashPassword(password: string): string {
@@ -120,49 +192,103 @@ export function verifyPassword(password: string, stored: string): boolean {
   if (stored.startsWith("scrypt:")) {
     const [, salt, hashHex] = stored.split(":");
     if (!salt || !hashHex) return false;
-    const derived = crypto.scryptSync(password, salt, 64);
-    const expected = Buffer.from(hashHex, "hex");
-    if (derived.length !== expected.length) return false;
-    return crypto.timingSafeEqual(derived, expected);
+    try {
+      const derived = crypto.scryptSync(password, salt, 64);
+      const expected = Buffer.from(hashHex, "hex");
+      if (derived.length !== expected.length) return false;
+      return crypto.timingSafeEqual(derived, expected);
+    } catch {
+      return false;
+    }
   }
   return false;
+}
+
+function getDefaultOwnerUser(now: number): StoredUser {
+  if (!runtimeState.cachedDefaultOwnerHash) {
+    runtimeState.cachedDefaultOwnerHash = hashPassword("123mamat@#");
+  }
+  return {
+    username: "matt",
+    passwordHash: runtimeState.cachedDefaultOwnerHash,
+    role: "owner",
+    provider: "local",
+    displayName: "MattzLM (Owner)",
+    chatLimit: 999999,
+    createdAt: now,
+    lastLoginAt: now,
+  };
 }
 
 export function getSessionSecret(): string {
   if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 16) {
     return process.env.SESSION_SECRET;
   }
-  ensureDataDir();
-  if (fs.existsSync(SECRET_PATH)) {
-    const existing = fs.readFileSync(SECRET_PATH, "utf8").trim();
-    if (existing.length >= 32) return existing;
+  if (runtimeState.cachedSessionSecret) return runtimeState.cachedSessionSecret;
+
+  const storage = resolveStorage();
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+  if (storage.mode === "vps-disk" && !isServerless) {
+    const secretPath = getSecretPath();
+    if (secretPath) {
+      try {
+        if (fs.existsSync(secretPath)) {
+          const existing = fs.readFileSync(secretPath, "utf8").trim();
+          if (existing.length >= 32) {
+            runtimeState.cachedSessionSecret = existing;
+            return existing;
+          }
+        }
+        const generated = crypto.randomBytes(48).toString("hex");
+        fs.writeFileSync(secretPath, generated, { mode: 0o600 });
+        runtimeState.cachedSessionSecret = generated;
+        return generated;
+      } catch {
+        // fall through to deterministic secret below
+      }
+    }
   }
-  const generated = crypto.randomBytes(48).toString("hex");
-  fs.writeFileSync(SECRET_PATH, generated, { mode: 0o600 });
-  return generated;
+
+  // Deterministic fallback for ephemeral serverless / read-only runtimes when SESSION_SECRET is unset
+  const seed =
+    process.env.VERCEL_PROJECT_ID ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    process.env.HOSTNAME ||
+    "mattzlm-vip-tools-local";
+  runtimeState.cachedSessionSecret = crypto
+    .createHmac("sha256", "mattzlm-vip-tools-session-fallback-v2")
+    .update(seed)
+    .digest("hex");
+  return runtimeState.cachedSessionSecret;
 }
 
 export function getYtCookiesPath(): string {
-  ensureDataDir();
-  return COOKIES_PATH;
+  return getCookiesFilePath() || path.join(os.tmpdir(), "mattzlm-yt-cookies.txt");
 }
 
 export function hasYtCookies(): boolean {
   try {
-    return fs.existsSync(COOKIES_PATH) && fs.statSync(COOKIES_PATH).size > 20;
+    const p = getCookiesFilePath();
+    if (!p) return false;
+    return fs.existsSync(p) && fs.statSync(p).size > 20;
   } catch {
     return false;
   }
 }
 
 export function saveYtCookies(content: string): void {
-  ensureDataDir();
+  const p = getCookiesFilePath();
+  if (!p) {
+    throw new Error("Filesystem server hanya baca (read-only); yt-cookies.txt tidak dapat disimpan.");
+  }
   const trimmed = content.trim();
   if (!trimmed) {
-    if (fs.existsSync(COOKIES_PATH)) fs.unlinkSync(COOKIES_PATH);
+    if (fs.existsSync(p)) fs.unlinkSync(p);
     return;
   }
-  fs.writeFileSync(COOKIES_PATH, trimmed + "\n", { mode: 0o600 });
+  fs.writeFileSync(p, trimmed + "\n", { mode: 0o600 });
 }
 
 function getEnvOwnerEmails(): string[] {
@@ -184,20 +310,25 @@ function getEnvFirebaseConfig(): FirebaseWebConfig {
   };
 }
 
+function getDefaultSettings(): GlobalSettings {
+  return {
+    defaultTheme: "hitam",
+    announcement:
+      "Aplikasi ini gratis dari MattzLM. Terintegrasi langsung dengan server VPS untuk semua modul utilitas.",
+    maintenanceMode: false,
+    bgVideoUrl: "https://c.termai.cc/v131/H4vF9D.mp4",
+    homeRotate: 0,
+    visits: 0,
+    telegramBotToken: "",
+    telegramChatId: "",
+  };
+}
+
 function createInitialStore(): VpsStoreData {
   const now = Date.now();
   return {
     users: {
-      matt: {
-        username: "matt",
-        passwordHash: hashPassword("123mamat@#"),
-        role: "owner",
-        provider: "local",
-        displayName: "MattzLM (Owner)",
-        chatLimit: 999999,
-        createdAt: now,
-        lastLoginAt: now,
-      },
+      matt: getDefaultOwnerUser(now),
     },
     ownerEmails: getEnvOwnerEmails(),
     customTools: [],
@@ -205,17 +336,7 @@ function createInitialStore(): VpsStoreData {
     chatMessages: [],
     shortLinks: [],
     pastes: [],
-    settings: {
-      defaultTheme: "hitam",
-      announcement:
-        "Aplikasi ini gratis dari MattzLM. Terintegrasi langsung dengan server VPS untuk semua modul utilitas.",
-      maintenanceMode: false,
-      bgVideoUrl: "https://c.termai.cc/v131/H4vF9D.mp4",
-      homeRotate: 0,
-      visits: 0,
-      telegramBotToken: "",
-      telegramChatId: "",
-    },
+    settings: getDefaultSettings(),
     firebaseConfig: getEnvFirebaseConfig(),
     auditLogs: [
       {
@@ -229,52 +350,79 @@ function createInitialStore(): VpsStoreData {
   };
 }
 
-export function readStore(): VpsStoreData {
-  ensureDataDir();
-  if (!fs.existsSync(STORE_PATH)) {
-    const initial = createInitialStore();
-    writeStore(initial);
-    return initial;
-  }
+export function writeStore(data: VpsStoreData): void {
+  runtimeState.memoryStore = data;
+  const storePath = getStorePath();
+  if (!storePath) return;
   try {
-    const raw = fs.readFileSync(STORE_PATH, "utf8");
+    const tmpPath = storePath + ".tmp." + process.pid + "." + Date.now();
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), { mode: 0o600 });
+    fs.renameSync(tmpPath, storePath);
+  } catch {
+    // Gracefully keep data in memory if disk becomes unavailable or read-only
+  }
+}
+
+export function readStore(): VpsStoreData {
+  const storePath = getStorePath();
+
+  if (!storePath) {
+    if (!runtimeState.memoryStore) {
+      runtimeState.memoryStore = createInitialStore();
+    }
+    return runtimeState.memoryStore;
+  }
+
+  try {
+    if (!fs.existsSync(storePath)) {
+      const initial = runtimeState.memoryStore || createInitialStore();
+      writeStore(initial);
+      return initial;
+    }
+
+    const raw = fs.readFileSync(storePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<VpsStoreData>;
-    const defaults = createInitialStore();
+    const now = Date.now();
+    const defaultSettings = getDefaultSettings();
+    const defaultFb = getEnvFirebaseConfig();
+
+    const users: Record<string, StoredUser> =
+      parsed.users && typeof parsed.users === "object" ? { ...parsed.users } : {};
+
+    let needsSave = false;
+    if (!users.matt) {
+      users.matt = getDefaultOwnerUser(now);
+      needsSave = true;
+    } else if (users.matt.role !== "owner") {
+      users.matt = { ...users.matt, role: "owner" };
+      needsSave = true;
+    }
+
     const merged: VpsStoreData = {
-      users: parsed.users && typeof parsed.users === "object" ? parsed.users : defaults.users,
-      ownerEmails: Array.isArray(parsed.ownerEmails) ? parsed.ownerEmails : defaults.ownerEmails,
+      users,
+      ownerEmails: Array.isArray(parsed.ownerEmails) ? parsed.ownerEmails : getEnvOwnerEmails(),
       customTools: Array.isArray(parsed.customTools) ? parsed.customTools : [],
       hiddenTools: Array.isArray(parsed.hiddenTools) ? parsed.hiddenTools : [],
       chatMessages: Array.isArray(parsed.chatMessages) ? parsed.chatMessages : [],
       shortLinks: Array.isArray(parsed.shortLinks) ? parsed.shortLinks : [],
       pastes: Array.isArray(parsed.pastes) ? parsed.pastes : [],
-      settings: { ...defaults.settings, ...(parsed.settings || {}) },
-      firebaseConfig: { ...defaults.firebaseConfig, ...(parsed.firebaseConfig || {}) },
-      auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs : defaults.auditLogs,
+      settings: { ...defaultSettings, ...(parsed.settings || {}) },
+      firebaseConfig: { ...defaultFb, ...(parsed.firebaseConfig || {}) },
+      auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs : [],
     };
 
-    // Always ensure primary owner account 'matt' exists and keeps owner role
-    if (!merged.users.matt) {
-      merged.users.matt = defaults.users.matt;
-      writeStore(merged);
-    } else if (merged.users.matt.role !== "owner") {
-      merged.users.matt.role = "owner";
+    runtimeState.memoryStore = merged;
+    if (needsSave) {
       writeStore(merged);
     }
-
     return merged;
   } catch {
-    const fallback = createInitialStore();
-    writeStore(fallback);
-    return fallback;
+    if (!runtimeState.memoryStore) {
+      runtimeState.memoryStore = createInitialStore();
+    }
+    writeStore(runtimeState.memoryStore);
+    return runtimeState.memoryStore;
   }
-}
-
-export function writeStore(data: VpsStoreData): void {
-  ensureDataDir();
-  const tmpPath = STORE_PATH + ".tmp." + process.pid + "." + Date.now();
-  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), { mode: 0o600 });
-  fs.renameSync(tmpPath, STORE_PATH);
 }
 
 export function updateStore<T>(mutator: (data: VpsStoreData) => T): T {

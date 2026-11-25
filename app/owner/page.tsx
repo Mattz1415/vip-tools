@@ -11,14 +11,27 @@ export const metadata: Metadata = {
 };
 
 export default async function OwnerPage() {
-  const user = await getCurrentSessionUser();
-  const store = readStore();
-  const fbReady = isFirebaseReady(getEffectiveFirebaseConfig(store));
+  let initialUser: ReturnType<typeof sanitizePublicUser> | null = null;
+  let fbReady = false;
 
-  return (
-    <OwnerPanelClient
-      initialUser={user ? sanitizePublicUser(user) : null}
-      firebaseReady={fbReady}
-    />
-  );
+  try {
+    const user = await getCurrentSessionUser();
+    initialUser = user ? sanitizePublicUser(user) : null;
+  } catch {
+    initialUser = null;
+  }
+
+  try {
+    const store = readStore();
+    fbReady = isFirebaseReady(getEffectiveFirebaseConfig(store));
+  } catch {
+    fbReady = Boolean(
+      process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
+        process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+        process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+    );
+  }
+
+  return <OwnerPanelClient initialUser={initialUser} firebaseReady={fbReady} />;
 }

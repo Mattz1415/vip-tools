@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { updateStore } from "@/lib/server/store";
+import { updateStore, type PasteEntry } from "@/lib/server/store";
 
 export const dynamic = "force-dynamic";
 
@@ -8,12 +8,18 @@ export default async function PasteViewerPage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await props.params;
-  const paste = updateStore((store) => {
-    const item = store.pastes.find((p) => p.id === id);
-    if (!item) return null;
-    item.views += 1;
-    return { ...item };
-  });
+  let paste: PasteEntry | null = null;
+
+  try {
+    paste = updateStore((store) => {
+      const item = store.pastes.find((p) => p.id === id);
+      if (!item) return null;
+      item.views += 1;
+      return { ...item };
+    });
+  } catch {
+    paste = null;
+  }
 
   if (!paste) {
     notFound();

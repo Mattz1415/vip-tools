@@ -376,6 +376,7 @@ export default function VipToolsApp() {
             </button>
             <Link
               href="/owner"
+              prefetch={false}
               id="ownerRailLink"
               className="rail-item owner-only-link"
               aria-label="Buka Panel Owner"
@@ -413,6 +414,7 @@ export default function VipToolsApp() {
           <div className="header-right">
             <Link
               href="/owner"
+              prefetch={false}
               id="ownerHeaderBtn"
               className="header-btn owner-only-btn"
               aria-label="Buka Owner Panel /owner"
@@ -900,7 +902,7 @@ export default function VipToolsApp() {
                   <h2 className="owner-heading" style={{ marginBottom: 0 }}>
                     <i className="fas fa-crown" aria-hidden="true" /> Panel Owner (Akses Penuh)
                   </h2>
-                  <Link href="/owner" id="ownerFullPanelBtn" className="btn-auth mecha-cut-sm owner-jump-btn">
+                  <Link href="/owner" prefetch={false} id="ownerFullPanelBtn" className="btn-auth mecha-cut-sm owner-jump-btn">
                     <i className="fas fa-sliders" aria-hidden="true" /> Buka Console /owner
                   </Link>
                 </div>
@@ -1139,6 +1141,7 @@ export default function VipToolsApp() {
           </button>
           <Link
             href="/owner"
+            prefetch={false}
             id="ownerMobileLink"
             className="nav-item owner-only-link"
             aria-label="Panel Owner"
