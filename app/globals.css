@@ -182,8 +182,7 @@ select:disabled,
 .mecha-cut:focus-visible,
 .mecha-cut-sm:focus-visible {
   outline: 2px solid var(--focus-ring);
-  outline-offset: -3px;
-  box-shadow: inset 0 0 0 3px var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .btn-auth.mecha-cut-sm:focus-visible,
@@ -331,13 +330,13 @@ select:disabled,
   height: 100%;
 }
 
-/* Hallmark Angular Chamfer Identity Motif */
+/* Smooth Rounded Kuro-Mecha Identity Motif */
 .mecha-cut {
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  border-radius: 24px;
 }
 
 .mecha-cut-sm {
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  border-radius: 14px;
 }
 
 /* ===== 3D GYRO LOADER ===== */
@@ -408,6 +407,7 @@ select:disabled,
 .loader-crest-3d {
   width: 64px;
   height: 64px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -505,7 +505,7 @@ select:disabled,
   border: 1px solid var(--theme-primary-light);
   color: var(--text-primary);
   padding: 10px 18px;
-  border-radius: 10px;
+  border-radius: 14px;
   font-size: 0.88rem;
   font-weight: 600;
   z-index: 10000;
@@ -528,7 +528,7 @@ select:disabled,
   padding: 12px 16px;
   background: var(--surface-elevated);
   border: 1px solid var(--accent-hallmark);
-  border-radius: 10px;
+  border-radius: 16px;
   color: var(--text-primary);
 }
 
@@ -595,7 +595,7 @@ select:disabled,
   grid-template-columns: 0.95fr 1.15fr;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: 24px;
   overflow: hidden;
   box-shadow: var(--shadow-elevated);
   transform-style: preserve-3d;
@@ -645,6 +645,7 @@ select:disabled,
   z-index: 1;
   width: 72px;
   height: 72px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -714,7 +715,7 @@ select:disabled,
   margin-bottom: 18px;
   padding: 4px;
   background: var(--surface-input);
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid var(--border-color);
 }
 
@@ -722,7 +723,7 @@ select:disabled,
   min-height: 44px;
   padding: 8px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: transparent;
   color: var(--text-muted);
   font-family: 'Rajdhani', sans-serif;
@@ -762,7 +763,7 @@ select:disabled,
   gap: 8px;
   background: var(--surface-input);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 0 6px 0 12px;
   min-height: 46px;
   transition: border-color 0.2s ease;
@@ -835,7 +836,7 @@ select:disabled,
   min-height: 46px;
   padding: 10px 18px;
   border: none;
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--accent-hallmark);
   color: var(--text-on-accent);
   font-family: 'Rajdhani', sans-serif;
@@ -889,7 +890,7 @@ select:disabled,
   width: 86px;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: 20px;
   z-index: 120;
   display: flex;
   flex-direction: column;
@@ -901,6 +902,7 @@ select:disabled,
 .rail-brand {
   width: 48px;
   height: 48px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -918,7 +920,7 @@ select:disabled,
   width: 70px;
   min-height: 54px;
   padding: 6px 4px;
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
@@ -953,7 +955,7 @@ select:disabled,
 .rail-logout {
   width: 70px;
   min-height: 50px;
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid var(--status-danger);
   background: transparent;
   color: var(--status-danger);
@@ -981,7 +983,7 @@ select:disabled,
   padding: 10px 16px;
   background: var(--header-glass-bg);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: 20px;
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-elevated);
   display: flex;
@@ -1003,7 +1005,7 @@ select:disabled,
 .logo-icon {
   width: 42px;
   height: 42px;
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
   display: flex;
@@ -1059,7 +1061,7 @@ select:disabled,
   min-width: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--surface-elevated);
   color: var(--text-primary);
@@ -1175,6 +1177,7 @@ select:disabled,
   position: relative;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
+  border-radius: 24px;
   overflow: hidden;
   min-height: 270px;
   transform-style: preserve-3d;
@@ -1243,7 +1246,7 @@ select:disabled,
   min-height: 44px;
   padding: 0 12px;
   border: 1px solid rgba(248, 250, 252, 0.35);
-  border-radius: 8px;
+  border-radius: 12px;
   background: rgba(15, 21, 36, 0.86);
   color: #f8fafc;
   font-size: 0.82rem;
@@ -1268,6 +1271,7 @@ select:disabled,
   gap: 8px;
   min-height: 44px;
   padding: 8px 16px;
+  border-radius: 14px;
   text-decoration: none;
   color: var(--text-on-accent);
   font-family: 'Rajdhani', sans-serif;
@@ -1290,7 +1294,7 @@ select:disabled,
 .dossier-panel {
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -1321,7 +1325,7 @@ select:disabled,
   padding: 10px 12px;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 0.88rem;
 }
 
@@ -1357,7 +1361,7 @@ select:disabled,
 .deck-panel {
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -1390,7 +1394,7 @@ select:disabled,
   top: 88px;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -1401,7 +1405,7 @@ select:disabled,
   width: 100%;
   min-height: 44px;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
@@ -1453,7 +1457,7 @@ select:disabled,
 .tools-main-pane {
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -1471,7 +1475,7 @@ select:disabled,
   gap: 10px;
   background: var(--surface-input);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 0 14px;
   min-height: 46px;
   margin-bottom: 18px;
@@ -1496,7 +1500,7 @@ select:disabled,
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.74rem;
   padding: 3px 8px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--surface-elevated);
   color: var(--text-muted);
   border: 1px solid var(--border-color);
@@ -1525,7 +1529,7 @@ select:disabled,
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: 16px;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
@@ -1578,7 +1582,7 @@ select:disabled,
 }
 
 .tools-feed-list .tools-card {
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--surface-input);
 }
 
@@ -1599,7 +1603,7 @@ select:disabled,
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--theme-primary);
   color: var(--text-on-primary);
   display: flex;
@@ -1645,7 +1649,7 @@ select:disabled,
   font-size: 0.7rem;
   font-weight: 700;
   padding: 3px 8px;
-  border-radius: 4px;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
@@ -1670,7 +1674,7 @@ select:disabled,
   grid-column: 1 / -1;
   text-align: center;
   padding: 28px 18px;
-  border-radius: 10px;
+  border-radius: 16px;
   background: var(--surface-elevated);
   border: 1px dashed var(--border-color);
   color: var(--text-muted);
@@ -1689,7 +1693,7 @@ select:disabled,
 .device-card {
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 22px;
 }
 
@@ -1846,7 +1850,7 @@ select:disabled,
 .theme-chip-btn {
   min-height: 44px;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--surface-elevated);
   color: var(--text-primary);
@@ -1882,7 +1886,7 @@ select:disabled,
   justify-content: space-between;
   gap: 10px;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
   font-size: 0.86rem;
@@ -1891,7 +1895,7 @@ select:disabled,
 .btn-delete-user {
   min-height: 44px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--status-danger);
   background: transparent;
   color: var(--status-danger);
@@ -1931,7 +1935,7 @@ select:disabled,
   padding: 10px 16px;
   background: transparent;
   border: 1px solid var(--status-danger);
-  border-radius: 10px;
+  border-radius: 14px;
   color: var(--status-danger);
   font-weight: 700;
   font-size: 0.92rem;
@@ -1953,7 +1957,7 @@ select:disabled,
 .chat-container {
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 18px;
   height: calc(100dvh - 200px);
   min-height: 420px;
@@ -2005,7 +2009,7 @@ select:disabled,
 .chat-msg {
   max-width: 78%;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 16px;
   font-size: 0.9rem;
 }
 
@@ -2051,7 +2055,7 @@ select:disabled,
   min-width: 0;
   min-height: 46px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid var(--border-color);
   background: var(--surface-input);
   color: var(--text-primary);
@@ -2062,7 +2066,7 @@ select:disabled,
   min-width: 100px;
   min-height: 46px;
   padding: 0 18px;
-  border-radius: 10px;
+  border-radius: 14px;
   border: none;
   background: var(--accent-hallmark);
   color: var(--text-on-accent);
@@ -2110,7 +2114,7 @@ select:disabled,
   background: var(--surface-card);
   border: 1px solid var(--border-color);
   border-top: 3px solid var(--accent-hallmark);
-  border-radius: 14px;
+  border-radius: 24px;
   padding: 22px;
   position: relative;
   color: var(--text-primary);
@@ -2140,7 +2144,7 @@ select:disabled,
   right: 14px;
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--surface-elevated);
   color: var(--text-primary);
@@ -2170,7 +2174,7 @@ select:disabled,
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--surface-input);
   color: var(--text-primary);
@@ -2183,7 +2187,7 @@ select:disabled,
   width: 100%;
   min-height: 44px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: none;
   background: var(--theme-primary);
   color: var(--text-on-primary);
@@ -2220,7 +2224,7 @@ select:disabled,
 .result-box {
   margin-top: 14px;
   padding: 14px;
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
   text-align: center;
@@ -2241,7 +2245,7 @@ select:disabled,
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 12px;
   display: block;
   margin-bottom: 10px;
 }
@@ -2275,7 +2279,7 @@ select:disabled,
 .preview-back {
   min-height: 44px;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: none;
   background: var(--theme-primary);
   color: var(--text-on-primary);
@@ -2308,7 +2312,7 @@ select:disabled,
 .preview-external {
   min-height: 44px;
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--surface-elevated);
   color: var(--text-primary);
@@ -2367,7 +2371,7 @@ select:disabled,
   right: 12px;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 6px;
   box-shadow: var(--shadow-elevated);
   z-index: 200;
@@ -2386,7 +2390,7 @@ select:disabled,
   justify-content: center;
   gap: 3px;
   padding: 6px 4px;
-  border-radius: 10px;
+  border-radius: 14px;
   font-size: 0.74rem;
   font-weight: 600;
   transition: background 0.2s ease, color 0.2s ease;
