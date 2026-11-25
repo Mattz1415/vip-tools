@@ -19,7 +19,7 @@ export default function VipToolsApp() {
 
   return (
     <>
-      <a href="#mainContent" className="skip-link">
+      <a href="#authPage" id="skipLink" className="skip-link">
         Lewati ke konten utama
       </a>
 
@@ -41,7 +41,7 @@ export default function VipToolsApp() {
 
       <div id="loader" role="status" aria-live="polite">
         <div className="loader-crest-3d mecha-cut" aria-hidden="true">
-          <i className="fas fa-bolt" style={{ fontSize: "1.75rem", color: "var(--accent-hallmark)" }} />
+          <span className="brand-monogram">MLM</span>
         </div>
         <div className="loader-title">MATTZLM</div>
         <div className="loader-sub">KURO-MECHA 3D DECK</div>
@@ -75,20 +75,31 @@ export default function VipToolsApp() {
           <span className="preview-title" id="previewTitle">
             Memuat preview...
           </span>
+          <a
+            href="#previewOverlay"
+            id="previewExternalLink"
+            className="preview-external"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i className="fas fa-arrow-up-right-from-square" aria-hidden="true" /> Buka Tab Baru
+          </a>
         </div>
         <iframe
           className="preview-frame"
           id="previewFrame"
           title="Pratinjau Tool Eksternal"
+          width={1280}
+          height={720}
           src="about:blank"
         />
       </div>
 
-      <main id="authPage" aria-labelledby="authHeading">
+      <section className="auth-portal" id="authPage" tabIndex={-1} aria-labelledby="authHeading">
         <div className="auth-box mecha-cut">
           <div className="auth-anime-side">
             <div className="anime-emblem-3d mecha-cut-sm" aria-hidden="true">
-              <i className="fas fa-bolt" style={{ fontSize: "1.65rem", color: "var(--accent-hallmark)" }} />
+              <span className="brand-monogram">MLM</span>
             </div>
             <h1 className="auth-brand-title" id="authHeading">
               MattzLM 3D Deck
@@ -99,7 +110,7 @@ export default function VipToolsApp() {
             <ul className="auth-feature-list">
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>35+ utilitas web &amp; modul XVIP terintegrasi</span>
+                <span>35 utilitas web &amp; modul XVIP terintegrasi</span>
               </li>
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
@@ -161,6 +172,7 @@ export default function VipToolsApp() {
                     type="text"
                     id="loginUser"
                     autoComplete="username"
+                    aria-describedby="loginError"
                     placeholder="Masukkan username"
                     required
                   />
@@ -177,6 +189,7 @@ export default function VipToolsApp() {
                     type="password"
                     id="loginPass"
                     autoComplete="current-password"
+                    aria-describedby="loginError"
                     placeholder="Masukkan password"
                     required
                   />
@@ -218,6 +231,7 @@ export default function VipToolsApp() {
                     type="text"
                     id="regUser"
                     autoComplete="username"
+                    aria-describedby="regError"
                     placeholder="Pilih username unik"
                     required
                   />
@@ -234,6 +248,7 @@ export default function VipToolsApp() {
                     type="password"
                     id="regPass"
                     autoComplete="new-password"
+                    aria-describedby="regError"
                     placeholder="Minimal 4 karakter"
                     required
                   />
@@ -259,6 +274,7 @@ export default function VipToolsApp() {
                     type="password"
                     id="regPass2"
                     autoComplete="new-password"
+                    aria-describedby="regError"
                     placeholder="Ulangi password"
                     required
                   />
@@ -282,12 +298,12 @@ export default function VipToolsApp() {
             </form>
           </div>
         </div>
-      </main>
+      </section>
 
       <div className="app-wrap" id="appWrap" hidden>
         <aside className="anime-rail" aria-label="Navigasi desktop">
           <div className="rail-brand mecha-cut-sm" aria-hidden="true">
-            <i className="fas fa-dragon" style={{ fontSize: "1.35rem", color: "var(--accent-hallmark)" }} />
+            <span className="brand-monogram">MLM</span>
           </div>
 
           <nav className="rail-nav" aria-label="Menu utama desktop">
@@ -344,7 +360,7 @@ export default function VipToolsApp() {
         <header className="header-top">
           <div className="logo-wrapper">
             <div className="logo-icon" id="logoIcon" aria-hidden="true">
-              <i className="fas fa-bolt" />
+              <span className="brand-monogram">MLM</span>
             </div>
             <div className="logo-text">
               <span className="brand-name">
@@ -375,7 +391,7 @@ export default function VipToolsApp() {
               aria-pressed="false"
               aria-label="Jeda atau jalankan animasi latar"
             >
-              <i className="fas fa-sparkles" aria-hidden="true" />
+              <i className="fas fa-wave-square" aria-hidden="true" />
               <span className="header-btn-text" id="motionToggleLabel">Gerak</span>
             </button>
 
@@ -434,7 +450,7 @@ export default function VipToolsApp() {
           </div>
 
           <div className="workspace-header-row">
-            <h1 className="page-hero-title" id="workspaceHeading">
+            <h1 className="page-hero-title" id="workspaceHeading" tabIndex={-1}>
               Beranda Deck MattzLM
             </h1>
             <p className="workspace-sub" id="workspaceSub">
@@ -493,7 +509,7 @@ export default function VipToolsApp() {
               <div className="dossier-panel">
                 <div>
                   <h2 className="dossier-heading">
-                    <i className="fas fa-id-card" aria-hidden="true" style={{ color: "var(--accent-hallmark)" }} />
+                    <i className="fas fa-id-card" aria-hidden="true" style={{ color: "var(--accent-hallmark-fg)" }} />
                     Dossier Pilot Aktif
                   </h2>
                   <div className="dossier-list">
@@ -544,7 +560,7 @@ export default function VipToolsApp() {
             <div className="home-section-block">
               <div className="deck-panel">
                 <h2 className="section-title">
-                  <i className="fas fa-fire" aria-hidden="true" style={{ color: "var(--accent-hallmark)" }} />
+                  <i className="fas fa-fire" aria-hidden="true" style={{ color: "var(--accent-hallmark-fg)" }} />
                   Tools Populer
                   <span className="line" aria-hidden="true" />
                 </h2>
@@ -555,7 +571,7 @@ export default function VipToolsApp() {
             <div className="home-section-block">
               <div className="deck-panel">
                 <h2 className="section-title">
-                  <i className="fas fa-robot" aria-hidden="true" style={{ color: "var(--status-success)" }} />
+                  <i className="fas fa-plug" aria-hidden="true" style={{ color: "var(--status-success)" }} />
                   Feed Tools Terbaru (Telegram / Custom)
                   <span className="line" aria-hidden="true" />
                 </h2>
@@ -581,7 +597,7 @@ export default function VipToolsApp() {
                 </button>
                 <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="maker">
                   <span className="category-tab-main">
-                    <i className="fas fa-wand-magic-sparkles" aria-hidden="true" /> MAKER
+                    <i className="fas fa-paintbrush" aria-hidden="true" /> MAKER
                   </span>
                   <span className="category-count" data-count-for="maker">0</span>
                 </button>
@@ -611,7 +627,7 @@ export default function VipToolsApp() {
                 </button>
                 <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="telegram">
                   <span className="category-tab-main">
-                    <i className="fas fa-robot" aria-hidden="true" /> CUSTOM
+                    <i className="fas fa-plug" aria-hidden="true" /> CUSTOM
                   </span>
                   <span className="category-count" data-count-for="telegram">0</span>
                 </button>
