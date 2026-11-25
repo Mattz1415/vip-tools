@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { initVipTools } from "@/lib/vip-tools-client";
 
 function callGlobal(name: string, ...args: unknown[]) {
-  const fn = (window as unknown as Record<string, ((...a: unknown[]) => void) | undefined>)[name];
+  const fn = (
+    window as unknown as Record<string, ((...a: unknown[]) => void) | undefined>
+  )[name];
   if (typeof fn === "function") {
     fn(...args);
   }
@@ -17,298 +19,379 @@ export default function VipToolsApp() {
 
   return (
     <>
-      <video id="bgVideo" autoPlay loop muted playsInline>
-        <source src="https://c.termai.cc/v131/H4vF9D.mp4" type="video/mp4" />
-      </video>
-      <div id="bgOverlay" />
-      <div className="anime-orbs">
-        <div className="anime-orb orb-1" />
-        <div className="anime-orb orb-2" />
-        <div className="anime-orb orb-3" />
-      </div>
-      <div className="anime-grid-3d" />
-      <canvas id="animeParticles" />
+      <a href="#mainContent" className="skip-link">
+        Lewati ke konten utama
+      </a>
 
-      <div id="loader">
-        <div className="loader-ring-3d">
-          <span />
-          <span />
-          <span />
+      <div className="backdrop-stage" aria-hidden="true">
+        <video
+          id="bgVideo"
+          width={1280}
+          height={720}
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src="https://c.termai.cc/v131/H4vF9D.mp4" type="video/mp4" />
+        </video>
+        <div id="bgOverlay" />
+        <canvas id="animeParticles" width={1280} height={720} />
+      </div>
+
+      <div id="loader" role="status" aria-live="polite">
+        <div className="loader-crest-3d mecha-cut" aria-hidden="true">
+          <i className="fas fa-bolt" style={{ fontSize: "1.75rem", color: "var(--accent-hallmark)" }} />
         </div>
         <div className="loader-title">MATTZLM</div>
-        <div className="loader-sub">✦ ANIME 3D DECK ✦</div>
-        <div className="loader-bar-wrap">
+        <div className="loader-sub">KURO-MECHA 3D DECK</div>
+        <div className="loader-bar-wrap" aria-hidden="true">
           <div className="loader-bar" />
         </div>
         <div className="loader-status" id="ldStatus">
-          INITIALIZING 3D MODULES...
+          MEMUAT MODUL DECK...
         </div>
       </div>
 
-      <div id="toast" />
+      <div id="toast" role="status" aria-live="polite" aria-atomic="true" />
 
-      <div id="warningBanner" className="warning-banner">
-        <button
-          className="warning-close"
-          onClick={() => callGlobal("closeWarningBanner")}
-        >
-          <i className="fas fa-times" />
-        </button>
-        <div className="warning-text">
-          𝐈𝐍𝐈 𝐀𝐏𝐋𝐈𝐊𝐀𝐒𝐈 𝐅𝐑𝐄𝐄 𝐁𝐘 𝐌𝐀𝐓𝐓𝐙𝐋𝐌, 𝐊𝐀𝐋𝐎 𝐀𝐃𝐀 𝐘𝐀𝐍𝐆 𝐌𝐄𝐌𝐏𝐄𝐑𝐉𝐔𝐀𝐋 𝐁𝐄𝐋𝐈𝐊𝐀𝐍 𝐒𝐄𝐆𝐄𝐑𝐀 𝐋𝐀𝐏𝐎𝐑 𝐊𝐄 𝐎𝐖𝐍𝐄𝐑 (𝐌𝐀𝐓𝐓𝐙𝐋𝐌) 𝐀𝐆𝐀𝐑 𝐓𝐈𝐃𝐀𝐊 𝐀𝐃𝐀 𝐊𝐎𝐑𝐁𝐀𝐍 𝐒𝐄𝐋𝐀𝐍𝐉𝐔𝐓𝐍𝐘𝐀
-        </div>
-      </div>
-
-      <div className="preview-overlay" id="previewOverlay">
+      <div
+        className="preview-overlay"
+        id="previewOverlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="previewTitle"
+        hidden
+      >
         <div className="preview-header">
           <button
+            type="button"
             className="preview-back"
+            id="previewBackBtn"
             onClick={() => callGlobal("closePreview")}
           >
-            <i className="fas fa-arrow-left" /> Kembali
+            <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali
           </button>
           <span className="preview-title" id="previewTitle">
-            Loading...
+            Memuat preview...
           </span>
         </div>
-        <iframe className="preview-frame" id="previewFrame" src="about:blank" />
+        <iframe
+          className="preview-frame"
+          id="previewFrame"
+          title="Pratinjau Tool Eksternal"
+          src="about:blank"
+        />
       </div>
 
-      <div className="sidebar-overlay" id="sbOverlay" />
-      <div className="sidebar" id="sidebar">
-        <div className="sb-head">
-          <div className="avatar" id="sbAvatar">
-            <span id="sbAvatarText">M</span>
-          </div>
-          <div>
-            <div className="sb-name" id="sbName">
-              User
-            </div>
-            <div className="sb-role" id="sbRole">
-              ✦ MEMBER
-            </div>
-          </div>
-        </div>
-        <div className="sb-item active" data-page="homePage">
-          <i className="fas fa-home" /> Beranda
-        </div>
-        <div className="sb-item" data-page="toolsPage">
-          <i className="fas fa-toolbox" /> Tools
-        </div>
-        <div className="sb-item" data-page="profilePage">
-          <i className="fas fa-user" /> Profil
-        </div>
-        <div className="sb-item" data-page="chatPage">
-          <i className="fas fa-comment" /> Chat Admin
-        </div>
-        <div
-          className="sb-item"
-          style={{
-            borderTop: "1px solid var(--theme-border-color)",
-            marginTop: "8px",
-            color: "#dc2626",
-          }}
-          onClick={() => callGlobal("doLogout")}
-        >
-          <i className="fas fa-sign-out-alt" /> Keluar
-        </div>
-      </div>
-
-      <div id="authPage">
-        <div className="auth-box">
+      <main id="authPage" aria-labelledby="authHeading">
+        <div className="auth-box mecha-cut">
           <div className="auth-anime-side">
-            <div className="anime-emblem-3d">
-              <i className="fas fa-bolt" />
+            <div className="anime-emblem-3d mecha-cut-sm" aria-hidden="true">
+              <i className="fas fa-bolt" style={{ fontSize: "1.65rem", color: "var(--accent-hallmark)" }} />
             </div>
-            <div className="auth-jp-tag">マッツ // ANIME 3D PORTAL</div>
+            <h1 className="auth-brand-title" id="authHeading">
+              MattzLM 3D Deck
+            </h1>
+            <p className="auth-brand-desc">
+              Pusat utilitas web downloader, image maker, generator, dan console command dalam satu workspace cepat.
+            </p>
+            <ul className="auth-feature-list">
+              <li>
+                <i className="fas fa-check" aria-hidden="true" />
+                <span>35+ utilitas web &amp; modul XVIP terintegrasi</span>
+              </li>
+              <li>
+                <i className="fas fa-check" aria-hidden="true" />
+                <span>5 tema kontras terkalibrasi (Biru, Merah, Hitam, Putih, Silver)</span>
+              </li>
+              <li>
+                <i className="fas fa-check" aria-hidden="true" />
+                <span>Dukungan shortcut keyboard ⌘K / Ctrl+K &amp; panel owner</span>
+              </li>
+            </ul>
           </div>
+
           <div className="auth-form-side">
-            <div className="logo">
-              <h1>MATTZLM</h1>
-              <p>✦ VIP TOOLS 3D ✦</p>
-            </div>
-            <div className="auth-mode">
+            <h2 className="auth-form-heading" id="authFormTitle">
+              Akses Portal
+            </h2>
+            <p className="auth-form-sub">
+              Masuk atau daftarkan akun lokal untuk membuka command deck.
+            </p>
+
+            <div className="auth-mode" role="tablist" aria-label="Mode autentikasi">
               <button
+                type="button"
+                role="tab"
+                id="tabLoginBtn"
+                aria-selected="true"
                 className="mode-btn active"
                 onClick={() => callGlobal("switchAuthMode", "login")}
               >
                 LOGIN
               </button>
               <button
+                type="button"
+                role="tab"
+                id="tabRegisterBtn"
+                aria-selected="false"
                 className="mode-btn"
                 onClick={() => callGlobal("switchAuthMode", "register")}
               >
                 DAFTAR
               </button>
             </div>
-            <div id="loginView">
-              <div className="input-group">
-                <i className="fas fa-user" />
-                <input type="text" id="loginUser" placeholder="Username" />
+
+            <form
+              id="loginView"
+              onSubmit={(e) => {
+                e.preventDefault();
+                callGlobal("doLogin");
+              }}
+              noValidate
+            >
+              <div className="field-stack">
+                <label htmlFor="loginUser" className="field-label">
+                  Username
+                </label>
+                <div className="input-group" id="loginUserGroup">
+                  <i className="fas fa-user" aria-hidden="true" />
+                  <input
+                    type="text"
+                    id="loginUser"
+                    autoComplete="username"
+                    placeholder="Masukkan username"
+                    required
+                  />
+                </div>
               </div>
-              <div className="input-group">
-                <i className="fas fa-lock" />
-                <input type="password" id="loginPass" placeholder="Password" />
+
+              <div className="field-stack">
+                <label htmlFor="loginPass" className="field-label">
+                  Password
+                </label>
+                <div className="input-group" id="loginPassGroup">
+                  <i className="fas fa-lock" aria-hidden="true" />
+                  <input
+                    type="password"
+                    id="loginPass"
+                    autoComplete="current-password"
+                    placeholder="Masukkan password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="pass-toggle-btn"
+                    aria-label="Tampilkan atau sembunyikan password"
+                    aria-pressed="false"
+                    data-toggle-pass="loginPass"
+                  >
+                    <i className="fas fa-eye" aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <button className="btn-auth" onClick={() => callGlobal("doLogin")}>
-                <i className="fas fa-right-to-bracket" /> MASUK
+
+              <div id="loginError" className="inline-error" role="alert" aria-live="polite" />
+
+              <button type="submit" id="loginSubmitBtn" className="btn-auth mecha-cut-sm">
+                <i className="fas fa-right-to-bracket" aria-hidden="true" /> MASUK KE DECK
               </button>
-            </div>
-            <div id="registerView" style={{ display: "none" }}>
-              <div className="input-group">
-                <i className="fas fa-user" />
-                <input type="text" id="regUser" placeholder="Username" />
+            </form>
+
+            <form
+              id="registerView"
+              hidden
+              onSubmit={(e) => {
+                e.preventDefault();
+                callGlobal("doRegister");
+              }}
+              noValidate
+            >
+              <div className="field-stack">
+                <label htmlFor="regUser" className="field-label">
+                  Username Baru
+                </label>
+                <div className="input-group" id="regUserGroup">
+                  <i className="fas fa-user" aria-hidden="true" />
+                  <input
+                    type="text"
+                    id="regUser"
+                    autoComplete="username"
+                    placeholder="Pilih username unik"
+                    required
+                  />
+                </div>
               </div>
-              <div className="input-group">
-                <i className="fas fa-lock" />
-                <input type="password" id="regPass" placeholder="Password" />
+
+              <div className="field-stack">
+                <label htmlFor="regPass" className="field-label">
+                  Password
+                </label>
+                <div className="input-group" id="regPassGroup">
+                  <i className="fas fa-lock" aria-hidden="true" />
+                  <input
+                    type="password"
+                    id="regPass"
+                    autoComplete="new-password"
+                    placeholder="Minimal 4 karakter"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="pass-toggle-btn"
+                    aria-label="Tampilkan atau sembunyikan password"
+                    aria-pressed="false"
+                    data-toggle-pass="regPass"
+                  >
+                    <i className="fas fa-eye" aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <div className="input-group">
-                <i className="fas fa-lock" />
-                <input
-                  type="password"
-                  id="regPass2"
-                  placeholder="Konfirmasi Password"
-                />
+
+              <div className="field-stack">
+                <label htmlFor="regPass2" className="field-label">
+                  Konfirmasi Password
+                </label>
+                <div className="input-group" id="regPass2Group">
+                  <i className="fas fa-lock" aria-hidden="true" />
+                  <input
+                    type="password"
+                    id="regPass2"
+                    autoComplete="new-password"
+                    placeholder="Ulangi password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="pass-toggle-btn"
+                    aria-label="Tampilkan atau sembunyikan konfirmasi password"
+                    aria-pressed="false"
+                    data-toggle-pass="regPass2"
+                  >
+                    <i className="fas fa-eye" aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <button
-                className="btn-auth"
-                onClick={() => callGlobal("doRegister")}
-              >
-                <i className="fas fa-user-plus" /> DAFTAR
+
+              <div id="regError" className="inline-error" role="alert" aria-live="polite" />
+
+              <button type="submit" id="regSubmitBtn" className="btn-auth mecha-cut-sm">
+                <i className="fas fa-user-plus" aria-hidden="true" /> BUAT AKUN
               </button>
-            </div>
+            </form>
           </div>
         </div>
-      </div>
+      </main>
 
-      <div className="app-wrap" id="appWrap">
-        <aside className="anime-rail">
-          <div className="rail-brand">
-            <i className="fas fa-dragon" />
+      <div className="app-wrap" id="appWrap" hidden>
+        <aside className="anime-rail" aria-label="Navigasi desktop">
+          <div className="rail-brand mecha-cut-sm" aria-hidden="true">
+            <i className="fas fa-dragon" style={{ fontSize: "1.35rem", color: "var(--accent-hallmark)" }} />
           </div>
-          <div className="rail-nav">
+
+          <nav className="rail-nav" aria-label="Menu utama desktop">
             <button
+              type="button"
               className="rail-item active"
               data-page="homePage"
-              title="Beranda"
+              aria-current="page"
+              aria-label="Beranda"
             >
-              <i className="fas fa-home" />
+              <i className="fas fa-home" aria-hidden="true" />
+              <span>Beranda</span>
             </button>
             <button
+              type="button"
               className="rail-item"
               data-page="toolsPage"
-              title="Tools"
+              aria-label="Tools"
             >
-              <i className="fas fa-toolbox" />
+              <i className="fas fa-toolbox" aria-hidden="true" />
+              <span>Tools</span>
             </button>
             <button
+              type="button"
               className="rail-item"
               data-page="profilePage"
-              title="Profil"
+              aria-label="Profil"
             >
-              <i className="fas fa-user" />
+              <i className="fas fa-user" aria-hidden="true" />
+              <span>Profil</span>
             </button>
             <button
+              type="button"
               className="rail-item"
               data-page="chatPage"
-              title="Chat"
+              aria-label="Chat Admin"
             >
-              <i className="fas fa-comment" />
+              <i className="fas fa-comment" aria-hidden="true" />
+              <span>Chat</span>
             </button>
-          </div>
+          </nav>
+
           <button
+            type="button"
             className="rail-logout"
             onClick={() => callGlobal("doLogout")}
-            title="Keluar"
+            aria-label="Keluar dari akun"
           >
-            <i className="fas fa-sign-out-alt" />
+            <i className="fas fa-sign-out-alt" aria-hidden="true" />
+            <span>Keluar</span>
           </button>
         </aside>
 
         <header className="header-top">
-          <div className="header-left-group">
-            <div className="menu-btn" onClick={() => callGlobal("toggleSidebar")}>
-              <span />
-              <span />
-              <span />
+          <div className="logo-wrapper">
+            <div className="logo-icon" id="logoIcon" aria-hidden="true">
+              <i className="fas fa-bolt" />
             </div>
-            <div className="logo-wrapper">
-              <div className="logo-icon" id="logoIcon">
-                <i className="fas fa-bolt" />
-              </div>
-              <div className="logo-text">
-                <span className="brand-name">
-                  Mattz<span>LM</span>
-                </span>
-                <span className="brand-tagline">ANIME 3D DECK</span>
-              </div>
+            <div className="logo-text">
+              <span className="brand-name">
+                Mattz<span>LM</span>
+              </span>
+              <span className="brand-tagline">KURO-MECHA 3D DECK</span>
             </div>
           </div>
+
           <div className="header-right">
-            <nav className="header-nav" id="headerNav">
-              <a
-                href="#"
-                className="active"
-                id="navHome"
-                onClick={(e) => {
-                  e.preventDefault();
-                  callGlobal("showPage", "homePage");
-                }}
-              >
-                Home
-              </a>
-              <a
-                href="#"
-                id="navTools"
-                onClick={(e) => {
-                  e.preventDefault();
-                  callGlobal("showPage", "toolsPage");
-                }}
-              >
-                Tools
-              </a>
-              <a
-                href="#"
-                id="navProfile"
-                onClick={(e) => {
-                  e.preventDefault();
-                  callGlobal("showPage", "profilePage");
-                }}
-              >
-                Profil
-              </a>
-              <a
-                href="#"
-                id="navChat"
-                onClick={(e) => {
-                  e.preventDefault();
-                  callGlobal("showPage", "chatPage");
-                }}
-              >
-                Chat
-              </a>
-            </nav>
             <button
+              type="button"
               className="header-btn"
               id="themeToggleBtn"
               onClick={() => callGlobal("toggleSpecialTheme")}
-              title="Ganti tema & video"
+              aria-pressed="false"
+              aria-label="Ganti tema antara mode standar dan silver"
             >
-              <i className="fas fa-circle-half-stroke" />
+              <i className="fas fa-circle-half-stroke" aria-hidden="true" />
+              <span className="header-btn-text">Tema</span>
             </button>
-            <div style={{ display: "flex", alignItems: "center" }}>
+
+            <button
+              type="button"
+              className="header-btn"
+              id="motionToggleBtn"
+              onClick={() => callGlobal("toggleMotion")}
+              aria-pressed="false"
+              aria-label="Jeda atau jalankan animasi latar"
+            >
+              <i className="fas fa-sparkles" aria-hidden="true" />
+              <span className="header-btn-text" id="motionToggleLabel">Gerak</span>
+            </button>
+
+            <div className="music-group">
               <button
+                type="button"
                 className="header-btn"
                 id="musicToggleBtn"
                 onClick={() => callGlobal("toggleMusic")}
-                title="Musik"
+                aria-pressed="false"
+                aria-label="Putar atau hentikan musik latar"
               >
-                <i className="fas fa-music" />
+                <i className="fas fa-music" aria-hidden="true" />
+                <span className="header-btn-text" id="musicToggleLabel">Musik</span>
               </button>
-              <div className="music-visualizer" id="musicVisualizer">
-                <span className="bar" />
-                <span className="bar" />
+              <div className="music-visualizer" id="musicVisualizer" aria-hidden="true">
                 <span className="bar" />
                 <span className="bar" />
                 <span className="bar" />
@@ -317,19 +400,14 @@ export default function VipToolsApp() {
                 <span className="bar" />
               </div>
               <button
+                type="button"
                 className="change-music-btn"
                 onClick={() => callGlobal("changeMusic")}
-                title="Ganti lagu"
+                aria-label="Ganti trek musik"
               >
-                <i className="fas fa-rotate" />
+                <i className="fas fa-rotate" aria-hidden="true" />
               </button>
             </div>
-            <button
-              className="header-btn"
-              onClick={() => callGlobal("showPage", "chatPage")}
-            >
-              <i className="fas fa-comment" /> Chat
-            </button>
           </div>
         </header>
 
@@ -337,12 +415,46 @@ export default function VipToolsApp() {
           <source src="https://c.termai.cc/v139/dhV3.mp4" type="audio/mp4" />
         </audio>
 
-        <div className="content-wrap">
-          <div className="page active" id="homePage">
+        <main className="content-wrap" id="mainContent" tabIndex={-1}>
+          <div id="warningBanner" className="warning-banner" role="region" aria-label="Pemberitahuan aplikasi gratis">
+            <div className="warning-text">
+              <i className="fas fa-shield-halved" aria-hidden="true" />
+              <span>
+                Aplikasi ini gratis dari MattzLM. Jika ada pihak yang memperjualbelikan akses, segera lapor ke Owner (MattzLM).
+              </span>
+            </div>
+            <button
+              type="button"
+              className="warning-close"
+              onClick={() => callGlobal("closeWarningBanner")}
+              aria-label="Tutup pemberitahuan"
+            >
+              <i className="fas fa-times" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="workspace-header-row">
+            <h1 className="page-hero-title" id="workspaceHeading">
+              Beranda Deck MattzLM
+            </h1>
+            <p className="workspace-sub" id="workspaceSub">
+              Ringkasan pilot, pratinjau visual, dan akses cepat utilitas utama.
+            </p>
+          </div>
+
+          <section className="page active" id="homePage" aria-label="Beranda">
             <div className="anime-hero-grid">
-              <div className="hero-visor">
+              <div className="hero-visor mecha-cut">
                 <div className="video-landscape">
-                  <video autoPlay loop muted playsInline id="homeVideo">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    width={640}
+                    height={360}
+                    id="homeVideo"
+                  >
                     <source
                       src="https://c.termai.cc/v131/H4vF9D.mp4"
                       type="video/mp4"
@@ -350,202 +462,226 @@ export default function VipToolsApp() {
                   </video>
                 </div>
                 <div className="visor-hud-overlay">
-                  <span className="visor-badge">LIVE HUD // MATTZLM</span>
-                  <a
-                    href="https://github.com/Mattz1415"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="channel-btn"
-                  >
-                    <i className="fab fa-github" /> MattzLM
-                  </a>
+                  <div className="visor-meta">
+                    <span className="visor-badge">UNIT VISUAL // MATTZLM-01</span>
+                    <span className="visor-caption">Kuro-Mecha Deck Status Aktif</span>
+                  </div>
+                  <div className="visor-actions">
+                    <button
+                      type="button"
+                      className="visor-control-btn"
+                      id="visorVideoToggleBtn"
+                      onClick={() => callGlobal("toggleHomeVideo")}
+                      aria-pressed="false"
+                      aria-label="Jeda atau putar video visor"
+                    >
+                      <i className="fas fa-pause" aria-hidden="true" />
+                      <span id="visorVideoToggleLabel">Jeda</span>
+                    </button>
+                    <a
+                      href="https://github.com/Mattz1415"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="channel-btn mecha-cut-sm"
+                    >
+                      <i className="fab fa-github" aria-hidden="true" /> GitHub Mattz1415
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div className="telemetry-grid">
-                <div className="stat-tile">
-                  <div className="tile-icon">
-                    <i className="fas fa-user" />
+              <div className="dossier-panel">
+                <div>
+                  <h2 className="dossier-heading">
+                    <i className="fas fa-id-card" aria-hidden="true" style={{ color: "var(--accent-hallmark)" }} />
+                    Dossier Pilot Aktif
+                  </h2>
+                  <div className="dossier-list">
+                    <div className="dossier-row">
+                      <span className="label">
+                        <i className="fas fa-user" aria-hidden="true" /> Username
+                      </span>
+                      <span className="value" id="devUser">
+                        -
+                      </span>
+                    </div>
+                    <div className="dossier-row">
+                      <span className="label">
+                        <i className="fas fa-laptop" aria-hidden="true" /> Perangkat
+                      </span>
+                      <span className="value" id="devDevice">
+                        -
+                      </span>
+                    </div>
+                    <div className="dossier-row">
+                      <span className="label">
+                        <i className="fas fa-battery-three-quarters" aria-hidden="true" /> Baterai
+                      </span>
+                      <span className="value" id="devBattery">
+                        -
+                      </span>
+                    </div>
+                    <div className="dossier-row">
+                      <span className="label">
+                        <i className="fas fa-crown" aria-hidden="true" /> Role
+                      </span>
+                      <span className="value role" id="devRole">
+                        MEMBER
+                      </span>
+                    </div>
                   </div>
-                  <span className="label">Username</span>
-                  <span className="value" id="devUser">
-                    -
-                  </span>
                 </div>
-                <div className="stat-tile">
-                  <div className="tile-icon">
-                    <i className="fas fa-laptop" />
-                  </div>
-                  <span className="label">Perangkat</span>
-                  <span className="value" id="devDevice">
-                    -
-                  </span>
-                </div>
-                <div className="stat-tile">
-                  <div className="tile-icon">
-                    <i className="fas fa-battery-three-quarters" />
-                  </div>
-                  <span className="label">Baterai</span>
-                  <span className="value" id="devBattery">
-                    -
-                  </span>
-                </div>
-                <div className="stat-tile">
-                  <div className="tile-icon">
-                    <i className="fas fa-crown" />
-                  </div>
-                  <span className="label">Role</span>
-                  <span className="value role" id="devRole">
-                    ✦ MEMBER
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  className="btn-auth mecha-cut-sm dossier-cta"
+                  onClick={() => callGlobal("showPage", "toolsPage")}
+                >
+                  <i className="fas fa-toolbox" aria-hidden="true" /> Buka Katalog Tools
+                </button>
               </div>
             </div>
 
-            <div className="home-bento-decks">
+            <div className="home-section-block">
               <div className="deck-panel">
-                <div className="section-title">
-                  <i
-                    className="fas fa-th-large"
-                    style={{ color: "var(--theme-primary)" }}
-                  />{" "}
+                <h2 className="section-title">
+                  <i className="fas fa-fire" aria-hidden="true" style={{ color: "var(--accent-hallmark)" }} />
                   Tools Populer
-                  <span className="line" />
-                </div>
+                  <span className="line" aria-hidden="true" />
+                </h2>
                 <div className="tools-grid" id="popularGrid" />
               </div>
+            </div>
 
+            <div className="home-section-block">
               <div className="deck-panel">
-                <div className="section-title">
-                  <i
-                    className="fas fa-plus-circle"
-                    style={{ color: "var(--new-badge)" }}
-                  />{" "}
-                  Tools Terbaru
-                  <span className="line" />
-                </div>
-                <div className="tools-grid" id="telegramToolsGrid" />
+                <h2 className="section-title">
+                  <i className="fas fa-robot" aria-hidden="true" style={{ color: "var(--status-success)" }} />
+                  Feed Tools Terbaru (Telegram / Custom)
+                  <span className="line" aria-hidden="true" />
+                </h2>
+                <div className="tools-feed-list" id="telegramToolsGrid" />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="page" id="toolsPage">
+          <section className="page" id="toolsPage" aria-label="Katalog Tools" hidden>
             <div className="tools-workspace">
-              <div className="category-tabs" id="categoryTabs">
-                <button className="category-tab active" data-category="all">
-                  <i className="fas fa-th-large" /> ALL
+              <div className="category-tabs" id="categoryTabs" role="tablist" aria-label="Kategori Tools">
+                <button type="button" role="tab" aria-selected="true" className="category-tab active" data-category="all">
+                  <span className="category-tab-main">
+                    <i className="fas fa-th-large" aria-hidden="true" /> SEMUA
+                  </span>
+                  <span className="category-count" data-count-for="all">0</span>
                 </button>
-                <button className="category-tab" data-category="downloader">
-                  <i className="fas fa-download" /> DOWNLOADER
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="downloader">
+                  <span className="category-tab-main">
+                    <i className="fas fa-download" aria-hidden="true" /> DOWNLOADER
+                  </span>
+                  <span className="category-count" data-count-for="downloader">0</span>
                 </button>
-                <button className="category-tab" data-category="maker">
-                  <i className="fas fa-wand-magic-sparkles" /> MAKER
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="maker">
+                  <span className="category-tab-main">
+                    <i className="fas fa-wand-magic-sparkles" aria-hidden="true" /> MAKER
+                  </span>
+                  <span className="category-count" data-count-for="maker">0</span>
                 </button>
-                <button className="category-tab" data-category="tools">
-                  <i className="fas fa-screwdriver-wrench" /> TOOLS
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="tools">
+                  <span className="category-tab-main">
+                    <i className="fas fa-screwdriver-wrench" aria-hidden="true" /> TOOLS
+                  </span>
+                  <span className="category-count" data-count-for="tools">0</span>
                 </button>
-                <button className="category-tab" data-category="external">
-                  <i className="fas fa-link" /> EXTERNAL
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="external">
+                  <span className="category-tab-main">
+                    <i className="fas fa-link" aria-hidden="true" /> EXTERNAL
+                  </span>
+                  <span className="category-count" data-count-for="external">0</span>
                 </button>
-                <button className="category-tab" data-category="extra">
-                  <i className="fas fa-plus-circle" /> EXTRA
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="extra">
+                  <span className="category-tab-main">
+                    <i className="fas fa-plus-circle" aria-hidden="true" /> EXTRA
+                  </span>
+                  <span className="category-count" data-count-for="extra">0</span>
                 </button>
-                <button
-                  className="category-tab"
-                  data-category="xvip"
-                  style={{
-                    borderColor: "rgba(245,158,11,0.3)",
-                    color: "#f59e0b",
-                  }}
-                >
-                  <i className="fas fa-crown" /> XVIP
+                <button type="button" role="tab" aria-selected="false" className="category-tab tab-xvip" data-category="xvip">
+                  <span className="category-tab-main">
+                    <i className="fas fa-crown" aria-hidden="true" /> XVIP
+                  </span>
+                  <span className="category-count" data-count-for="xvip">0</span>
                 </button>
-                <button
-                  className="category-tab"
-                  data-category="telegram"
-                  style={{
-                    borderColor: "rgba(34,197,94,0.3)",
-                    color: "var(--new-badge)",
-                  }}
-                >
-                  <i className="fas fa-robot" /> TELEGRAM
+                <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="telegram">
+                  <span className="category-tab-main">
+                    <i className="fas fa-robot" aria-hidden="true" /> CUSTOM
+                  </span>
+                  <span className="category-count" data-count-for="telegram">0</span>
                 </button>
               </div>
 
               <div className="tools-main-pane">
+                <label htmlFor="searchInput" className="search-label">
+                  Cari modul tool berdasarkan nama atau deskripsi
+                </label>
                 <div className="search-wrapper" id="searchWrapper">
-                  <i className="fas fa-search" />
+                  <i className="fas fa-search" aria-hidden="true" />
                   <input
-                    type="text"
+                    type="search"
                     id="searchInput"
-                    placeholder="Cari tools..."
+                    placeholder="Ketik nama tool (contoh: TikTok, Fake IG, QR)..."
                   />
-                  <span className="search-shortcut">⌘K</span>
+                  <span className="search-shortcut" aria-hidden="true">⌘K</span>
                 </div>
                 <div id="toolsContainer" />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="page" id="profilePage">
+          <section className="page" id="profilePage" aria-label="Profil dan Pengaturan" hidden>
             <div className="device-card">
               <div className="profile-pilot-banner">
-                <div
-                  className="profile-avatar-container"
+                <button
+                  type="button"
+                  className="profile-avatar-btn"
                   id="profAvatarContainer"
+                  aria-label="Unggah atau ganti foto profil"
                 >
                   <img
                     id="profAvatarImg"
+                    width={92}
+                    height={92}
                     style={{ display: "none" }}
-                    alt="Avatar"
+                    alt="Foto profil pengguna"
                   />
-                  <span
-                    className="avatar-placeholder"
-                    id="profAvatarPlaceholder"
-                  >
+                  <span className="avatar-placeholder" id="profAvatarPlaceholder">
                     M
                   </span>
-                  <div className="avatar-overlay">
+                  <span className="avatar-overlay" aria-hidden="true">
                     <i className="fas fa-camera" />
-                  </div>
-                </div>
+                  </span>
+                </button>
+                <label htmlFor="avatarFileInput" className="sr-only">
+                  Pilih file foto profil
+                </label>
                 <input
                   type="file"
                   id="avatarFileInput"
                   accept="image/*"
-                  style={{ display: "none" }}
+                  className="sr-only"
                 />
-                <div style={{ flex: 1, minWidth: "200px" }}>
-                  <div
-                    style={{ fontSize: "1.25rem", fontWeight: 700 }}
-                    id="profName"
-                  >
+
+                <div className="profile-pilot-info">
+                  <div className="profile-pilot-name" id="profName">
                     User
                   </div>
-                  <div
-                    style={{
-                      fontSize: "0.72rem",
-                      color: "var(--anime-cyan)",
-                      letterSpacing: "3px",
-                      marginTop: "2px",
-                    }}
-                    id="profRole"
-                  >
-                    ✦ MEMBER ✦
+                  <div className="profile-pilot-role" id="profRole">
+                    MEMBER
                   </div>
-                  <div
-                    style={{
-                      fontSize: "0.68rem",
-                      color: "var(--theme-text-muted)",
-                      marginTop: "6px",
-                    }}
-                  >
-                    Klik atau drag &amp; drop foto ke avatar
+                  <div className="profile-avatar-hint">
+                    Klik tombol foto atau seret gambar (maks. 2MB) untuk mengganti avatar.
                   </div>
-                  <div style={{ marginTop: "10px" }}>
+                  <div style={{ marginTop: "12px" }}>
                     <div className="dev-row">
                       <span className="label">
-                        <i className="fas fa-laptop" /> Perangkat
+                        <i className="fas fa-laptop" aria-hidden="true" /> Perangkat
                       </span>
                       <span className="value" id="profDevice">
                         -
@@ -553,7 +689,7 @@ export default function VipToolsApp() {
                     </div>
                     <div className="dev-row">
                       <span className="label">
-                        <i className="fas fa-battery-three-quarters" /> Baterai
+                        <i className="fas fa-battery-three-quarters" aria-hidden="true" /> Baterai
                       </span>
                       <span className="value" id="profBattery">
                         -
@@ -561,10 +697,10 @@ export default function VipToolsApp() {
                     </div>
                     <div className="dev-row">
                       <span className="label">
-                        <i className="fas fa-crown" /> Role
+                        <i className="fas fa-crown" aria-hidden="true" /> Role Akses
                       </span>
                       <span className="value role" id="profRoleValue">
-                        ✦ MEMBER
+                        MEMBER
                       </span>
                     </div>
                   </div>
@@ -572,106 +708,135 @@ export default function VipToolsApp() {
               </div>
 
               <div className="profile-settings-grid">
-                <div>
-                  <h3 style={{ marginBottom: "12px", fontSize: "0.9rem" }}>
-                    <i className="fas fa-user-pen" /> Ganti Username
-                  </h3>
-                  <div className="input-group">
-                    <i className="fas fa-user" />
-                    <input
-                      type="text"
-                      id="newUsernameInput"
-                      placeholder="Username baru"
-                    />
-                  </div>
-                  <button
-                    className="btn-auth"
-                    onClick={() => callGlobal("changeUsername")}
-                    style={{ padding: "10px", fontSize: "0.8rem" }}
-                  >
-                    <i className="fas fa-check" /> Simpan Username
-                  </button>
-                </div>
-
-                <div>
-                  <h3 style={{ marginBottom: "12px", fontSize: "0.9rem" }}>
-                    <i className="fas fa-key" /> Ganti Password
-                  </h3>
-                  <div className="input-group">
-                    <i className="fas fa-lock" />
-                    <input
-                      type="password"
-                      id="currentPassInput"
-                      placeholder="Password saat ini"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-lock" />
-                    <input
-                      type="password"
-                      id="newPassInput"
-                      placeholder="Password baru"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <i className="fas fa-lock" />
-                    <input
-                      type="password"
-                      id="newPassInput2"
-                      placeholder="Konfirmasi password baru"
-                    />
-                  </div>
-                  <button
-                    className="btn-auth"
-                    onClick={() => callGlobal("changePassword")}
-                    style={{ padding: "10px", fontSize: "0.8rem" }}
-                  >
-                    <i className="fas fa-check" /> Simpan Password
-                  </button>
-                </div>
-              </div>
-
-              <div
-                id="ownerPanel"
-                style={{
-                  display: "none",
-                  marginTop: "20px",
-                  borderTop: "1px solid var(--theme-border-color)",
-                  paddingTop: "16px",
-                  textAlign: "left",
-                }}
-              >
-                <h3
-                  style={{
-                    marginBottom: "12px",
-                    fontSize: "0.95rem",
-                    color: "#f59e0b",
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    callGlobal("changeUsername");
                   }}
                 >
-                  <i className="fas fa-crown" /> Panel Owner (Full Akses)
-                </h3>
-
-                <div style={{ marginBottom: "14px" }}>
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--theme-text-muted)",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    Tema Website
+                  <h2 className="settings-heading">
+                    <i className="fas fa-user-pen" aria-hidden="true" /> Ganti Username
+                  </h2>
+                  <div className="field-stack">
+                    <label htmlFor="newUsernameInput" className="field-label">
+                      Username Baru
+                    </label>
+                    <div className="input-group">
+                      <i className="fas fa-user" aria-hidden="true" />
+                      <input
+                        type="text"
+                        id="newUsernameInput"
+                        placeholder="Masukkan username baru"
+                      />
+                    </div>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  <button type="submit" className="btn-auth mecha-cut-sm">
+                    <i className="fas fa-check" aria-hidden="true" /> Simpan Username
+                  </button>
+                </form>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    callGlobal("changePassword");
+                  }}
+                >
+                  <h2 className="settings-heading">
+                    <i className="fas fa-key" aria-hidden="true" /> Ganti Password
+                  </h2>
+                  <div className="field-stack">
+                    <label htmlFor="currentPassInput" className="field-label">
+                      Password Saat Ini
+                    </label>
+                    <div className="input-group">
+                      <i className="fas fa-lock" aria-hidden="true" />
+                      <input
+                        type="password"
+                        id="currentPassInput"
+                        autoComplete="current-password"
+                        placeholder="Password saat ini"
+                      />
+                      <button
+                        type="button"
+                        className="pass-toggle-btn"
+                        aria-label="Tampilkan atau sembunyikan password saat ini"
+                        aria-pressed="false"
+                        data-toggle-pass="currentPassInput"
+                      >
+                        <i className="fas fa-eye" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="field-stack">
+                    <label htmlFor="newPassInput" className="field-label">
+                      Password Baru
+                    </label>
+                    <div className="input-group">
+                      <i className="fas fa-lock" aria-hidden="true" />
+                      <input
+                        type="password"
+                        id="newPassInput"
+                        autoComplete="new-password"
+                        placeholder="Password baru"
+                      />
+                      <button
+                        type="button"
+                        className="pass-toggle-btn"
+                        aria-label="Tampilkan atau sembunyikan password baru"
+                        aria-pressed="false"
+                        data-toggle-pass="newPassInput"
+                      >
+                        <i className="fas fa-eye" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="field-stack">
+                    <label htmlFor="newPassInput2" className="field-label">
+                      Konfirmasi Password Baru
+                    </label>
+                    <div className="input-group">
+                      <i className="fas fa-lock" aria-hidden="true" />
+                      <input
+                        type="password"
+                        id="newPassInput2"
+                        autoComplete="new-password"
+                        placeholder="Ulangi password baru"
+                      />
+                      <button
+                        type="button"
+                        className="pass-toggle-btn"
+                        aria-label="Tampilkan atau sembunyikan konfirmasi password baru"
+                        aria-pressed="false"
+                        data-toggle-pass="newPassInput2"
+                      >
+                        <i className="fas fa-eye" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn-auth mecha-cut-sm">
+                    <i className="fas fa-check" aria-hidden="true" /> Simpan Password
+                  </button>
+                </form>
+              </div>
+
+              <div id="ownerPanel" className="owner-panel-box" hidden>
+                <h2 className="owner-heading">
+                  <i className="fas fa-crown" aria-hidden="true" /> Panel Owner (Akses Penuh)
+                </h2>
+
+                <div className="field-stack">
+                  <span className="field-label">Pilih Tema Website</span>
+                  <div className="owner-theme-row" role="group" aria-label="Pilihan tema website">
                     {["biru", "merah", "hitam", "putih", "silver"].map((t) => (
                       <button
                         key={t}
                         type="button"
-                        className="category-tab"
-                        style={{
-                          width: "auto",
-                          padding: "6px 12px",
-                          fontSize: "0.7rem",
-                        }}
+                        className="theme-chip-btn"
+                        data-theme-btn={t}
+                        aria-pressed="false"
                         onClick={() => callGlobal("applyTheme", t)}
                       >
                         {t.toUpperCase()}
@@ -682,266 +847,238 @@ export default function VipToolsApp() {
 
                 <div className="profile-settings-grid">
                   <div>
-                    <div
-                      style={{
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      <i className="fas fa-plus-circle" /> Tambah Tool Custom
+                    <h3 className="settings-heading">
+                      <i className="fas fa-plus-circle" aria-hidden="true" /> Tambah Tool Custom
+                    </h3>
+                    <div className="field-stack">
+                      <label htmlFor="ownerToolName" className="field-label">
+                        Nama Tool
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-tag" aria-hidden="true" />
+                        <input type="text" id="ownerToolName" placeholder="Contoh: MattzLM Parser" />
+                      </div>
                     </div>
-                    <div className="input-group">
-                      <i className="fas fa-tag" />
-                      <input
-                        type="text"
-                        id="ownerToolName"
-                        placeholder="Nama tool"
-                      />
+                    <div className="field-stack">
+                      <label htmlFor="ownerToolUrl" className="field-label">
+                        URL Tool
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-link" aria-hidden="true" />
+                        <input type="url" id="ownerToolUrl" placeholder="https://example.com" />
+                      </div>
                     </div>
-                    <div className="input-group">
-                      <i className="fas fa-link" />
-                      <input
-                        type="text"
-                        id="ownerToolUrl"
-                        placeholder="URL tool (https://...)"
-                      />
+                    <div className="field-stack">
+                      <label htmlFor="ownerToolDesc" className="field-label">
+                        Deskripsi Singkat
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-align-left" aria-hidden="true" />
+                        <input type="text" id="ownerToolDesc" placeholder="Keterangan singkat tool" />
+                      </div>
                     </div>
-                    <div className="input-group">
-                      <i className="fas fa-align-left" />
-                      <input
-                        type="text"
-                        id="ownerToolDesc"
-                        placeholder="Deskripsi singkat"
-                      />
-                    </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div className="owner-action-row">
                       <button
                         type="button"
-                        className="btn-auth"
+                        className="btn-auth mecha-cut-sm"
                         onClick={() => callGlobal("ownerAddTool")}
-                        style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
                       >
-                        <i className="fas fa-plus" /> Tambah Tool
+                        <i className="fas fa-plus" aria-hidden="true" /> Tambah Tool
                       </button>
                       <button
                         type="button"
-                        className="btn-auth"
+                        className="btn-auth btn-secondary"
                         onClick={() => callGlobal("ownerRestoreTools")}
-                        style={{
-                          padding: "10px",
-                          fontSize: "0.75rem",
-                          flex: 1,
-                          background: "rgba(50,100,255,0.2)",
-                        }}
                       >
-                        <i className="fas fa-rotate-left" /> Restore Tools
+                        <i className="fas fa-rotate-left" aria-hidden="true" /> Pulihkan Tools
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <div
-                      style={{
-                        fontSize: "0.8rem",
-                        fontWeight: 600,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      <i className="fas fa-users-cog" /> Kelola Akun &amp; Role
+                    <h3 className="settings-heading">
+                      <i className="fas fa-users-cog" aria-hidden="true" /> Kelola Akun &amp; Role
+                    </h3>
+                    <div className="field-stack">
+                      <label htmlFor="ownerAccUser" className="field-label">
+                        Username Akun
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-user" aria-hidden="true" />
+                        <input type="text" id="ownerAccUser" placeholder="Username target" />
+                      </div>
                     </div>
-                    <div className="input-group">
-                      <i className="fas fa-user" />
-                      <input
-                        type="text"
-                        id="ownerAccUser"
-                        placeholder="Username"
-                      />
+                    <div className="field-stack">
+                      <label htmlFor="ownerAccPass" className="field-label">
+                        Password Akun
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-lock" aria-hidden="true" />
+                        <input type="password" id="ownerAccPass" placeholder="Password (kosongkan jika ubah role)" />
+                        <button
+                          type="button"
+                          className="pass-toggle-btn"
+                          aria-label="Tampilkan atau sembunyikan password akun"
+                          aria-pressed="false"
+                          data-toggle-pass="ownerAccPass"
+                        >
+                          <i className="fas fa-eye" aria-hidden="true" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="input-group">
-                      <i className="fas fa-lock" />
-                      <input
-                        type="password"
-                        id="ownerAccPass"
-                        placeholder="Password"
-                      />
-                    </div>
-                    <div className="input-group">
-                      <i className="fas fa-shield-halved" />
-                      <select
-                        id="ownerAccRole"
-                        defaultValue="member"
-                        style={{
-                          width: "100%",
-                          background: "transparent",
-                          border: "none",
-                          color: "var(--theme-text-primary)",
-                          outline: "none",
-                          fontFamily: "'Poppins', sans-serif",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        <option value="member" style={{ color: "#000" }}>
-                          member
-                        </option>
-                        <option value="admin" style={{ color: "#000" }}>
-                          admin
-                        </option>
-                        <option value="owner" style={{ color: "#000" }}>
-                          owner
-                        </option>
-                      </select>
+                    <div className="field-stack">
+                      <label htmlFor="ownerAccRole" className="field-label">
+                        Role Akun
+                      </label>
+                      <div className="input-group">
+                        <i className="fas fa-shield-halved" aria-hidden="true" />
+                        <select id="ownerAccRole" defaultValue="member">
+                          <option value="member">member</option>
+                          <option value="admin">admin</option>
+                          <option value="owner">owner</option>
+                        </select>
+                      </div>
                     </div>
                     <button
                       type="button"
-                      className="btn-auth"
+                      className="btn-auth mecha-cut-sm"
                       onClick={() => callGlobal("ownerSaveAccount")}
-                      style={{ padding: "10px", fontSize: "0.75rem" }}
                     >
-                      <i className="fas fa-user-check" /> Simpan / Update Akun
+                      <i className="fas fa-user-check" aria-hidden="true" /> Simpan / Update Akun
                     </button>
-                    <div
-                      id="ownerUsersList"
-                      style={{
-                        marginTop: "10px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "6px",
-                      }}
-                    />
+                    <div id="ownerUsersList" className="owner-users-list" />
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    marginTop: "14px",
-                    borderTop: "1px solid var(--theme-border-color)",
-                    paddingTop: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.8rem",
-                      fontWeight: 600,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <i className="fas fa-comment-dots" /> Balas Chat &amp; Reset Limit
+                <div className="owner-chat-box">
+                  <h3 className="settings-heading">
+                    <i className="fas fa-comment-dots" aria-hidden="true" /> Balas Chat &amp; Reset Limit
+                  </h3>
+                  <div className="field-stack">
+                    <label htmlFor="ownerReplyInput" className="field-label">
+                      Pesan Balasan Owner
+                    </label>
+                    <div className="input-group">
+                      <i className="fas fa-reply" aria-hidden="true" />
+                      <input type="text" id="ownerReplyInput" placeholder="Tulis balasan sebagai Owner..." />
+                    </div>
                   </div>
-                  <div className="input-group">
-                    <i className="fas fa-reply" />
-                    <input
-                      type="text"
-                      id="ownerReplyInput"
-                      placeholder="Tulis balasan sebagai Owner..."
-                    />
-                  </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div className="owner-action-row">
                     <button
                       type="button"
-                      className="btn-auth"
+                      className="btn-auth mecha-cut-sm"
                       onClick={() => callGlobal("ownerReplyChat")}
-                      style={{ padding: "10px", fontSize: "0.75rem", flex: 1 }}
                     >
-                      <i className="fas fa-paper-plane" /> Kirim Balasan
+                      <i className="fas fa-paper-plane" aria-hidden="true" /> Kirim Balasan
                     </button>
                     <button
                       type="button"
-                      className="btn-auth"
+                      className="btn-auth btn-secondary"
                       onClick={() => callGlobal("ownerResetChatLimits")}
-                      style={{
-                        padding: "10px",
-                        fontSize: "0.75rem",
-                        flex: 1,
-                        background: "rgba(34,197,94,0.2)",
-                      }}
                     >
-                      <i className="fas fa-unlock" /> Reset Limit Chat
+                      <i className="fas fa-unlock" aria-hidden="true" /> Reset Limit Chat
                     </button>
                   </div>
                 </div>
               </div>
 
               <button
+                type="button"
+                className="btn-logout-full"
                 onClick={() => callGlobal("doLogout")}
-                style={{
-                  width: "100%",
-                  marginTop: "16px",
-                  padding: "12px",
-                  background: "rgba(220,38,38,0.12)",
-                  border: "1px solid rgba(220,38,38,0.15)",
-                  borderRadius: "12px",
-                  color: "#dc2626",
-                  fontWeight: 600,
-                  fontSize: "0.8rem",
-                  cursor: "pointer",
-                  transition: "0.3s",
-                  fontFamily: "'Poppins',sans-serif",
-                }}
               >
-                <i className="fas fa-sign-out-alt" /> Keluar
+                <i className="fas fa-sign-out-alt" aria-hidden="true" /> Keluar dari Sesi
               </button>
             </div>
-          </div>
+          </section>
 
-          <div className="page" id="chatPage">
+          <section className="page" id="chatPage" aria-label="Terminal Chat Admin" hidden>
             <div className="chat-container">
               <div className="chat-header">
-                <h3>
-                  <i className="fas fa-comment" /> Chat Admin
-                </h3>
+                <h2>
+                  <i className="fas fa-comment" aria-hidden="true" /> Terminal Chat Admin
+                </h2>
               </div>
-              <div className="chat-messages" id="chatMessages">
+              <div className="chat-messages" id="chatMessages" aria-live="polite">
                 <div className="chat-empty">
-                  <i className="fas fa-comment-dots" />
-                  Kirim pesan ke admin. Admin akan membalas melalui Telegram.
+                  <i className="fas fa-comment-dots" aria-hidden="true" />
+                  Kirim pesan ke admin. Balasan akan tampil langsung di sini.
                 </div>
               </div>
               <div className="chat-input-area">
+                <label htmlFor="chatInput" className="sr-only">
+                  Tulis pesan ke admin
+                </label>
                 <input
                   type="text"
                   id="chatInput"
-                  placeholder="Tulis pesan..."
+                  placeholder="Tulis pesan untuk admin..."
                   maxLength={500}
                 />
-                <button id="chatSendBtn">
-                  <i className="fas fa-paper-plane" /> Kirim
+                <button type="button" id="chatSendBtn">
+                  <i className="fas fa-paper-plane" aria-hidden="true" /> Kirim
                 </button>
               </div>
               <div className="chat-limit" id="chatLimit">
                 Sisa chat: 5
               </div>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <div className="bottom-nav">
-          <button className="nav-item active" data-page="homePage">
-            <i className="fas fa-home" />
+          <footer className="app-footer">
+            <span>MattzLM Kuro-Mecha 3D Deck • Shortcut cari cepat: Ctrl+K / ⌘K</span>
+            <a
+              href="https://github.com/Mattz1415/vip-tools"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Repositori Mattz1415/vip-tools
+            </a>
+          </footer>
+        </main>
+
+        <nav className="bottom-nav" aria-label="Navigasi mobile">
+          <button
+            type="button"
+            className="nav-item active"
+            data-page="homePage"
+            aria-current="page"
+          >
+            <i className="fas fa-home" aria-hidden="true" />
             <span>Beranda</span>
           </button>
-          <button className="nav-item" data-page="toolsPage">
-            <i className="fas fa-toolbox" />
+          <button type="button" className="nav-item" data-page="toolsPage">
+            <i className="fas fa-toolbox" aria-hidden="true" />
             <span>Tools</span>
           </button>
-          <button className="nav-item" data-page="profilePage">
-            <i className="fas fa-user" />
+          <button type="button" className="nav-item" data-page="profilePage">
+            <i className="fas fa-user" aria-hidden="true" />
             <span>Profil</span>
           </button>
-          <button className="nav-item" data-page="chatPage">
-            <i className="fas fa-comment" />
+          <button type="button" className="nav-item" data-page="chatPage">
+            <i className="fas fa-comment" aria-hidden="true" />
             <span>Chat</span>
           </button>
-        </div>
+        </nav>
       </div>
 
-      <div className="tool-viewer" id="toolViewer">
-        <div className="tool-viewer-content" id="toolViewerContent">
+      <div
+        className="tool-viewer"
+        id="toolViewer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="toolViewerTitle"
+        hidden
+      >
+        <div className="tool-viewer-content mecha-cut" id="toolViewerContent">
           <button
+            type="button"
             className="tool-viewer-close"
+            id="toolViewerCloseBtn"
+            aria-label="Tutup dialog tool"
             onClick={() => callGlobal("closeTool")}
           >
-            <i className="fas fa-times" />
+            <i className="fas fa-times" aria-hidden="true" />
           </button>
           <div id="toolViewerBody" />
         </div>
