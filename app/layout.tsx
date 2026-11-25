@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vip Tools - Kaze Senpai",
-  description: "Vip Tools - Kaze Senpai",
+  title: "MattzLM - VIP Tools",
+  description: "MattzLM - VIP Tools",
 };
 
 export const viewport: Viewport = {

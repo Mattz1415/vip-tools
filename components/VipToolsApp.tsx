@@ -23,8 +23,8 @@ export default function VipToolsApp() {
       <div id="bgOverlay" />
 
       <div id="loader">
-        <div className="loader-title">VIP TOOLS</div>
-        <div className="loader-sub">✦ KAZE SENPAI ✦</div>
+        <div className="loader-title">MATTZLM</div>
+        <div className="loader-sub">✦ VIP TOOLS ✦</div>
         <div className="loader-bar-wrap">
           <div className="loader-bar" />
         </div>
@@ -43,7 +43,7 @@ export default function VipToolsApp() {
           <i className="fas fa-times" />
         </button>
         <div className="warning-text">
-          𝐈𝐍𝐈 𝐀𝐏𝐋𝐈𝐊𝐀𝐒𝐈 𝐅𝐑𝐄𝐄 𝐁𝐘 𝐊𝐀𝐙𝐄, 𝐊𝐀𝐋𝐎 𝐀𝐃𝐀 𝐘𝐀𝐍𝐆 𝐌𝐄𝐌𝐏𝐄𝐑𝐉𝐔𝐀𝐋 𝐁𝐄𝐋𝐈𝐊𝐀𝐍 𝐒𝐄𝐆𝐄𝐑𝐀 𝐋𝐀𝐏𝐎𝐑 𝐊𝐄 𝐎𝐖𝐍𝐄𝐑 (𝐊𝐀𝐙𝐄) 𝟎𝟖𝟓𝟏𝟑𝟒𝟕𝟓𝟎𝟗𝟓𝟑 𝐀𝐆𝐀𝐑 𝐓𝐈𝐃𝐀𝐊 𝐀𝐃𝐀 𝐊𝐎𝐑𝐁𝐀𝐍 𝐒𝐄𝐋𝐀𝐍𝐉𝐔𝐓𝐍𝐘𝐀
+          𝐈𝐍𝐈 𝐀𝐏𝐋𝐈𝐊𝐀𝐒𝐈 𝐅𝐑𝐄𝐄 𝐁𝐘 𝐌𝐀𝐓𝐓𝐙𝐋𝐌, 𝐊𝐀𝐋𝐎 𝐀𝐃𝐀 𝐘𝐀𝐍𝐆 𝐌𝐄𝐌𝐏𝐄𝐑𝐉𝐔𝐀𝐋 𝐁𝐄𝐋𝐈𝐊𝐀𝐍 𝐒𝐄𝐆𝐄𝐑𝐀 𝐋𝐀𝐏𝐎𝐑 𝐊𝐄 𝐎𝐖𝐍𝐄𝐑 (𝐌𝐀𝐓𝐓𝐙𝐋𝐌) 𝐀𝐆𝐀𝐑 𝐓𝐈𝐃𝐀𝐊 𝐀𝐃𝐀 𝐊𝐎𝐑𝐁𝐀𝐍 𝐒𝐄𝐋𝐀𝐍𝐉𝐔𝐓𝐍𝐘𝐀
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export default function VipToolsApp() {
       <div className="sidebar" id="sidebar">
         <div className="sb-head">
           <div className="avatar" id="sbAvatar">
-            <span id="sbAvatarText">K</span>
+            <span id="sbAvatarText">M</span>
           </div>
           <div>
             <div className="sb-name" id="sbName">
@@ -105,8 +105,8 @@ export default function VipToolsApp() {
       <div id="authPage">
         <div className="auth-box">
           <div className="logo">
-            <h1>VIP TOOLS</h1>
-            <p>✦ KAZE SENPAI ✦</p>
+            <h1>MATTZLM</h1>
+            <p>✦ VIP TOOLS ✦</p>
           </div>
           <div className="auth-mode">
             <button
@@ -175,9 +175,9 @@ export default function VipToolsApp() {
             </div>
             <div className="logo-text">
               <span className="brand-name">
-                Vip <span>Tools</span>
+                Mattz<span>LM</span>
               </span>
-              <span className="brand-tagline">PREMIUM TOOLS</span>
+              <span className="brand-tagline">VIP TOOLS</span>
             </div>
           </div>
           <div className="header-right">
@@ -326,12 +326,12 @@ export default function VipToolsApp() {
 
             <div className="channel-buttons">
               <a
-                href="https://www.tiktok.com/@voidzerov2"
+                href="https://github.com/Mattz1415"
                 target="_blank"
                 rel="noreferrer"
                 className="channel-btn tt"
               >
-                <i className="fab fa-tiktok" /> @voidzerov2
+                <i className="fab fa-github" /> MattzLM
               </a>
             </div>
 
@@ -419,7 +419,7 @@ export default function VipToolsApp() {
               <div className="profile-avatar-container" id="profAvatarContainer">
                 <img id="profAvatarImg" style={{ display: "none" }} alt="Avatar" />
                 <span className="avatar-placeholder" id="profAvatarPlaceholder">
-                  K
+                  M
                 </span>
                 <div className="avatar-overlay">
                   <i className="fas fa-camera" />
