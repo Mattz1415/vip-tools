@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       }
       const resData = updateStore((store) => {
         if (store.users[newUsername]) {
-          return { error: "Username sudah dipakai!", status: 409 };
+          return { error: "Username sudah dipakai.", status: 409 };
         }
         const existing = store.users[user.username];
         if (!existing) return { error: "Akun tidak ditemukan.", status: 404 };

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MattzLM: Kuro-Mecha 3D Tools Deck",
-  description: "Workspace utilitas web bertema Anime 3D oleh MattzLM.",
+  title: "MattzLM | Web Tools & VPS",
+  description: "Kumpulan 45 web tools, pengunduh media, dan utilitas server VPS oleh MattzLM.",
 };
 
 export const viewport: Viewport = {

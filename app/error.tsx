@@ -15,7 +15,7 @@ export default function AppErrorBoundary({
           <span className="owner-monogram">MLM</span>
           <div>
             <h1 className="owner-title">Halaman Gagal Dimuat</h1>
-            <p className="owner-sub">Terjadi kendala sementara di server. Muat ulang untuk mencoba lagi.</p>
+            <p className="owner-sub">Permintaan gagal diproses server; muat ulang halaman atau kembali ke beranda.</p>
           </div>
         </div>
         <div className="owner-gate-actions">

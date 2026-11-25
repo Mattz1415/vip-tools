@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     } else if (type === "sertifikat") {
       const award =
         String(body?.award || "").trim() ||
-        "Atas dedikasi luar biasa & pencapaian terbaik di MattzLM Deck";
+        "Atas kontribusi aktif di MattzLM";
       const issuer = String(body?.issuer || "MattzLM Official").trim().slice(0, 28);
       svg = buildSertifikatSvg(text, award, issuer);
     } else {

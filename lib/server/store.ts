@@ -314,7 +314,7 @@ function getDefaultSettings(): GlobalSettings {
   return {
     defaultTheme: "hitam",
     announcement:
-      "Aplikasi ini gratis dari MattzLM. Terintegrasi langsung dengan server VPS untuk semua modul utilitas.",
+      "Akses MattzLM gratis; seluruh modul berjalan langsung di server VPS.",
     maintenanceMode: false,
     bgVideoUrl: "https://c.termai.cc/v131/H4vF9D.mp4",
     homeRotate: 0,
@@ -344,7 +344,7 @@ function createInitialStore(): VpsStoreData {
         time: now,
         actor: "system",
         action: "VPS_STORE_INIT",
-        detail: "Database JSON VPS diinisialisasi dengan akun owner default matt.",
+        detail: "Store awal dibuat bersama akun owner default matt.",
       },
     ],
   };

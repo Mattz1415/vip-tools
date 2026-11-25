@@ -39,7 +39,7 @@ export default async function PasteViewerPage(props: {
             </div>
           </div>
           <Link href="/" className="owner-nav-btn">
-            <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke Deck
+            <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke Beranda
           </Link>
         </header>
 

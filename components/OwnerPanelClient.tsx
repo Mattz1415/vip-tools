@@ -324,8 +324,8 @@ export default function OwnerPanelClient({
           <div className="owner-brand" style={{ marginBottom: "18px" }}>
             <span className="owner-monogram">MLM</span>
             <div>
-              <h1 className="owner-title">Owner Control Deck</h1>
-              <p className="owner-sub">Area Terproteksi /owner • Khusus Role Owner</p>
+              <h1 className="owner-title">Owner Control Panel</h1>
+              <p className="owner-sub">Area khusus akun Owner (/owner)</p>
             </div>
           </div>
 
@@ -359,8 +359,8 @@ export default function OwnerPanelClient({
           ) : (
             <>
               <p className="owner-sub" style={{ marginBottom: "16px" }}>
-                Masuk dengan akun Owner untuk mengakses telemetri VPS, kelola akun, konfigurasi
-                Firebase Google Login, dan pengaturan global.
+                Masuk dengan akun Owner untuk memantau server VPS, mengatur akun, mengisi
+                konfigurasi Firebase Google Login, dan mengubah pengaturan situs.
               </p>
               <form onSubmit={handleOwnerLocalLogin}>
                 <label htmlFor="gateUser" className="v-label">
@@ -410,7 +410,7 @@ export default function OwnerPanelClient({
 
               <div style={{ marginTop: "16px", textAlign: "center" }}>
                 <Link href="/" className="owner-inline-link">
-                  <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke MattzLM Deck
+                  <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke Beranda
                 </Link>
               </div>
             </>
@@ -430,7 +430,7 @@ export default function OwnerPanelClient({
             <div>
               <h1 className="owner-title">MattzLM Owner Panel</h1>
               <p className="owner-sub">
-                Login sebagai <strong>{user.username}</strong> (OWNER) • VPS Integrated Console
+                Login sebagai <strong>{user.username}</strong> (OWNER) • Panel VPS
               </p>
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function OwnerPanelClient({
               <i className={`fas fa-rotate ${loading ? "spin" : ""}`} aria-hidden="true" /> Muat Ulang
             </button>
             <Link href="/" className="owner-nav-btn">
-              <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke Deck
+              <i className="fas fa-arrow-left" aria-hidden="true" /> Kembali ke Beranda
             </Link>
             <button type="button" className="owner-nav-btn is-danger" onClick={handleLogout}>
               <i className="fas fa-sign-out-alt" aria-hidden="true" /> Keluar
@@ -489,7 +489,7 @@ export default function OwnerPanelClient({
 
         {!data ? (
           <section className="owner-card">
-            <p className="owner-sub">Memuat telemetri VPS dan database...</p>
+            <p className="owner-sub">Memuat data server VPS...</p>
           </section>
         ) : (
           <>
@@ -529,7 +529,7 @@ export default function OwnerPanelClient({
                 <section className="owner-card">
                   <div className="owner-card-head">
                     <h2>
-                      <i className="fas fa-microchip" aria-hidden="true" /> Telemetri Linux VPS Real-Time
+                      <i className="fas fa-microchip" aria-hidden="true" /> Status Server Linux
                     </h2>
                     <span className="owner-pill">ONLINE</span>
                   </div>
@@ -1028,7 +1028,7 @@ export default function OwnerPanelClient({
                     style={{ marginBottom: 0 }}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Tulis balasan resmi sebagai Owner..."
+                    placeholder="Tulis balasan untuk user..."
                   />
                   <button
                     type="button"
@@ -1198,7 +1198,7 @@ export default function OwnerPanelClient({
                 <section className="owner-card">
                   <div className="owner-card-head">
                     <h2>
-                      <i className="fas fa-sliders" aria-hidden="true" /> Pengaturan Global Deck
+                      <i className="fas fa-sliders" aria-hidden="true" /> Pengaturan Global
                     </h2>
                   </div>
                   <label htmlFor="ownTheme" className="v-label">

@@ -6,8 +6,8 @@ import { getEffectiveFirebaseConfig, isFirebaseReady, readStore } from "@/lib/se
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Owner Panel | MattzLM VPS Deck",
-  description: "Panel kontrol khusus Owner untuk mengelola VPS, akun, Firebase Google Auth, dan tools.",
+  title: "Owner Panel | MattzLM",
+  description: "Panel admin khusus Owner untuk mengatur akun, tools custom, Firebase Auth, dan konfigurasi VPS.",
 };
 
 export default async function OwnerPage() {

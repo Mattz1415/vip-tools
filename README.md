@@ -1,15 +1,15 @@
-# MattzLM - Anime 3D Tools (Next.js)
+# MattzLM Web Tools
 
-Web tools berbasis Next.js (App Router) dengan tampilan Anime 3D interaktif, animasi penuh, dan tata letak command deck modern oleh **MattzLM**.
+Aplikasi web Next.js (App Router) berisi 45 utilitas harian, pengunduh media, maker gambar, serta alat jaringan yang berjalan langsung di server VPS tanpa mengandalkan API luar yang sering mati.
 
-## Menjalankan Secara Lokal
+## Menjalankan di Lokal
 
 ```bash
 npm install
 npm run dev
 ```
 
-Lalu buka `http://localhost:3000` di browser.
+Buka `http://localhost:3000` di browser.
 
 ## Build Production
 
@@ -18,8 +18,9 @@ npm run build
 npm start
 ```
 
-## Fitur & Desain
+## Apa Saja di Dalamnya
 
-- **Anime 3D Visual & Animasi**: 3D perspective grid floor, floating neon orbs, canvas sakura/spark particles, 3D gyro loader, split 3D auth portal, dan interactive 3D pointer tilt + spotlight pada kartu.
-- **Tata Letak Baru**: Left vertical command rail (desktop), floating HUD header, asymmetric bento hero + 2x2 telemetry tiles di Beranda, split workspace (sidebar kategori + horizontal bento tool cards) di halaman Tools, dan floating mobile dock.
-- **Akses Owner & XVIP**: Akun owner default (`matt`) memiliki akses penuh ke seluruh tools XVIP, chat tanpa batas, dan Panel Owner.
+- **45 Tool Aktif di VPS**: DNS & WHOIS lookup, HTTP/SSL inspector, TCP port checker, IP tracker, URL shortener (`/s/kode`), code paste (`/p/id`), kompresi dan konversi gambar dengan Sharp, remove background, upscale 2x, QR generator, serta pengunduh IG/TikTok/YouTube lewat `yt-dlp`.
+- **Tampilan Monokrom 3 Palet**: Pilihan tema Hitam, Abu, dan Putih dengan kontras WCAG AA, latar 3D ringan, dan tombol jeda animasi.
+- **Panel Khusus `/owner`**: Hanya akun dengan role `owner` (bawaan `matt`) yang bisa membuka konsol `/owner` untuk memantau CPU/RAM/disk VPS, mengatur pengguna, menambah tool custom, membalas chat, dan menyimpan konfigurasi Firebase Google Login.
+- **Pencarian Cepat**: Tekan `Ctrl+K` atau `⌘K` kapan saja setelah login untuk langsung menyaring daftar tool.

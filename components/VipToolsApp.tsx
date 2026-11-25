@@ -16,7 +16,12 @@ function callGlobal(name: string, ...args: unknown[]) {
 
 export default function VipToolsApp() {
   useEffect(() => {
-    initVipTools({ signInWithGoogleFirebase, signOutFirebaseQuietly });
+    const cleanup = initVipTools({ signInWithGoogleFirebase, signOutFirebaseQuietly });
+    return () => {
+      if (typeof cleanup === "function") {
+        cleanup();
+      }
+    };
   }, []);
 
   return (
@@ -59,12 +64,12 @@ export default function VipToolsApp() {
           </div>
         </div>
         <div className="loader-title">MATTZLM</div>
-        <div className="loader-sub">KURO-MECHA 3D DECK</div>
+        <div className="loader-sub">WEB TOOLS &amp; VPS</div>
         <div className="loader-bar-wrap" aria-hidden="true">
           <div className="loader-bar" />
         </div>
         <div className="loader-status" id="ldStatus">
-          MEMUAT MODUL DECK...
+          MEMUAT APLIKASI...
         </div>
       </div>
 
@@ -117,33 +122,33 @@ export default function VipToolsApp() {
               <span className="brand-monogram">MLM</span>
             </div>
             <h1 className="auth-brand-title" id="authHeading">
-              MattzLM 3D Deck
+              MattzLM Web Tools
             </h1>
             <p className="auth-brand-desc">
-              Pusat utilitas web downloader, image maker, generator, dan console command dalam satu workspace cepat.
+              45 tool harian, pengunduh media, maker gambar, dan cek jaringan yang berjalan langsung di server VPS.
             </p>
             <ul className="auth-feature-list">
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>45 utilitas VPS, downloader, jaringan, &amp; modul XVIP</span>
+                <span>45 tool aktif: jaringan VPS, downloader, maker gambar, &amp; XVIP</span>
               </li>
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>3 palet monokrom kontras tinggi (Hitam, Abu, Putih)</span>
+                <span>3 tema monokrom (Hitam, Abu, Putih) dengan kontras terbaca jelas</span>
               </li>
               <li>
                 <i className="fas fa-check" aria-hidden="true" />
-                <span>Login Google Firebase, shortcut ⌘K / Ctrl+K, &amp; /owner</span>
+                <span>Login lokal atau Google, cari cepat ⌘K / Ctrl+K, &amp; panel /owner</span>
               </li>
             </ul>
           </div>
 
           <div className="auth-form-side">
             <h2 className="auth-form-heading" id="authFormTitle">
-              Akses Portal
+              Masuk Akun
             </h2>
             <p className="auth-form-sub">
-              Masuk akun lokal atau Google Firebase untuk membuka VPS command deck.
+              Gunakan akun lokal atau Google untuk masuk.
             </p>
 
             <div className="auth-mode" role="tablist" aria-label="Mode autentikasi">
@@ -223,7 +228,7 @@ export default function VipToolsApp() {
               <div id="loginError" className="inline-error" role="alert" aria-live="polite" />
 
               <button type="submit" id="loginSubmitBtn" className="btn-auth mecha-cut-sm">
-                <i className="fas fa-right-to-bracket" aria-hidden="true" /> MASUK KE DECK
+                <i className="fas fa-right-to-bracket" aria-hidden="true" /> MASUK
               </button>
             </form>
 
@@ -407,7 +412,7 @@ export default function VipToolsApp() {
               <span className="brand-name">
                 Mattz<span>LM</span>
               </span>
-              <span className="brand-tagline">KURO-MECHA 3D DECK</span>
+              <span className="brand-tagline">WEB TOOLS VPS</span>
             </div>
           </div>
 
@@ -489,7 +494,7 @@ export default function VipToolsApp() {
             <div className="warning-text">
               <i className="fas fa-shield-halved" aria-hidden="true" />
               <span id="warningBannerText">
-                Aplikasi ini gratis dari MattzLM. Jika ada pihak yang memperjualbelikan akses, segera lapor ke Owner (MattzLM).
+                Akses MattzLM gratis. Kalau ada pihak yang menjual akun atau aksesnya, laporkan ke Owner.
               </span>
             </div>
             <button
@@ -504,10 +509,10 @@ export default function VipToolsApp() {
 
           <div className="workspace-header-row">
             <h1 className="page-hero-title" id="workspaceHeading" tabIndex={-1}>
-              Beranda Deck MattzLM
+              Beranda MattzLM
             </h1>
             <p className="workspace-sub" id="workspaceSub">
-              Ringkasan pilot, pratinjau visual, dan akses cepat utilitas utama.
+              Info akun aktif dan daftar tool yang paling sering dipakai.
             </p>
           </div>
 
@@ -532,8 +537,8 @@ export default function VipToolsApp() {
                 </div>
                 <div className="visor-hud-overlay">
                   <div className="visor-meta">
-                    <span className="visor-badge">UNIT VISUAL // MATTZLM-01</span>
-                    <span className="visor-caption">Kuro-Mecha Deck Status Aktif</span>
+                    <span className="visor-badge">MATTZLM // VPS</span>
+                    <span className="visor-caption">Server aktif</span>
                   </div>
                   <div className="visor-actions">
                     <button
@@ -563,7 +568,7 @@ export default function VipToolsApp() {
                 <div>
                   <h2 className="dossier-heading">
                     <i className="fas fa-id-card" aria-hidden="true" style={{ color: "var(--accent-hallmark-fg)" }} />
-                    Dossier Pilot Aktif
+                    Info Akun
                   </h2>
                   <div className="dossier-list">
                     <div className="dossier-row">
@@ -903,7 +908,7 @@ export default function VipToolsApp() {
                     <i className="fas fa-crown" aria-hidden="true" /> Panel Owner (Akses Penuh)
                   </h2>
                   <Link href="/owner" prefetch={false} id="ownerFullPanelBtn" className="btn-auth mecha-cut-sm owner-jump-btn">
-                    <i className="fas fa-sliders" aria-hidden="true" /> Buka Console /owner
+                    <i className="fas fa-sliders" aria-hidden="true" /> Buka Panel /owner
                   </Link>
                 </div>
 
@@ -1072,17 +1077,17 @@ export default function VipToolsApp() {
             </div>
           </section>
 
-          <section className="page" id="chatPage" aria-label="Terminal Chat Admin" hidden>
+          <section className="page" id="chatPage" aria-label="Chat Admin" hidden>
             <div className="chat-container">
               <div className="chat-header">
                 <h2>
-                  <i className="fas fa-comment" aria-hidden="true" /> Terminal Chat Admin
+                  <i className="fas fa-comment" aria-hidden="true" /> Chat Admin
                 </h2>
               </div>
               <div className="chat-messages" id="chatMessages" aria-live="polite">
                 <div className="chat-empty">
                   <i className="fas fa-comment-dots" aria-hidden="true" />
-                  Kirim pesan ke admin. Balasan akan tampil langsung di sini.
+                  Tulis pesan untuk admin; balasan muncul di sini.
                 </div>
               </div>
               <div className="chat-input-area">
@@ -1106,7 +1111,7 @@ export default function VipToolsApp() {
           </section>
 
           <footer className="app-footer">
-            <span>MattzLM Kuro-Mecha 3D Deck • Shortcut cari cepat: Ctrl+K / ⌘K</span>
+            <span>MattzLM • Cari tool: Ctrl+K / ⌘K</span>
             <a
               href="https://github.com/Mattz1415/vip-tools"
               target="_blank"
