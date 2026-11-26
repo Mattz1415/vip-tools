@@ -1,6 +1,6 @@
 # Panduan Handoff AI & Operasional Proyek MattzLM (`/root/vip-tools`)
 
-Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **75 modul tools** (termasuk 30 fitur jaman sekarang), dependensi VPS, aturan desain monokrom, serta perintah verifikasi wajib.
+Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **76 modul tools** (termasuk Music Downloader Realtime + 30 fitur jaman sekarang), dependensi VPS, aturan desain monokrom, serta perintah verifikasi wajib.
 
 ---
 
@@ -9,7 +9,7 @@ Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung 
 - **Aplikasi**: MattzLM Web Tools & VPS Suite
 - **Lokasi repo**: `/root/vip-tools`
 - **Stack**: Next.js 16 (App Router, React 19, TypeScript) + Backend API Route di VPS Linux
-- **Total modul aktif**: **75 modul tools** (45 modul bawaan + 30 fitur jaman sekarang)
+- **Total modul aktif**: **76 modul tools** (45 modul bawaan + 31 modul modern termasuk Music Downloader Realtime)
 - **Autentikasi & Sesi**:
   - Login lokal (`username` + `password` PBKDF2-SHA256) dengan cookie `HttpOnly` bertanda tangan HMAC (`vip_session_token`).
   - Login Google via Firebase Auth (`/api/auth/google`, verifikasi `idToken` di server via Identity Toolkit API).
@@ -49,16 +49,17 @@ Aplikasi memiliki 4 role: `"owner" | "admin" | "xvip" | "member"`.
 
 ---
 
-## 3. Peta Lengkap 75 Modul Tools & Backend API
+## 3. Peta Lengkap 76 Modul Tools & Backend API
 
-### A. 30 Fitur Jaman Sekarang (UI di `lib/vip-tools-extra-ui.js`)
+### A. 31 Fitur Modern & Music Downloader (UI di `lib/vip-tools-extra-ui.js`)
 
-Seluruh UI 30 fitur ini berada di **`lib/vip-tools-extra-ui.js`** (di-import ke `lib/vip-tools-client.js` dan terdaftar di `BUILTIN_TOOL_IDS` pada `components/OwnerPanelClient.tsx`).
+Seluruh UI 31 fitur ini berada di **`lib/vip-tools-extra-ui.js`** (di-import ke `lib/vip-tools-client.js` dan terdaftar di `BUILTIN_TOOL_IDS` pada `components/OwnerPanelClient.tsx`).
 
-#### 1) Downloader & Media Sosmed (+3, kategori `downloader`, total 6)
+#### 1) Downloader & Media Sosmed (+4, kategori `downloader`, total 7)
+0. `dl_music_dl` (`/api/tools/music-dl`): Music Downloader Realtime dengan pencarian live (SoundCloud API v2 + verifikasi referensi judul & durasi Deezer), penolakan ketat hasil yang tidak cocok (anti-mismatch), filter versi original, dukungan tautan langsung SoundCloud / Spotify / YouTube, pemutar full audio realtime (`206 Partial Content` Range), unduh penuh `.m4a`/`.mp3` terkunci ke ID trek persis, serta lirik terverifikasi.
 1. `dl_sosmed` (`/api/tools/download`): Unduh video/foto HD publik dari X/Twitter (`fxtwitter` + `yt-dlp`), Pinterest, Facebook, dan Threads.
 2. `dl_ytthumb` (`/api/tools/creator-kit`, `action: "yt_thumb"`): Ambil thumbnail YouTube Full HD 1280x720, SD, & HQ + tombol unduh via proxy.
-3. `dl_music` (`/api/tools/live-hub`, `action: "music"`): Cari lagu, putar preview audio 30 detik (iTunes Search) + lirik lengkap (LRCLIB).
+3. `dl_music` (`/api/tools/live-hub`, `action: "music"`): Cari lagu, putar preview audio 30 detik (iTunes Search) + lirik lengkap (LRCLIB) + tombol lompat ke `dl_music_dl`.
 
 #### 2) Viral Maker, Stiker WA & Mockup Konten (+10, kategori `maker`, total 15)
 Backend: **`app/api/tools/viral-maker/route.ts`** (menggunakan `sharp` + `lib/server/svg-render.ts` yang mengubah teks SVG menjadi vector `<path>` dari font TrueType bawaan `lib/fonts/*.ttf` via `opentype.js`, sehingga bebas kotak tofu di Vercel/serverless/Linux tanpa font sistem).
