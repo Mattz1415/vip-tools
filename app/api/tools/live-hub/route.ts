@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
 
       const [itRes, lrcRes] = await Promise.allSettled([
         fetch(
-          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=6`,
+          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&country=ID&limit=10`,
           { signal: AbortSignal.timeout(8000) }
         ).then((r) => (r.ok ? r.json() : null)),
         fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`, {
@@ -115,7 +115,15 @@ export async function POST(req: NextRequest) {
       ]);
 
       const rawTracks = itRes.status === "fulfilled" && Array.isArray(itRes.value?.results) ? itRes.value.results : [];
-      const tracks = rawTracks.map((t: Record<string, unknown>) => ({
+      const variantRe = /\b(remix|rmx|edit|koplo|hipdut|dangdut|orchestral|slowed|sped up|speed up|nightcore|cover|karaoke|instrumental|version|ver|dj|jj|jedag|live|acoustic|akustik|mashup|reverb)\b/i;
+      const queryHasVariant = variantRe.test(query);
+      const sortedTracks = [...rawTracks].sort((a: Record<string, unknown>, b: Record<string, unknown>) => {
+        if (queryHasVariant) return 0;
+        const aVar = variantRe.test(`${String(a.trackName || "")} ${String(a.collectionName || "")}`) ? 1 : 0;
+        const bVar = variantRe.test(`${String(b.trackName || "")} ${String(b.collectionName || "")}`) ? 1 : 0;
+        return aVar - bVar;
+      });
+      const tracks = sortedTracks.slice(0, 6).map((t: Record<string, unknown>) => ({
         title: String(t.trackName || "-"),
         artist: String(t.artistName || "-"),
         album: String(t.collectionName || "-"),
