@@ -61,7 +61,7 @@ Seluruh UI 30 fitur ini berada di **`lib/vip-tools-extra-ui.js`** (di-import ke 
 3. `dl_music` (`/api/tools/live-hub`, `action: "music"`): Cari lagu, putar preview audio 30 detik (iTunes Search) + lirik lengkap (LRCLIB).
 
 #### 2) Viral Maker, Stiker WA & Mockup Konten (+10, kategori `maker`, total 15)
-Backend: **`app/api/tools/viral-maker/route.ts`** (menggunakan `sharp` + SVG renderer server-side).
+Backend: **`app/api/tools/viral-maker/route.ts`** (menggunakan `sharp` + `lib/server/svg-render.ts` yang mengubah teks SVG menjadi vector `<path>` dari font TrueType bawaan `lib/fonts/*.ttf` via `opentype.js`, sehingga bebas kotak tofu di Vercel/serverless/Linux tanpa font sistem).
 4. `mk_wasticker` (`action: "wa_sticker"`): Stiker WhatsApp 512x512 WebP transparan (bulat/membulat/kotak) + teks atas/bawah.
 5. `mk_fakewa` (`action: "fake_wa"`): Screenshot Fake Chat WhatsApp mode gelap/terang realistis.
 6. `mk_faketweet` (`action: "fake_tweet"`): Generator postingan Fake Tweet X/Twitter centang biru custom.
@@ -118,11 +118,11 @@ Pastikan binary berikut tersedia di VPS Linux:
   ```
 - `python3` (dibutuhkan oleh `yt-dlp`)
 - `dig` (`dnsutils`) & `whois` (`whois`) untuk `vps_dns`
-- `openssl`, `curl`, `df`, serta font sistem `DejaVu Sans` / `DejaVu Serif` (untuk rendering teks SVG `sharp` pada `viral-maker` dan `maker`).
+- `openssl`, `curl`, `df`. (Font sistem OS tidak wajib karena seluruh teks SVG pada `viral-maker` dan `maker` dikonversi menjadi vector `<path>` memakai font bawaan `lib/fonts/DejaVu*.ttf` + `opentype.js` dan disertakan ke bundle melalui `outputFileTracingIncludes` di `next.config.ts`.)
 - **Catatan**: `ffmpeg` dan `imagemagick` tidak wajib karena seluruh pemrosesan stiker/gambar/mockup memakai `sharp` (Node native).
 
 ### B. Paket NPM (`package.json`)
-Dependensi utama: `next`, `react`, `react-dom`, `sharp`, `qrcode`, `firebase`. Jika baru clone atau pindah VPS, jalankan:
+Dependensi utama: `next`, `react`, `react-dom`, `sharp`, `opentype.js`, `qrcode`, `firebase`. Jika baru clone atau pindah VPS, jalankan:
 ```bash
 cd /root/vip-tools && npm install
 ```
