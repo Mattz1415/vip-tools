@@ -230,7 +230,7 @@ select:disabled,
   top: 16px;
 }
 
-/* ===== 3D STAGE BACKDROP ===== */
+/* ===== 3D EARTH GLOBE STAGE BACKDROP ===== */
 .backdrop-stage {
   position: fixed;
   inset: 0;
@@ -239,88 +239,73 @@ select:disabled,
   overflow: hidden;
 }
 
-#bgVideo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.28;
-  filter: grayscale(100%) contrast(1.06);
-}
-
 #bgOverlay {
   position: absolute;
   inset: 0;
   background: var(--overlay-scrim);
 }
 
-.anime-orbs {
+.globe-atmosphere-glow {
+  position: absolute;
+  right: -14vw;
+  bottom: -22vh;
+  width: 78vmax;
+  height: 78vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 42% 42%,
+    var(--card-spotlight) 0%,
+    rgba(128, 128, 128, 0.04) 48%,
+    rgba(0, 0, 0, 0) 72%
+  );
+  pointer-events: none;
+}
+
+.globe-orbital-grid {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
 }
 
-.anime-orb {
+.orbital-ring {
   position: absolute;
   border-radius: 50%;
-  filter: blur(64px);
-  opacity: 0.22;
-  animation: orbFloat 12s ease-in-out infinite alternate;
-}
-
-.anime-orb.orb-1 {
-  width: 320px;
-  height: 320px;
-  top: -60px;
-  left: -60px;
-  background: var(--orb-1);
-}
-
-.anime-orb.orb-2 {
-  width: 280px;
-  height: 280px;
-  bottom: 10%;
-  right: -40px;
-  background: var(--orb-2);
-  animation-delay: -4s;
-}
-
-.anime-orb.orb-3 {
-  width: 220px;
-  height: 220px;
-  top: 45%;
-  left: 45%;
-  background: var(--orb-3);
-  animation-delay: -8s;
-}
-
-@keyframes orbFloat {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(40px, -35px, 30px) scale(1.18); }
-}
-
-.anime-grid-3d {
-  position: absolute;
-  left: -25%;
-  right: -25%;
-  bottom: -18%;
-  height: 62vh;
+  border: 1px solid var(--grid-line-x);
+  opacity: 0.55;
   pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--grid-line-x) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line-y) 1px, transparent 1px);
-  background-size: 48px 48px;
-  transform: perspective(520px) rotateX(68deg);
-  transform-origin: bottom center;
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 90%);
-  animation: gridScroll3d 8s linear infinite;
 }
 
-@keyframes gridScroll3d {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 48px; }
+.orbital-ring.ring-1 {
+  width: 82vmax;
+  height: 82vmax;
+  right: -28vmax;
+  bottom: -36vmax;
+  border-style: dashed;
+  animation: orbitalRingSpin 84s linear infinite;
+}
+
+.orbital-ring.ring-2 {
+  width: 58vmax;
+  height: 58vmax;
+  left: -24vmax;
+  top: -28vmax;
+  border-color: var(--grid-line-y);
+  animation: orbitalRingSpin 68s linear infinite reverse;
+}
+
+.orbital-ring.ring-3 {
+  width: 108vmax;
+  height: 108vmax;
+  right: -42vmax;
+  bottom: -48vmax;
+  border-color: var(--grid-line-y);
+  opacity: 0.35;
+}
+
+@keyframes orbitalRingSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 #animeParticles {
@@ -328,9 +313,10 @@ select:disabled,
   inset: 0;
   width: 100%;
   height: 100%;
+  display: block;
 }
 
-/* Smooth Rounded Kuro-Mecha Identity Motif */
+/* Smooth Rounded Orbital Identity Motif */
 .mecha-cut {
   border-radius: 24px;
 }
@@ -339,7 +325,7 @@ select:disabled,
   border-radius: 14px;
 }
 
-/* ===== 3D GYRO LOADER ===== */
+/* ===== 3D EARTH GLOBE GYRO LOADER ===== */
 #loader {
   position: fixed;
   inset: 0;
@@ -361,59 +347,106 @@ select:disabled,
 
 .loader-stage-3d {
   position: relative;
-  width: 116px;
-  height: 116px;
+  width: 128px;
+  height: 128px;
   margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  perspective: 720px;
   transform-style: preserve-3d;
+}
+
+.loader-globe-sphere {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 1.5px solid var(--theme-primary-light);
+  transform-style: preserve-3d;
+  animation: globeCageSpin 7s linear infinite;
+}
+
+.loader-globe-sphere .globe-meridian {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+}
+
+.loader-globe-sphere .globe-meridian.m-1 {
+  transform: rotateY(0deg);
+}
+
+.loader-globe-sphere .globe-meridian.m-2 {
+  transform: rotateY(60deg);
+}
+
+.loader-globe-sphere .globe-meridian.m-3 {
+  transform: rotateY(120deg);
+}
+
+.loader-globe-sphere .globe-equator {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 50%;
+  height: 1px;
+  background: var(--accent-hallmark);
+  opacity: 0.65;
+}
+
+@keyframes globeCageSpin {
+  0% { transform: rotateZ(-18deg) rotateY(0deg); }
+  100% { transform: rotateZ(-18deg) rotateY(360deg); }
 }
 
 .loader-ring-3d {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  animation: ringSpin3d 3.2s linear infinite;
+  animation: ringSpin3d 4.2s linear infinite;
 }
 
 .loader-ring-3d span {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 2px solid transparent;
   border-top-color: var(--theme-primary-light);
   border-right-color: var(--accent-hallmark);
 }
 
 .loader-ring-3d span:nth-child(2) {
-  inset: 10px;
+  inset: 8px;
   border-top-color: var(--text-muted);
   border-left-color: var(--accent-hallmark-fg);
-  transform: rotateX(60deg);
+  transform: rotateX(68deg);
 }
 
 .loader-ring-3d span:nth-child(3) {
-  inset: 20px;
+  inset: 16px;
   border-bottom-color: var(--theme-primary-light);
-  transform: rotateY(60deg);
+  transform: rotateY(68deg);
 }
 
 @keyframes ringSpin3d {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-  100% { transform: rotateX(360deg) rotateY(180deg) rotateZ(360deg); }
+  0% { transform: rotateZ(-22deg) rotateX(68deg) rotateY(0deg); }
+  100% { transform: rotateZ(-22deg) rotateX(68deg) rotateY(360deg); }
 }
 
 .loader-crest-3d {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  position: relative;
+  z-index: 2;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  animation: crestTilt3d 2.8s ease-in-out infinite alternate;
+  animation: crestTilt3d 3.2s ease-in-out infinite alternate;
 }
 
 @keyframes crestTilt3d {
@@ -598,66 +631,87 @@ select:disabled,
   border-radius: 24px;
   overflow: hidden;
   box-shadow: var(--shadow-elevated);
-  transform-style: preserve-3d;
-  animation: float3dCard 6s ease-in-out infinite alternate;
-}
-
-@keyframes float3dCard {
-  0% { transform: perspective(1100px) translateY(0px) rotateX(1.2deg); }
-  100% { transform: perspective(1100px) translateY(-8px) rotateX(-1.2deg); }
 }
 
 .auth-anime-side {
   position: relative;
   overflow: hidden;
-  padding: 36px 28px;
+  padding: 32px 26px;
   background: var(--surface-elevated);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  gap: 16px;
+  text-align: center;
+  gap: 18px;
 }
 
 .auth-anime-side::before {
   content: "";
   position: absolute;
-  inset: -50%;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 14px,
-    var(--speed-line) 14px,
-    var(--speed-line) 28px
+  inset: -25%;
+  background: repeating-radial-gradient(
+    circle at 50% 42%,
+    transparent 0,
+    transparent 34px,
+    var(--speed-line) 34px,
+    var(--speed-line) 35px
   );
-  animation: speedLines 14s linear infinite;
   pointer-events: none;
 }
 
-@keyframes speedLines {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(40px, 40px); }
+.auth-globe-stage {
+  position: relative;
+  z-index: 1;
+  width: 216px;
+  height: 216px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#authGlobeCanvas {
+  width: 216px;
+  height: 216px;
+  display: block;
 }
 
 .anime-emblem-3d {
   position: relative;
   z-index: 1;
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
-  transform: perspective(600px) rotateY(-14deg) rotateX(10deg);
-  animation: emblemFloat 4s ease-in-out infinite alternate;
 }
 
-@keyframes emblemFloat {
-  0% { transform: perspective(600px) rotateY(-14deg) rotateX(10deg) translateY(0); }
-  100% { transform: perspective(600px) rotateY(14deg) rotateX(-8deg) translateY(-8px); }
+.auth-globe-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  box-shadow: var(--shadow-elevated);
+}
+
+.auth-globe-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth-globe-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
 }
 
 .auth-brand-title {
@@ -873,7 +927,9 @@ select:disabled,
 .rail-brand {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--surface-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -976,7 +1032,7 @@ select:disabled,
 .logo-icon {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: 50%;
   background: var(--surface-elevated);
   border: 1px solid var(--border-color);
   display: flex;
@@ -984,7 +1040,7 @@ select:disabled,
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  animation: pulseLogo3d 3s ease-in-out infinite;
+  animation: pulseLogo3d 4.2s ease-in-out infinite;
 }
 
 @keyframes pulseLogo3d {
@@ -1136,100 +1192,198 @@ select:disabled,
   to { opacity: 1; transform: perspective(900px) rotateX(0deg) translateY(0); }
 }
 
-/* ===== HOME PAGE: VARIED RHYTHM (VISOR + PILOT DOSSIER -> POPULAR DECK -> LATEST FEED) ===== */
+/* ===== HOME PAGE: INTERACTIVE 3D MONOCHROME EARTH GLOBE + ACCOUNT DOSSIER ===== */
 .anime-hero-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.52fr 1fr;
   gap: 18px;
   margin-bottom: 24px;
 }
 
 .hero-visor {
   position: relative;
-  background: var(--surface-card);
+  background: radial-gradient(circle at 50% 48%, var(--surface-elevated) 0%, var(--surface-card) 74%);
   border: 1px solid var(--border-color);
   border-radius: 24px;
   overflow: hidden;
-  min-height: 270px;
-  transform-style: preserve-3d;
-  transition: transform 0.25s ease, border-color 0.25s ease;
-  animation: visorFloat3d 5.5s ease-in-out infinite alternate;
+  min-height: 390px;
+  transition: border-color 0.25s ease;
 }
 
-@keyframes visorFloat3d {
-  0% { transform: perspective(1000px) rotateX(0.8deg) translateY(0); }
-  100% { transform: perspective(1000px) rotateX(-0.8deg) translateY(-4px); }
+.hero-visor:hover {
+  border-color: var(--theme-primary-light);
 }
 
-.video-landscape {
+.globe-viewport {
+  position: relative;
   width: 100%;
   height: 100%;
-  aspect-ratio: 16 / 9;
-  min-height: 270px;
-  max-height: 330px;
+  min-height: 390px;
 }
 
-.video-landscape video {
+#earthHeroCanvas {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  min-height: 390px;
   display: block;
-  filter: grayscale(100%) contrast(1.06);
+  cursor: grab;
+  touch-action: none;
+}
+
+#earthHeroCanvas.is-dragging {
+  cursor: grabbing;
+}
+
+.globe-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.globe-telemetry-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  pointer-events: auto;
+}
+
+.globe-region-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  pointer-events: auto;
+}
+
+.globe-region-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.globe-region-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.globe-region-btn.active {
+  background: var(--theme-primary);
+  color: var(--text-on-primary);
 }
 
 .visor-hud-overlay {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.9) 100%);
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px;
+  flex-wrap: wrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.globe-nav-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
   flex-wrap: wrap;
 }
 
-.visor-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.globe-icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.14s ease;
+}
+
+.globe-icon-btn:hover {
+  border-color: var(--accent-hallmark);
+  background: var(--surface-elevated);
+  transform: translateY(-1px);
+}
+
+.globe-icon-btn:active {
+  transform: scale(0.96);
 }
 
 .visor-badge {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.74rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .visor-caption {
-  font-size: 0.84rem;
-  color: #d4d4d4;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--text-muted);
 }
 
 .visor-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  pointer-events: auto;
+  flex-wrap: wrap;
 }
 
 .visor-control-btn {
   min-width: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  background: rgba(16, 16, 16, 0.86);
-  color: #ffffff;
+  background: var(--surface-card);
+  color: var(--text-primary);
   font-size: 0.82rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.14s ease;
 }
 
 .visor-control-btn:hover {
-  border-color: var(--theme-primary-light);
+  border-color: var(--accent-hallmark);
+  background: var(--surface-elevated);
   transform: translateY(-1px);
 }
 
@@ -1320,6 +1474,37 @@ select:disabled,
 
 .dossier-row .value.role {
   color: var(--status-warn);
+}
+
+.dossier-orbit-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.orbit-stat-chip {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orbit-stat-val {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.orbit-stat-lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
 .dossier-cta {
@@ -2573,6 +2758,12 @@ select:disabled,
     padding: 24px 20px;
   }
 
+  .auth-globe-stage,
+  #authGlobeCanvas {
+    width: 176px;
+    height: 176px;
+  }
+
   .category-tabs {
     position: static;
     flex-direction: row;
@@ -2588,6 +2779,52 @@ select:disabled,
 
   .bottom-nav {
     display: flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-visor {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .globe-hud-top {
+    position: static;
+    order: 1;
+    padding: 12px 12px 0;
+    pointer-events: auto;
+  }
+
+  .globe-viewport {
+    order: 2;
+    min-height: 270px;
+    height: 270px;
+  }
+
+  #earthHeroCanvas {
+    min-height: 270px;
+    height: 270px;
+  }
+
+  .visor-hud-overlay {
+    position: static;
+    order: 3;
+    padding: 0 12px 12px;
+    pointer-events: auto;
+  }
+
+  .globe-telemetry-chip {
+    width: 100%;
+  }
+
+  .globe-region-bar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .globe-region-btn {
+    flex: 1;
   }
 }
 
@@ -2616,9 +2853,8 @@ select:disabled,
 }
 
 /* ===== REDUCED MOTION & USER PAUSE CONTROL (R-39) ===== */
-body.motion-paused .anime-orbs,
-body.motion-paused .anime-orb,
-body.motion-paused .anime-grid-3d,
+body.motion-paused .orbital-ring,
+body.motion-paused .loader-globe-sphere,
 body.motion-paused .loader-ring-3d,
 body.motion-paused .loader-crest-3d,
 body.motion-paused .loader-title,

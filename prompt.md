@@ -162,10 +162,11 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 
 ## 5. Aturan & Invarian Kode (Wajib Dipatuhi AI Selanjutnya)
 
-1. **Tema Monokrom Murni**:
+1. **Tema Monokrom Murni & Globe Bumi 3D (`lib/earth-globe-engine.js`)**:
    - 3 tema wajib: `hitam`, `abu`, `putih` di `app/globals.css`.
    - Seluruh kode warna `#RRGGBB` dan `rgb()/rgba()` di `app/globals.css` **wajib** achromatic (`R === G === B`).
    - Seluruh pasangan warna teks/latar wajib memenuhi kontras WCAG AA `>= 4.5:1`.
+   - Visual utama (backdrop orbital horizon `#animeParticles`, loader `#loader`, portal login `#authGlobeCanvas`, dan hero Beranda `#earthHeroCanvas`) memakai engine Globe Bumi 3D proyeksi ortografis Canvas 2D monokrom tanpa dependensi eksternal, lengkap dengan drag pointer, fokus wilayah (`ID`/`JP`/`UK`/`US`), kontrol rotasi/zoom tombol tunggal (WCAG 2.5.7) + keyboard, serta dukungan `body.motion-paused` / `prefers-reduced-motion`.
 2. **Batas Glassmorphism & Tipografi**:
    - Maksimal **2** properti `backdrop-filter` di seluruh `app/globals.css`.
    - Font UI hanya `Rajdhani`, `IBM Plex Sans`, dan `IBM Plex Mono`. Dilarang menambahkan `Poppins`, `Orbitron`, `Inter`, `Space Grotesk`, atau `JetBrains Mono`.

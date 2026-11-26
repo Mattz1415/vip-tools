@@ -31,29 +31,24 @@ export default function VipToolsApp() {
       </a>
 
       <div className="backdrop-stage" aria-hidden="true">
-        <video
-          id="bgVideo"
-          width={1280}
-          height={720}
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src="https://c.termai.cc/v131/H4vF9D.mp4" type="video/mp4" />
-        </video>
         <div id="bgOverlay" />
-        <div className="anime-orbs">
-          <div className="anime-orb orb-1" />
-          <div className="anime-orb orb-2" />
-          <div className="anime-orb orb-3" />
+        <div className="globe-atmosphere-glow" />
+        <div className="globe-orbital-grid">
+          <div className="orbital-ring ring-1" />
+          <div className="orbital-ring ring-2" />
+          <div className="orbital-ring ring-3" />
         </div>
-        <div className="anime-grid-3d" />
         <canvas id="animeParticles" width={1280} height={720} />
       </div>
 
       <div id="loader" role="status" aria-live="polite">
-        <div className="loader-stage-3d" aria-hidden="true">
+        <div className="loader-stage-3d loader-globe-stage" aria-hidden="true">
+          <div className="loader-globe-sphere">
+            <span className="globe-meridian m-1" />
+            <span className="globe-meridian m-2" />
+            <span className="globe-meridian m-3" />
+            <span className="globe-equator" />
+          </div>
           <div className="loader-ring-3d">
             <span />
             <span />
@@ -64,12 +59,12 @@ export default function VipToolsApp() {
           </div>
         </div>
         <div className="loader-title">MATTZLM</div>
-        <div className="loader-sub">WEB TOOLS</div>
+        <div className="loader-sub">GLOBAL WEB TOOLS</div>
         <div className="loader-bar-wrap" aria-hidden="true">
           <div className="loader-bar" />
         </div>
         <div className="loader-status" id="ldStatus">
-          MEMUAT...
+          MEMUAT GLOBE...
         </div>
       </div>
 
@@ -117,16 +112,22 @@ export default function VipToolsApp() {
 
       <section className="auth-portal" id="authPage" tabIndex={-1} aria-labelledby="authHeading">
         <div className="auth-box mecha-cut">
-          <div className="auth-anime-side">
-            <div className="anime-emblem-3d mecha-cut-sm" aria-hidden="true">
-              <span className="brand-monogram">MLM</span>
+          <div className="auth-anime-side auth-globe-side">
+            <div className="auth-globe-stage" aria-hidden="true">
+              <canvas id="authGlobeCanvas" width={220} height={220} />
+              <div className="anime-emblem-3d auth-globe-badge mecha-cut-sm">
+                <span className="brand-monogram">MLM</span>
+              </div>
             </div>
-            <h1 className="auth-brand-title" id="authHeading">
-              MattzLM
-            </h1>
-            <p className="auth-brand-desc">
-              Unduh video, olah gambar, buat shortlink, dan cek DNS atau port langsung dari browser.
-            </p>
+            <div className="auth-globe-copy">
+              <span className="auth-globe-meta">ORBITAL STUDIO · 75 MODUL</span>
+              <h1 className="auth-brand-title" id="authHeading">
+                MattzLM
+              </h1>
+              <p className="auth-brand-desc">
+                Unduh video, olah gambar, buat shortlink, dan cek DNS atau port langsung dari browser.
+              </p>
+            </div>
           </div>
 
           <div className="auth-form-side">
@@ -390,7 +391,7 @@ export default function VipToolsApp() {
               <span className="brand-name">
                 Mattz<span>LM</span>
               </span>
-              <span className="brand-tagline">WEB TOOLS</span>
+              <span className="brand-tagline">GLOBAL TOOLS</span>
             </div>
           </div>
 
@@ -490,34 +491,128 @@ export default function VipToolsApp() {
               Beranda MattzLM
             </h1>
             <p className="workspace-sub" id="workspaceSub">
-              Info akun aktif dan daftar tool yang paling sering dipakai.
+              Globe Bumi 3D interaktif, info akun aktif, dan daftar tool populer.
             </p>
           </div>
 
           <section className="page active" id="homePage" aria-label="Beranda">
             <div className="anime-hero-grid">
-              <div className="hero-visor mecha-cut">
-                <div className="video-landscape">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    width={640}
-                    height={360}
-                    id="homeVideo"
-                  >
-                    <source
-                      src="https://c.termai.cc/v131/H4vF9D.mp4"
-                      type="video/mp4"
-                    />
-                  </video>
+              <div className="hero-visor globe-stage-card mecha-cut">
+                <div className="globe-viewport">
+                  <canvas
+                    id="earthHeroCanvas"
+                    width={680}
+                    height={380}
+                    tabIndex={0}
+                    role="application"
+                    aria-label="Globe Bumi 3D interaktif. Seret untuk memutar, gunakan tombol panah keyboard, atau pilih tombol navigasi di bawah."
+                  />
                 </div>
-                <div className="visor-hud-overlay">
-                  <div className="visor-meta">
-                    <span className="visor-badge">MATTZLM</span>
-                    <span className="visor-caption">Online</span>
+
+                <div className="globe-hud-top">
+                  <div className="globe-telemetry-chip">
+                    <span className="visor-badge">
+                      <i className="fas fa-earth-asia" aria-hidden="true" /> MATTZLM GLOBE
+                    </span>
+                    <span className="visor-caption" id="globeCoordReadout">
+                      6.2°S · 106.8°E · JAKARTA
+                    </span>
                   </div>
+
+                  <div className="globe-region-bar" role="group" aria-label="Fokus wilayah Globe Bumi">
+                    <button
+                      type="button"
+                      className="globe-region-btn active"
+                      data-globe-region="jakarta"
+                      aria-pressed="true"
+                      onClick={() => callGlobal("focusGlobeRegion", "jakarta")}
+                    >
+                      ID
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-region-btn"
+                      data-globe-region="tokyo"
+                      aria-pressed="false"
+                      onClick={() => callGlobal("focusGlobeRegion", "tokyo")}
+                    >
+                      JP
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-region-btn"
+                      data-globe-region="london"
+                      aria-pressed="false"
+                      onClick={() => callGlobal("focusGlobeRegion", "london")}
+                    >
+                      UK
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-region-btn"
+                      data-globe-region="newyork"
+                      aria-pressed="false"
+                      onClick={() => callGlobal("focusGlobeRegion", "newyork")}
+                    >
+                      US
+                    </button>
+                  </div>
+                </div>
+
+                <div className="visor-hud-overlay globe-hud-bottom">
+                  <div className="globe-nav-controls" role="group" aria-label="Kontrol rotasi dan zoom Globe Bumi">
+                    <button
+                      type="button"
+                      className="globe-icon-btn"
+                      id="globeLeftBtn"
+                      onClick={() => callGlobal("nudgeGlobe", -22, 0)}
+                      aria-label="Putar globe ke barat"
+                      title="Putar Barat"
+                    >
+                      <i className="fas fa-chevron-left" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-icon-btn"
+                      id="globeRightBtn"
+                      onClick={() => callGlobal("nudgeGlobe", 22, 0)}
+                      aria-label="Putar globe ke timur"
+                      title="Putar Timur"
+                    >
+                      <i className="fas fa-chevron-right" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-icon-btn"
+                      id="globeZoomInBtn"
+                      onClick={() => callGlobal("zoomGlobe", 0.14)}
+                      aria-label="Perbesar globe"
+                      title="Perbesar"
+                    >
+                      <i className="fas fa-magnifying-glass-plus" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-icon-btn"
+                      id="globeZoomOutBtn"
+                      onClick={() => callGlobal("zoomGlobe", -0.14)}
+                      aria-label="Perkecil globe"
+                      title="Perkecil"
+                    >
+                      <i className="fas fa-magnifying-glass-minus" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="globe-icon-btn"
+                      id="globeResetBtn"
+                      onClick={() => callGlobal("resetGlobeView")}
+                      aria-label="Reset posisi globe ke Nusantara"
+                      title="Reset Nusantara"
+                    >
+                      <i className="fas fa-compass" aria-hidden="true" />
+                    </button>
+                  </div>
+
                   <div className="visor-actions">
                     <button
                       type="button"
@@ -525,7 +620,7 @@ export default function VipToolsApp() {
                       id="visorVideoToggleBtn"
                       onClick={() => callGlobal("toggleHomeVideo")}
                       aria-pressed="false"
-                      aria-label="Jeda atau putar video visor"
+                      aria-label="Jeda atau putar rotasi globe"
                     >
                       <i className="fas fa-pause" aria-hidden="true" />
                       <span id="visorVideoToggleLabel">Jeda</span>
@@ -580,6 +675,16 @@ export default function VipToolsApp() {
                       <span className="value role" id="devRole">
                         MEMBER
                       </span>
+                    </div>
+                  </div>
+                  <div className="dossier-orbit-stats" aria-label="Ringkasan katalog">
+                    <div className="orbit-stat-chip">
+                      <span className="orbit-stat-val">75</span>
+                      <span className="orbit-stat-lbl">Modul Aktif</span>
+                    </div>
+                    <div className="orbit-stat-chip">
+                      <span className="orbit-stat-val">8</span>
+                      <span className="orbit-stat-lbl">Hub Global</span>
                     </div>
                   </div>
                 </div>
