@@ -105,6 +105,7 @@ const BUILTIN_TOOL_IDS = [
   { id: "instagram", name: "Instagram Downloader" },
   { id: "tiktok", name: "TikTok Downloader" },
   { id: "youtube", name: "YouTube Downloader" },
+  { id: "dl_ytmp3", name: "YTMP3 Downloader (YouTube to MP3)" },
   { id: "dl_music_dl", name: "Music Downloader Realtime" },
   { id: "dl_sosmed", name: "X, Pinterest & FB Downloader" },
   { id: "dl_ytthumb", name: "YouTube Thumbnail HD" },

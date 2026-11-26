@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireXvipUser } from "@/lib/server/auth";
 import { assertPublicHttpUrl, safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 import { getYtCookiesPath, hasYtCookies } from "@/lib/server/store";
+import { extractYouTubeVideoId, fetchYouTubeVideoMeta } from "@/lib/server/yt-provider";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,21 +22,6 @@ function buildProxyUrl(url: string, filename: string, download = false): string 
   const params = new URLSearchParams({ url, filename });
   if (download) params.set("download", "1");
   return `/api/tools/proxy?${params.toString()}`;
-}
-
-function extractYouTubeId(rawUrl: string): string | null {
-  try {
-    const u = new URL(rawUrl);
-    if (u.hostname.includes("youtu.be")) {
-      return u.pathname.replace(/^\//, "").split("/")[0] || null;
-    }
-    if (u.pathname.startsWith("/shorts/") || u.pathname.startsWith("/embed/")) {
-      return u.pathname.split("/")[2] || null;
-    }
-    return u.searchParams.get("v");
-  } catch {
-    return null;
-  }
 }
 
 async function runYtDlp(targetUrl: string) {
@@ -58,83 +44,85 @@ async function runYtDlp(targetUrl: string) {
   return JSON.parse(stdout);
 }
 
-async function tryPipedYouTube(videoId: string) {
-  const hosts = ["https://api.piped.private.coffee"];
-  for (const host of hosts) {
-    try {
-      const res = await fetch(`${host}/streams/${encodeURIComponent(videoId)}`, {
-        signal: AbortSignal.timeout(10000),
-        headers: { "User-Agent": "MattzLM-Web/2.0" },
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (!data?.title) continue;
+async function resolveYouTubeFromProvider(videoId: string) {
+  const meta = await fetchYouTubeVideoMeta(videoId);
+  const encId = encodeURIComponent(videoId);
+  const safeTitle = String(meta.title || `yt_${videoId}`)
+    .replace(/[^a-zA-Z0-9_-]+/g, "_")
+    .slice(0, 48);
 
-      const safeTitle = String(data.title || "youtube_video")
-        .replace(/[^a-zA-Z0-9_-]+/g, "_")
-        .slice(0, 48);
+  const formats: MediaFormatItem[] = [
+    {
+      label: "Video 1080p Full HD (MP4)",
+      ext: "mp4",
+      quality: "1080p",
+      url: `/api/tools/yt-media?v=${encId}&format=mp4&quality=1080&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp4&quality=1080&mode=download`,
+      type: "video",
+    },
+    {
+      label: "Video 720p HD (MP4)",
+      ext: "mp4",
+      quality: "720p",
+      url: `/api/tools/yt-media?v=${encId}&format=mp4&quality=720&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp4&quality=720&mode=download`,
+      type: "video",
+    },
+    {
+      label: "Video 480p SD (MP4)",
+      ext: "mp4",
+      quality: "480p",
+      url: `/api/tools/yt-media?v=${encId}&format=mp4&quality=480&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp4&quality=480&mode=download`,
+      type: "video",
+    },
+    {
+      label: "Video 360p Hemat (MP4)",
+      ext: "mp4",
+      quality: "360p",
+      url: `/api/tools/yt-media?v=${encId}&format=mp4&quality=360&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp4&quality=360&mode=download`,
+      type: "video",
+    },
+    {
+      label: "Audio MP3 320 kbps (Hi-Res)",
+      ext: "mp3",
+      quality: "320kbps",
+      url: `/api/tools/yt-media?v=${encId}&format=mp3&quality=320&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp3&quality=320&mode=download`,
+      type: "audio",
+    },
+    {
+      label: "Audio MP3 128 kbps (Cepat)",
+      ext: "mp3",
+      quality: "128kbps",
+      url: `/api/tools/yt-media?v=${encId}&format=mp3&quality=128&mode=download`,
+      proxyUrl: `/api/tools/yt-media?v=${encId}&format=mp3&quality=128&mode=download`,
+      type: "audio",
+    },
+    {
+      label: "Thumbnail HD (JPG)",
+      ext: "jpg",
+      quality: "HD",
+      url: meta.thumbnailHd,
+      proxyUrl: buildProxyUrl(meta.thumbnailHd, `${safeTitle}_thumb.jpg`, true),
+      type: "image",
+    },
+  ];
 
-      const formats: MediaFormatItem[] = [];
-      const videoStreams = Array.isArray(data.videoStreams) ? data.videoStreams : [];
-      const muxed = videoStreams.filter((s: { videoOnly?: boolean; url?: string }) => !s.videoOnly && s.url);
-      const videoOnly = videoStreams.filter((s: { videoOnly?: boolean; url?: string }) => s.videoOnly && s.url);
-
-      for (const s of muxed.slice(0, 4)) {
-        const ext = String(s.format || "mp4").toLowerCase().includes("webm") ? "webm" : "mp4";
-        formats.push({
-          label: `Video ${s.quality || "SD"} (${ext.toUpperCase()} + Audio)`,
-          ext,
-          quality: String(s.quality || "SD"),
-          url: s.url,
-          proxyUrl: buildProxyUrl(s.url, `${safeTitle}_${s.quality || "sd"}.${ext}`, true),
-          type: "video",
-          filesize: Number(s.contentLength || 0) || undefined,
-        });
-      }
-      if (formats.length === 0) {
-        for (const s of videoOnly.slice(0, 3)) {
-          const ext = String(s.format || "mp4").toLowerCase().includes("webm") ? "webm" : "mp4";
-          formats.push({
-            label: `Video ${s.quality || "HD"} (Video Only)`,
-            ext,
-            quality: String(s.quality || "HD"),
-            url: s.url,
-            proxyUrl: buildProxyUrl(s.url, `${safeTitle}_${s.quality || "hd"}.${ext}`, true),
-            type: "video",
-          });
-        }
-      }
-
-      const audioStreams = Array.isArray(data.audioStreams) ? data.audioStreams : [];
-      for (const a of audioStreams.slice(0, 2)) {
-        if (!a.url) continue;
-        const ext = String(a.mimeType || "").includes("mp4") ? "m4a" : "webm";
-        formats.push({
-          label: `Audio ${a.quality || "HQ"} (${ext.toUpperCase()})`,
-          ext,
-          quality: String(a.quality || "Audio"),
-          url: a.url,
-          proxyUrl: buildProxyUrl(a.url, `${safeTitle}_audio.${ext}`, true),
-          type: "audio",
-        });
-      }
-
-      if (formats.length > 0) {
-        return {
-          engine: "media-stream",
-          platform: "youtube",
-          title: String(data.title),
-          uploader: String(data.uploader || "YouTube"),
-          duration: Number(data.duration || 0),
-          thumbnail: String(data.thumbnailUrl || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`),
-          formats,
-        };
-      }
-    } catch {
-      // try next
-    }
-  }
-  return null;
+  return {
+    ok: true,
+    engine: "yt-provider",
+    platform: "youtube",
+    videoId,
+    title: meta.title,
+    uploader: meta.uploader,
+    duration: meta.durationSec,
+    thumbnail: meta.thumbnail,
+    previewUrl: `/api/tools/yt-media?v=${encId}&format=mp4&quality=360&mode=stream`,
+    note: "Server menyediakan konversi langsung MP4 & MP3. Klik format di bawah untuk mengunduh atau tekan Putar pada pratinjau video.",
+    formats,
+  };
 }
 
 async function tryInstagramEmbed(targetUrl: string) {
@@ -216,10 +204,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "URL media wajib diisi." }, { status: 400 });
     }
 
-    const parsedUrl = await assertPublicHttpUrl(rawUrl);
-    const ytId = extractYouTubeId(parsedUrl.toString());
+    const normalizedUrl = /^(?:www\.|m\.|music\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com)\//i.test(
+      rawUrl
+    )
+      ? `https://${rawUrl}`
+      : rawUrl;
+    const parsedUrl = await assertPublicHttpUrl(normalizedUrl);
+    const ytId = extractYouTubeVideoId(parsedUrl.toString());
 
-    // 1. Try VPS yt-dlp first (handles TikTok, IG, YT with cookies, X, Facebook, Reddit, etc.)
+    // 1. YouTube direct provider (self-hosted MP4 1080p/720p/480p/360p + MP3 320/128 kbps via /api/tools/yt-media)
+    if (ytId) {
+      const ytPayload = await resolveYouTubeFromProvider(ytId);
+      return NextResponse.json(ytPayload, { headers: { "Cache-Control": "no-store" } });
+    }
+
+    // 2. Try VPS yt-dlp for other platforms (TikTok, IG, X, Facebook, Reddit, Pinterest, etc.)
     try {
       const info = await runYtDlp(parsedUrl.toString());
       const safeTitle = String(info.title || "media")
@@ -321,52 +320,6 @@ export async function POST(req: NextRequest) {
       }
     } catch {
       // Fallback below depending on platform
-    }
-
-    // 2. YouTube fallback via Piped API + oEmbed
-    if (ytId) {
-      const piped = await tryPipedYouTube(ytId);
-      if (piped) {
-        const firstVid = piped.formats.find((f) => f.type === "video") || piped.formats[0];
-        return NextResponse.json({
-          ok: true,
-          ...piped,
-          previewUrl: firstVid ? buildProxyUrl(firstVid.url, `yt_${ytId}.${firstVid.ext}`, false) : "",
-        });
-      }
-      // Last-resort YouTube oEmbed + HD thumbnail
-      try {
-        const oeRes = await fetch(
-          `https://www.youtube.com/oembed?url=${encodeURIComponent(parsedUrl.toString())}&format=json`,
-          { signal: AbortSignal.timeout(6000) }
-        );
-        if (oeRes.ok) {
-          const oe = await oeRes.json();
-          const thumb = `https://i.ytimg.com/vi/${ytId}/maxresdefault.jpg`;
-          return NextResponse.json({
-            ok: true,
-            engine: "media-preview",
-            platform: "youtube",
-            title: String(oe.title || "YouTube Video"),
-            uploader: String(oe.author_name || "YouTube"),
-            duration: 0,
-            thumbnail: thumb,
-            note: "Stream video sedang dibatasi oleh platform sumber. Hanya thumbnail HD yang tersedia saat ini.",
-            formats: [
-              {
-                label: "Thumbnail HD (JPG)",
-                ext: "jpg",
-                quality: "HD",
-                url: thumb,
-                proxyUrl: buildProxyUrl(thumb, `yt_${ytId}_thumb.jpg`, true),
-                type: "image",
-              },
-            ],
-          });
-        }
-      } catch {
-        // ignore
-      }
     }
 
     // 3. Instagram embed fallback

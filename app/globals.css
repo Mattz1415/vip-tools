@@ -3829,6 +3829,92 @@ body.motion-paused .anime-emblem-3d {
   color: var(--text-primary);
 }
 
+/* ===== YTMP3 DOWNLOADER (.ytmp3-*) ===== */
+.ytmp3-quality-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ytmp3-chip {
+  min-height: 44px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-input);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.ytmp3-chip:hover {
+  border-color: var(--accent-hallmark);
+  background: var(--surface-elevated);
+}
+
+.ytmp3-chip[aria-pressed="true"] {
+  background: var(--theme-primary);
+  color: var(--text-on-primary);
+  border-color: var(--theme-primary);
+}
+
+.ytmp3-thumb {
+  width: 80px;
+  height: 45px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: var(--surface-card);
+}
+
+.ytmp3-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.ytmp3-quick-link {
+  min-height: 44px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-input);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.ytmp3-quick-link:hover {
+  border-color: var(--accent-hallmark);
+  background: var(--surface-card);
+}
+
+.ytmp3-quick-link.is-selected {
+  border-color: var(--accent-hallmark);
+  background: var(--surface-card);
+}
+
+@media (max-width: 640px) {
+  .ytmp3-quality-row,
+  .ytmp3-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .owner-kpi-grid,
   .owner-kv-grid,

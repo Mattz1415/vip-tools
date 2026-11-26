@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "MattzLM | Web Tools Studio",
-  description: "Kumpulan 76 web tools, pengunduh media, dan utilitas jaringan oleh MattzLM.",
+  description: "Kumpulan 77 web tools, pengunduh media, dan utilitas jaringan oleh MattzLM.",
 };
 
 export const viewport: Viewport = {

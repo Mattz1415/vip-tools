@@ -1,6 +1,6 @@
 # Panduan Handoff AI & Operasional Proyek MattzLM (`/root/vip-tools`)
 
-Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **76 modul tools** (termasuk Music Downloader Realtime + 30 fitur jaman sekarang), dependensi VPS, aturan desain monokrom, serta perintah verifikasi wajib.
+Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **77 modul tools** (termasuk YTMP3 Downloader, Music Downloader Realtime, dan 30 fitur jaman sekarang), dependensi VPS, aturan desain monokrom, serta perintah verifikasi wajib.
 
 ---
 
@@ -9,7 +9,7 @@ Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung 
 - **Aplikasi**: MattzLM Web Tools & VPS Suite
 - **Lokasi repo**: `/root/vip-tools`
 - **Stack**: Next.js 16 (App Router, React 19, TypeScript) + Backend API Route di VPS Linux
-- **Total modul aktif**: **76 modul tools** (45 modul bawaan + 31 modul modern termasuk Music Downloader Realtime)
+- **Total modul aktif**: **77 modul tools** (45 modul bawaan + 32 modul modern termasuk YTMP3 Downloader & Music Downloader Realtime)
 - **Autentikasi & Sesi**:
   - Login lokal (`username` + `password` PBKDF2-SHA256) dengan cookie `HttpOnly` bertanda tangan HMAC (`vip_session_token`).
   - Login Google via Firebase Auth (`/api/auth/google`, verifikasi `idToken` di server via Identity Toolkit API).
@@ -49,14 +49,15 @@ Aplikasi memiliki 4 role: `"owner" | "admin" | "xvip" | "member"`.
 
 ---
 
-## 3. Peta Lengkap 76 Modul Tools & Backend API
+## 3. Peta Lengkap 77 Modul Tools & Backend API
 
-### A. 31 Fitur Modern & Music Downloader (UI di `lib/vip-tools-extra-ui.js`)
+### A. 32 Fitur Modern, YTMP3 & Music Downloader (UI di `lib/vip-tools-extra-ui.js`)
 
-Seluruh UI 31 fitur ini berada di **`lib/vip-tools-extra-ui.js`** (di-import ke `lib/vip-tools-client.js` dan terdaftar di `BUILTIN_TOOL_IDS` pada `components/OwnerPanelClient.tsx`).
+Seluruh UI 32 fitur ini berada di **`lib/vip-tools-extra-ui.js`** (di-import ke `lib/vip-tools-client.js` dan terdaftar di `BUILTIN_TOOL_IDS` pada `components/OwnerPanelClient.tsx`).
 
-#### 1) Downloader & Media Sosmed (+4, kategori `downloader`, total 7)
-0. `dl_music_dl` (`/api/tools/music-dl`): Music Downloader Realtime berbasis katalog lagu resmi YouTube Music Studio (`MUSIC_VIDEO_TYPE_ATV`) + verifikasi referensi judul & durasi Deezer + fallback terverifikasi SoundCloud API v2, penolakan ketat hasil tidak cocok (anti-mismatch), filter ketat anti-remix/koplo/edit/cover saat "Hanya Versi Original" aktif, dukungan tautan langsung YouTube / YouTube Music / Spotify / SoundCloud, pemutar full audio realtime (`206 Partial Content` Range) dengan deduplikasi permintaan paralel, unduh penuh `.mp3`/`.m4a` terkunci ke ID trek persis, serta lirik terverifikasi (LRCLIB).
+#### 1) Downloader & Media Sosmed (+5, kategori `downloader`, total 8)
+0a. `dl_ytmp3` (`/api/tools/yt-media` + `lib/server/yt-provider.ts`): YTMP3 Downloader khusus konversi & unduh audio `.mp3` YouTube (pilihan 320 / 256 / 128 / 96 kbps), mendukung tempel tautan langsung (`watch`, `shorts`, `youtu.be`, `music.youtube.com`) maupun pencarian video YouTube langsung, pratinjau pemutar audio realtime (`206 Partial Content` Range), validasi header biner MP3, deduplikasi permintaan paralel, serta cache disk terbatasi di server.
+0b. `dl_music_dl` (`/api/tools/music-dl`): Music Downloader Realtime berbasis katalog lagu resmi YouTube Music Studio (`MUSIC_VIDEO_TYPE_ATV`) + verifikasi referensi judul & durasi Deezer + fallback terverifikasi SoundCloud API v2, penolakan ketat hasil tidak cocok (anti-mismatch), filter ketat anti-remix/koplo/edit/cover saat "Hanya Versi Original" aktif, dukungan tautan langsung YouTube / YouTube Music / Spotify / SoundCloud, pemutar full audio realtime (`206 Partial Content` Range) dengan deduplikasi permintaan paralel, unduh penuh `.mp3`/`.m4a` terkunci ke ID trek persis, serta lirik terverifikasi (LRCLIB).
 1. `dl_sosmed` (`/api/tools/download`): Unduh video/foto HD publik dari X/Twitter (`fxtwitter` + `yt-dlp`), Pinterest, Facebook, dan Threads.
 2. `dl_ytthumb` (`/api/tools/creator-kit`, `action: "yt_thumb"`): Ambil thumbnail YouTube Full HD 1280x720, SD, & HQ + tombol unduh via proxy.
 3. `dl_music` (`/api/tools/live-hub`, `action: "music"`): Cari lagu, putar preview audio 30 detik (iTunes Search) + lirik lengkap (LRCLIB) + tombol lompat ke `dl_music_dl`.
@@ -98,7 +99,7 @@ Backend: **`app/api/tools/live-hub/route.ts`** + kartu PNG via **`app/api/tools/
 30. `live_crypto` (`action: "crypto"`): Pantau harga kripto live BTC, ETH, SOL, USDT, TON, BNB, DOGE (CoinGecko) + konverter kurs IDR/USD/SGD/MYR/JPY/EUR.
 
 ### B. 45 Modul Bawaan yang Tetap Aktif
-- **Downloader (3)**: `instagram`, `tiktok`, `youtube` (`/api/tools/download` + `/api/tools/proxy`).
+- **Downloader (3)**: `instagram`, `tiktok`, `youtube` (`/api/tools/download` + `/api/tools/yt-media` + `/api/tools/proxy`; YouTube menggunakan penyedia server sendiri di `lib/server/yt-provider.ts` untuk MP4 360p-1080p & MP3 128-320 kbps beserta pencarian judul langsung).
 - **Network & Web (`vps`, 8)**: `vps_dns`, `vps_http`, `vps_ip`, `vps_port`, `vps_ping` (`/api/tools/vps-net`), `vps_shortlink` (`/api/tools/shortlink` + `/s/[code]`), `vps_paste` (`/api/tools/paste` + `/p/[id]`), `vps_imgconv` (`/api/tools/imgconv`).
   - **Keamanan Informasi VPS**: Modul `vps_status` (telemetri VPS publik) telah **dihapus dari katalog publik** dan diganti `vps_ping` (`Website Uptime & Ping`). Endpoint `/api/tools/vps-status` dikunci dengan `requireOwnerUser()` (hanya mengembalikan `{ ok: true, status: "ONLINE" }` tanpa data OS/CPU/RAM/disk/Node/yt-dlp). `vps_ip` wajib menerima target IP/domain publik eksplisit (menolak input kosong dengan HTTP `400` agar IP publik VPS tidak pernah bocor). Telemetri server hanya dapat dilihat oleh `owner` melalui `/owner` (`/api/owner/overview`).
 - **Maker (5)**: `iqc`, `tanyaustadz`, `sertifikat` (`/api/tools/maker`), `brat`, `fakeig` (canvas lokal).
