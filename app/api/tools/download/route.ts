@@ -382,6 +382,126 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 4. X / Twitter fxtwitter API fallback
+    if (/(?:twitter\.com|x\.com)/i.test(parsedUrl.hostname)) {
+      const m = parsedUrl.pathname.match(/\/([^/]+)\/status\/(\d+)/);
+      if (m) {
+        try {
+          const fxRes = await fetch(`https://api.fxtwitter.com/${encodeURIComponent(m[1])}/status/${m[2]}`, {
+            headers: { "User-Agent": "MattzLM-VPS/2.0" },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (fxRes.ok) {
+            const fx = await fxRes.json();
+            const tw = fx?.tweet;
+            const mediaAll: Array<{ type?: string; url?: string; thumbnail_url?: string }> = [
+              ...(tw?.media?.videos || []),
+              ...(tw?.media?.photos || []),
+            ];
+            const formats: MediaFormatItem[] = [];
+            mediaAll.forEach((item, idx) => {
+              if (!item?.url) return;
+              const isVid = item.type === "video" || /\.mp4/i.test(item.url);
+              const ext = isVid ? "mp4" : "jpg";
+              formats.push({
+                label: isVid ? `Video X #${idx + 1} (MP4)` : `Foto X #${idx + 1} (JPG)`,
+                ext,
+                quality: "HD",
+                url: item.url,
+                proxyUrl: buildProxyUrl(item.url, `x_${m[2]}_${idx + 1}.${ext}`, true),
+                type: isVid ? "video" : "image",
+              });
+            });
+            if (formats.length > 0) {
+              const first = formats[0];
+              return NextResponse.json({
+                ok: true,
+                engine: "vps-fxtwitter",
+                platform: "x",
+                title: String(tw?.text || `Post X @${m[1]}`).slice(0, 100),
+                uploader: `@${tw?.author?.screen_name || m[1]}`,
+                duration: 0,
+                thumbnail: tw?.media?.videos?.[0]?.thumbnail_url
+                  ? buildProxyUrl(tw.media.videos[0].thumbnail_url, `x_${m[2]}_thumb.jpg`, false)
+                  : first.type === "image"
+                    ? buildProxyUrl(first.url, `x_${m[2]}_thumb.jpg`, false)
+                    : "",
+                previewUrl: buildProxyUrl(first.url, `x_${m[2]}.${first.ext}`, false),
+                formats,
+              });
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    // 5. Pinterest / Threads / Facebook OpenGraph media fallback
+    if (/(?:pinterest\.|pin\.it|threads\.|facebook\.com|fb\.watch)/i.test(parsedUrl.hostname)) {
+      try {
+        const pageRes = await fetch(parsedUrl.toString(), {
+          redirect: "follow",
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+          },
+          signal: AbortSignal.timeout(9000),
+        });
+        if (pageRes.ok) {
+          const html = (await pageRes.text()).slice(0, 260_000);
+          const ogVid =
+            html.match(/<meta[^>]+property=["']og:video(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i)?.[1] ||
+            html.match(/"(https:\/\/v1\.pinimg\.com\/videos\/[^"]+\.mp4)"/i)?.[1];
+          const ogImg =
+            html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)?.[1] ||
+            html.match(/"(https:\/\/i\.pinimg\.com\/originals\/[^"]+)"/i)?.[1];
+          const ogTitle =
+            html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1] ||
+            "Media Publik";
+          const formats: MediaFormatItem[] = [];
+          if (ogVid && /^https?:\/\//i.test(ogVid)) {
+            const clean = ogVid.replace(/&amp;/g, "&");
+            formats.push({
+              label: "Video HD (MP4)",
+              ext: "mp4",
+              quality: "HD",
+              url: clean,
+              proxyUrl: buildProxyUrl(clean, `media_${Date.now()}.mp4`, true),
+              type: "video",
+            });
+          }
+          if (ogImg && /^https?:\/\//i.test(ogImg)) {
+            const clean = ogImg.replace(/&amp;/g, "&");
+            formats.push({
+              label: "Gambar HD (JPG)",
+              ext: "jpg",
+              quality: "HD",
+              url: clean,
+              proxyUrl: buildProxyUrl(clean, `media_${Date.now()}.jpg`, true),
+              type: "image",
+            });
+          }
+          if (formats.length > 0) {
+            const first = formats[0];
+            return NextResponse.json({
+              ok: true,
+              engine: "vps-og-extractor",
+              platform: platformHint,
+              title: ogTitle.slice(0, 100),
+              uploader: parsedUrl.hostname,
+              duration: 0,
+              thumbnail: ogImg ? buildProxyUrl(ogImg.replace(/&amp;/g, "&"), "thumb.jpg", false) : "",
+              previewUrl: buildProxyUrl(first.url, `preview.${first.ext}`, false),
+              formats,
+            });
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     return NextResponse.json(
       {
         ok: false,
