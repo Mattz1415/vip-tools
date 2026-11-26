@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "graph:update": "graphify update . --force",
+    "graph:query": "graphify query"
   },
   "dependencies": {
     "firebase": "^13.4.0",

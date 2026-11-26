@@ -1,6 +1,6 @@
 # Panduan Handoff AI & Operasional Proyek MattzLM (`/root/vip-tools`)
 
-Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **77 modul tools** (termasuk YTMP3 Downloader, Music Downloader Realtime, dan 30 fitur jaman sekarang), dependensi VPS, aturan desain monokrom, serta perintah verifikasi wajib.
+Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **77 modul tools** (termasuk YTMP3 Downloader, Music Downloader Realtime, dan 30 fitur jaman sekarang), integrasi `graphify`, dependensi VPS, aturan desain Glassmorphism + 3D, serta perintah verifikasi wajib.
 
 ---
 
@@ -164,23 +164,25 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 
 ## 5. Aturan & Invarian Kode (Wajib Dipatuhi AI Selanjutnya)
 
-1. **Tema Monokrom Murni & Globe Bumi 3D (`lib/earth-globe-engine.js`)**:
-   - 3 tema wajib: `hitam`, `abu`, `putih` di `app/globals.css`.
-   - Seluruh kode warna `#RRGGBB` dan `rgb()/rgba()` di `app/globals.css` **wajib** achromatic (`R === G === B`).
-   - Seluruh pasangan warna teks/latar wajib memenuhi kontras WCAG AA `>= 4.5:1`.
-   - Visual utama (backdrop orbital horizon `#animeParticles`, loader `#loader`, portal login `#authGlobeCanvas`, dan hero Beranda `#earthHeroCanvas`) memakai engine Globe Bumi 3D proyeksi ortografis Canvas 2D monokrom tanpa dependensi eksternal, lengkap dengan drag pointer, fokus wilayah (`ID`/`JP`/`UK`/`US`), kontrol rotasi/zoom tombol tunggal (WCAG 2.5.7) + keyboard, serta dukungan `body.motion-paused` / `prefers-reduced-motion`.
-2. **Batas Glassmorphism & Tipografi**:
-   - Maksimal **2** properti `backdrop-filter` di seluruh `app/globals.css`.
+1. **Desain Glassmorphism + 3D & 3 Tema (`hitam`, `abu`, `putih`)**:
+   - 3 tema wajib: `hitam` (obsidian slate + warm amber hallmark), `abu` (graphite slate + warm amber), `putih` (frosted porcelain + deep amber) di `app/globals.css`.
+   - Override eksplisit permintaan user untuk R-10: permukaan utama memakai frosted glass (`backdrop-filter: var(--glass-blur)`, specular border `--glass-border`, sheen gradient `--glass-sheen`, dan layered 3D perspective depth pada `.hero-visor`, `.dossier-panel`, `.tools-card`, `.auth-box`, `.tool-viewer-content`, `.owner-card`, `.owner-kpi`).
+   - Seluruh pasangan warna teks/latar, termasuk teks di atas permukaan kaca semi-transparan (`--glass-surface`, `--glass-elevated`, `--glass-tile` dikomposit di atas `--surface-bg` dan orb latar), wajib memenuhi kontras WCAG AA `>= 4.5:1`.
+   - Latar panggung menggunakan `#bgVideo`, `.anime-orbs`, `.anime-grid-3d`, kanvas partikel `#animeParticles`, dan visor video `#homeVideo` (Globe Bumi 3D sudah di-revert). Seluruh animasi dan 3D tilt wajib berhenti saat `body.motion-paused` atau `prefers-reduced-motion: reduce` aktif.
+2. **Tipografi & Hierarki**:
    - Font UI hanya `Rajdhani`, `IBM Plex Sans`, dan `IBM Plex Mono`. Dilarang menambahkan `Poppins`, `Orbitron`, `Inter`, `Space Grotesk`, atau `JetBrains Mono`.
 3. **Anti-Slop UI & Aksesibilitas**:
    - Dilarang memakai ikon: `fa-bolt`, `fa-dragon`, `fa-sparkles`, `fa-robot`, `fa-magic`, `fa-broadcast`, `fa-star`, `fa-wand-magic-sparkles`, `fa-arrow-right`.
    - Dilarang memakai badge: `'Baru'`, `'NEW'`, `'AI'`, `'Instan'`, `'Aman'`.
    - Dilarang memakai karakter em dash (`\u2014`) di file TSX maupun JS.
-   - Setiap elemen `<img>`, `<video>`, dan `<iframe>` wajib memiliki atribut `width` dan `height` eksplisit.
+   - Setiap elemen `<img>`, `<video>`, `<canvas>`, dan `<iframe>` wajib memiliki atribut `width` dan `height` eksplisit.
    - Tombol interaktif utama wajib menjaga target sentuh minimal `44px`.
-4. **Lifecycle Cleanup SPA**:
-   - Semua listener/timer/ObjectURL di client wajib dibersihkan lewat fungsi `cleanup()` yang dikembalikan `initVipTools()` (atau `registerCleanup` di `lib/vip-tools-extra-ui.js`), agar navigasi `/` <-> `/owner` tidak membocorkan listener atau membuat `#loader` macet.
-5. **Batas Wilayah Kerja di VPS Ini**:
+4. **Integrasi Knowledge Graph (`graphify`)**:
+   - Skill, rules, workflow, dan git hooks `graphify` terpasang di `.agents/skills/graphify/`, `.agents/rules/graphify.md`, `.agents/workflows/graphify.md`, `AGENTS.md`, `.graphifyignore`, dan `graphify-out/`.
+   - Jalankan `npm run graph:update` setelah perubahan kode signifikan; gunakan `npm run graph:query -- "<pertanyaan>"` untuk eksplorasi arsitektur.
+5. **Lifecycle Cleanup SPA**:
+   - Semua listener/timer/rAF/ObjectURL di client wajib dibersihkan lewat fungsi `cleanup()` yang dikembalikan `initVipTools()` (atau `registerCleanup` di `lib/vip-tools-extra-ui.js`), agar navigasi `/` <-> `/owner` tidak membocorkan listener atau membuat `#loader` macet.
+6. **Batas Wilayah Kerja di VPS Ini**:
    - Edit hanya di dalam `/root/vip-tools`. Jangan menyentuh `/root/mattzzzz`.
    - Jangan mematikan proses sistem pada port `20128`.
    - Jika menjalankan server uji sementara (mis. port `3099`), selalu matikan proses beserta child process-nya setelah verifikasi selesai.
@@ -205,10 +207,13 @@ Setiap kali menambah atau mengubah fitur, jalankan seluruh rangkaian pengecekan 
 # 1. Type-check TypeScript
 cd /root/vip-tools && npx tsc --noEmit
 
-# 2. Simulasi runtime client (75 tools, navigasi, role member/xvip/owner, cleanup unmount/remount)
+# 2. Simulasi runtime client (77 tools, navigasi, role member/xvip/owner, 3D tilt, cleanup unmount/remount)
 node /tmp/antigravity/runtime-test.mjs
 
-# 3. Production build bersih
+# 3. Rebuild knowledge graph graphify (AST-only)
+cd /root/vip-tools && npm run graph:update
+
+# 4. Production build bersih
 cd /root/vip-tools && rm -rf .next && npm run build
 
 # 4. Uji E2E seluruh API VPS & RBAC XVIP + static/contrast verifier pada port sementara 3099
@@ -225,8 +230,8 @@ ss -ltnp | grep 3099 || echo "Port 3099 bersih"
 ```
 
 ### C. File Kunci yang Perlu Dicek Saat Mengembangkan Fitur Baru
-- `lib/vip-tools-extra-ui.js`: Katalog & renderer UI 30 fitur jaman sekarang.
-- `lib/vip-tools-client.js`: State utama, auth, katalog gabungan 75 tools, gerbang `xvip`, dan renderer 45 fitur bawaan.
+- `lib/vip-tools-extra-ui.js`: Katalog & renderer UI 32 fitur modern (termasuk `dl_ytmp3` & `dl_music_dl`).
+- `lib/vip-tools-client.js`: State utama, auth, katalog gabungan 77 tools, gerbang `xvip`, engine partikel + 3D glass tilt, dan renderer 45 fitur bawaan.
 - `lib/server/auth.ts` & `lib/server/store.ts`: Session HMAC, role `UserRole`, `requireXvipUser()`, `requireOwnerUser()`, dan penyimpanan `data/store.json`.
 - `lib/server/net-guard.ts`: Validasi URL publik anti-SSRF.
 - `app/api/tools/*`: Semua backend API tools (`viral-maker`, `creator-kit`, `live-hub`, `download`, `proxy`, `vps-net`, `vps-status`, `shortlink`, `paste`, `qr`, `maker`, `imgconv`, `removebg`, `enhance`, `source`, `ngl`, `stalk-game`, `stalk-social`).
