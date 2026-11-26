@@ -12,7 +12,7 @@ function decodeEntities(str: string): string {
 
 async function stalkGitHub(user: string) {
   const res = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}`, {
-    headers: { "User-Agent": "MattzLM-VPS/2.0", Accept: "application/vnd.github+json" },
+    headers: { "User-Agent": "MattzLM-Web/2.0", Accept: "application/vnd.github+json" },
     signal: AbortSignal.timeout(8000),
   });
   const data = await res.json();
@@ -171,7 +171,7 @@ async function stalkInstagram(user: string) {
   }
 
   throw new Error(
-    `Instagram membatasi akses tanpa sesi login untuk @${clean} dari IP VPS. Buka tautan profil langsung di instagram.com/${clean}.`
+    `Instagram membatasi akses publik tanpa sesi login untuk @${clean}. Buka tautan profil langsung di instagram.com/${clean}.`
   );
 }
 

@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: false, error: "Game tidak didukung." }, { status: 400 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal mengecek akun game di VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal mengecek akun game.";
     return NextResponse.json({ ok: false, error: msg }, { status: 404 });
   }
 }

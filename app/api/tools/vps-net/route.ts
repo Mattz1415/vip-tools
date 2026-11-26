@@ -4,13 +4,16 @@ import net from "node:net";
 import tls from "node:tls";
 import { promisify } from "node:util";
 import { NextRequest, NextResponse } from "next/server";
-import { assertPublicHost, assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { assertPublicHost, assertPublicHttpUrl, safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 
 const execFileAsync = promisify(execFile);
 
 async function runWhois(domain: string): Promise<string> {
+  if (!domain || domain.startsWith("-")) {
+    return "WHOIS tidak tersedia untuk domain ini.";
+  }
   try {
-    const { stdout } = await execFileAsync("whois", [domain], {
+    const { stdout } = await execFileAsync("whois", ["--", domain], {
       timeout: 7000,
       maxBuffer: 512 * 1024,
     });
@@ -88,6 +91,20 @@ function probePort(host: string, port: number): Promise<{ port: number; open: bo
   });
 }
 
+function extractHostInput(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  const unbracketed = trimmed.replace(/^\[|\]$/g, "");
+  if (net.isIP(unbracketed)) return unbracketed;
+  try {
+    const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+    const u = new URL(withProto);
+    return u.hostname.replace(/^\[|\]$/g, "");
+  } catch {
+    return trimmed.replace(/^https?:\/\//i, "").split(/[/?#]/)[0].replace(/^\[|\]$/g, "");
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -98,7 +115,13 @@ export async function POST(req: NextRequest) {
         .trim()
         .replace(/^https?:\/\//i, "")
         .split(/[/?#:]/)[0];
-      if (!raw || !/^[a-zA-Z0-9.-]{2,253}$/.test(raw)) {
+      if (
+        !raw ||
+        raw.startsWith("-") ||
+        !/^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(
+          raw
+        )
+      ) {
         return NextResponse.json({ ok: false, error: "Nama domain tidak valid." }, { status: 400 });
       }
       await assertPublicHost(raw);
@@ -145,10 +168,9 @@ export async function POST(req: NextRequest) {
       const parsed = await assertPublicHttpUrl(rawUrl);
 
       const t0 = Date.now();
-      const res = await fetch(parsed.toString(), {
+      const { response: res, finalUrl } = await safeFetchPublic(parsed.toString(), {
         method: "GET",
-        redirect: "follow",
-        headers: { "User-Agent": "MattzLM-VPS-Inspector/2.0" },
+        headers: { "User-Agent": "MattzLM-Web/2.0" },
         signal: AbortSignal.timeout(10000),
       });
       const latencyMs = Date.now() - t0;
@@ -157,8 +179,13 @@ export async function POST(req: NextRequest) {
       res.headers.forEach((v, k) => {
         headers[k] = v;
       });
+      try {
+        await res.body?.cancel();
+      } catch {
+        // ignore
+      }
 
-      const finalParsed = new URL(res.url);
+      const finalParsed = new URL(finalUrl);
       const ssl =
         finalParsed.protocol === "https:"
           ? await inspectTls(finalParsed.hostname, Number(finalParsed.port) || 443)
@@ -167,7 +194,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         ok: true,
         url: parsed.toString(),
-        finalUrl: res.url,
+        finalUrl,
         status: res.status,
         statusText: res.statusText,
         latencyMs,
@@ -176,22 +203,76 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (action === "ip") {
-      const raw = String(body?.target || "").trim();
-      let lookupTarget = raw;
-      if (!lookupTarget) {
-        const xff = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "";
-        lookupTarget = xff && xff !== "::1" && xff !== "127.0.0.1" ? xff : "";
-      } else {
-        const cleanHost = lookupTarget.replace(/^https?:\/\//i, "").split(/[/?#:]/)[0];
-        const checked = await assertPublicHost(cleanHost);
-        lookupTarget = checked.address;
+    if (action === "ping") {
+      let rawUrl = String(body?.target || "").trim();
+      if (!rawUrl) {
+        return NextResponse.json({ ok: false, error: "URL atau domain website wajib diisi." }, { status: 400 });
+      }
+      if (!/^https?:\/\//i.test(rawUrl)) rawUrl = `https://${rawUrl}`;
+
+      const dnsStart = Date.now();
+      const parsed = await assertPublicHttpUrl(rawUrl);
+      const dnsMs = Date.now() - dnsStart;
+
+      const reqStart = Date.now();
+      let result = await safeFetchPublic(parsed.toString(), {
+        method: "HEAD",
+        headers: { "User-Agent": "MattzLM-Web/2.0" },
+        signal: AbortSignal.timeout(9000),
+      });
+      if (result.response.status === 405 || result.response.status === 501) {
+        try {
+          await result.response.body?.cancel();
+        } catch {
+          // ignore
+        }
+        result = await safeFetchPublic(parsed.toString(), {
+          method: "GET",
+          headers: { "User-Agent": "MattzLM-Web/2.0" },
+          signal: AbortSignal.timeout(9000),
+        });
+      }
+      const latencyMs = Date.now() - reqStart;
+      try {
+        await result.response.body?.cancel();
+      } catch {
+        // ignore
       }
 
-      const apiUrl = lookupTarget
-        ? `http://ip-api.com/json/${encodeURIComponent(lookupTarget)}?fields=status,message,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,query`
-        : `http://ip-api.com/json/?fields=status,message,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
+      const online = result.response.status >= 200 && result.response.status < 500;
+      return NextResponse.json({
+        ok: true,
+        url: parsed.toString(),
+        finalUrl: result.finalUrl,
+        online,
+        status: result.response.status,
+        statusText: result.response.statusText || (online ? "OK" : "Error"),
+        dnsMs,
+        latencyMs,
+        https: new URL(result.finalUrl).protocol === "https:",
+      });
+    }
 
+    if (action === "ip") {
+      const raw = String(body?.target || "").trim();
+      if (!raw) {
+        return NextResponse.json(
+          { ok: false, error: "Masukkan alamat IP publik atau nama domain target terlebih dahulu." },
+          { status: 400 }
+        );
+      }
+
+      const cleanHost = extractHostInput(raw);
+      const checked = await assertPublicHost(cleanHost);
+      const lookupTarget = checked.address;
+      if (!lookupTarget || !net.isIP(lookupTarget)) {
+        return NextResponse.json(
+          { ok: false, error: "Target IP publik tidak valid." },
+          { status: 400 }
+        );
+      }
+
+      const apiUrl = `http://ip-api.com/json/${encodeURIComponent(lookupTarget)}?fields=status,message,country,countryCode,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
       const res = await fetch(apiUrl, { signal: AbortSignal.timeout(8000) });
       const data = await res.json();
       if (data.status !== "success") {
@@ -221,10 +302,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "port") {
-      const rawHost = String(body?.target || "")
-        .trim()
-        .replace(/^https?:\/\//i, "")
-        .split(/[/?#:]/)[0];
+      const rawHost = extractHostInput(String(body?.target || ""));
       if (!rawHost) {
         return NextResponse.json({ ok: false, error: "Host atau domain wajib diisi." }, { status: 400 });
       }
@@ -255,7 +333,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: false, error: "Aksi jaringan tidak dikenali." }, { status: 400 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal menjalankan modul jaringan VPS.";
+    const msg = sanitizePublicError(err, "Gagal menjalankan utilitas jaringan.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

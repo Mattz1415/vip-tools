@@ -627,7 +627,7 @@ export default function VipToolsApp() {
                 </button>
                 <button type="button" role="tab" aria-selected="false" className="category-tab" data-category="vps">
                   <span className="category-tab-main">
-                    <i className="fas fa-server" aria-hidden="true" /> VPS
+                    <i className="fas fa-globe" aria-hidden="true" /> NETWORK
                   </span>
                   <span className="category-count" data-count-for="vps">0</span>
                 </button>

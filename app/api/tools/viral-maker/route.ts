@@ -695,7 +695,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: false, error: `Action '${action}' tidak didukung.` }, { status: 400 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memproses Viral Maker di VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal memproses Viral Maker.";
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

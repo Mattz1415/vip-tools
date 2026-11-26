@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { NextRequest, NextResponse } from "next/server";
 import { requireXvipUser } from "@/lib/server/auth";
-import { assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { assertPublicHttpUrl, safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 import { getYtCookiesPath, hasYtCookies } from "@/lib/server/store";
 
 const execFileAsync = promisify(execFile);
@@ -49,7 +49,7 @@ async function runYtDlp(targetUrl: string) {
   if (hasYtCookies()) {
     args.push("--cookies", getYtCookiesPath());
   }
-  args.push(targetUrl);
+  args.push("--", targetUrl);
 
   const { stdout } = await execFileAsync("/usr/local/bin/yt-dlp", args, {
     timeout: 22000,
@@ -64,7 +64,7 @@ async function tryPipedYouTube(videoId: string) {
     try {
       const res = await fetch(`${host}/streams/${encodeURIComponent(videoId)}`, {
         signal: AbortSignal.timeout(10000),
-        headers: { "User-Agent": "MattzLM-VPS/2.0" },
+        headers: { "User-Agent": "MattzLM-Web/2.0" },
       });
       if (!res.ok) continue;
       const data = await res.json();
@@ -121,7 +121,7 @@ async function tryPipedYouTube(videoId: string) {
 
       if (formats.length > 0) {
         return {
-          engine: "vps-piped",
+          engine: "media-stream",
           platform: "youtube",
           title: String(data.title),
           uploader: String(data.uploader || "YouTube"),
@@ -186,7 +186,7 @@ async function tryInstagramEmbed(targetUrl: string) {
     }
     if (formats.length > 0) {
       return {
-        engine: "vps-ig-embed",
+        engine: "media-stream",
         platform: "instagram",
         title: `Instagram Post ${shortcode}`,
         uploader: userMatch?.[1] ? `@${userMatch[1]}` : "Instagram",
@@ -307,7 +307,7 @@ export async function POST(req: NextRequest) {
           formats.find((f) => f.type === "video") || formats[0];
         return NextResponse.json({
           ok: true,
-          engine: "vps-yt-dlp",
+          engine: "media-stream",
           platform: String(info.extractor_key || platformHint).toLowerCase(),
           title: String(info.title || "Media Unduhan"),
           uploader: String(info.uploader || info.channel || info.creator || "-"),
@@ -345,13 +345,13 @@ export async function POST(req: NextRequest) {
           const thumb = `https://i.ytimg.com/vi/${ytId}/maxresdefault.jpg`;
           return NextResponse.json({
             ok: true,
-            engine: "vps-yt-oembed",
+            engine: "media-preview",
             platform: "youtube",
             title: String(oe.title || "YouTube Video"),
             uploader: String(oe.author_name || "YouTube"),
             duration: 0,
             thumbnail: thumb,
-            note: "Stream YouTube dibatasi anti-bot dari IP VPS. Owner dapat memasang yt-dlp cookies.txt di /owner untuk unduhan penuh 1080p.",
+            note: "Stream video sedang dibatasi oleh platform sumber. Hanya thumbnail HD yang tersedia saat ini.",
             formats: [
               {
                 label: "Thumbnail HD (JPG)",
@@ -388,7 +388,7 @@ export async function POST(req: NextRequest) {
       if (m) {
         try {
           const fxRes = await fetch(`https://api.fxtwitter.com/${encodeURIComponent(m[1])}/status/${m[2]}`, {
-            headers: { "User-Agent": "MattzLM-VPS/2.0" },
+            headers: { "User-Agent": "MattzLM-Web/2.0" },
             signal: AbortSignal.timeout(8000),
           });
           if (fxRes.ok) {
@@ -416,7 +416,7 @@ export async function POST(req: NextRequest) {
               const first = formats[0];
               return NextResponse.json({
                 ok: true,
-                engine: "vps-fxtwitter",
+                engine: "media-stream",
                 platform: "x",
                 title: String(tw?.text || `Post X @${m[1]}`).slice(0, 100),
                 uploader: `@${tw?.author?.screen_name || m[1]}`,
@@ -440,8 +440,7 @@ export async function POST(req: NextRequest) {
     // 5. Pinterest / Threads / Facebook OpenGraph media fallback
     if (/(?:pinterest\.|pin\.it|threads\.|facebook\.com|fb\.watch)/i.test(parsedUrl.hostname)) {
       try {
-        const pageRes = await fetch(parsedUrl.toString(), {
-          redirect: "follow",
+        const { response: pageRes } = await safeFetchPublic(parsedUrl.toString(), {
           headers: {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
@@ -486,7 +485,7 @@ export async function POST(req: NextRequest) {
             const first = formats[0];
             return NextResponse.json({
               ok: true,
-              engine: "vps-og-extractor",
+              engine: "media-extractor",
               platform: platformHint,
               title: ogTitle.slice(0, 100),
               uploader: parsedUrl.hostname,
@@ -506,12 +505,12 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         error:
-          "Media tidak dapat diekstrak dari tautan tersebut (akun privat atau butuh cookies). Pastikan tautan publik atau tambahkan yt-dlp cookies di /owner.",
+          "Media tidak dapat diekstrak dari tautan tersebut (akun privat atau dibatasi oleh platform sumber). Pastikan tautan bersifat publik.",
       },
       { status: 422 }
     );
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memproses downloader di VPS.";
+    const msg = sanitizePublicError(err, "Gagal memproses unduhan media.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

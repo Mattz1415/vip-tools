@@ -98,7 +98,8 @@ Backend: **`app/api/tools/live-hub/route.ts`** + kartu PNG via **`app/api/tools/
 
 ### B. 45 Modul Bawaan yang Tetap Aktif
 - **Downloader (3)**: `instagram`, `tiktok`, `youtube` (`/api/tools/download` + `/api/tools/proxy`).
-- **VPS (8)**: `vps_dns`, `vps_http`, `vps_ip`, `vps_port` (`/api/tools/vps-net`), `vps_shortlink` (`/api/tools/shortlink` + `/s/[code]`), `vps_paste` (`/api/tools/paste` + `/p/[id]`), `vps_imgconv` (`/api/tools/imgconv`), `vps_status` (`/api/tools/vps-status`).
+- **Network & Web (`vps`, 8)**: `vps_dns`, `vps_http`, `vps_ip`, `vps_port`, `vps_ping` (`/api/tools/vps-net`), `vps_shortlink` (`/api/tools/shortlink` + `/s/[code]`), `vps_paste` (`/api/tools/paste` + `/p/[id]`), `vps_imgconv` (`/api/tools/imgconv`).
+  - **Keamanan Informasi VPS**: Modul `vps_status` (telemetri VPS publik) telah **dihapus dari katalog publik** dan diganti `vps_ping` (`Website Uptime & Ping`). Endpoint `/api/tools/vps-status` dikunci dengan `requireOwnerUser()` (hanya mengembalikan `{ ok: true, status: "ONLINE" }` tanpa data OS/CPU/RAM/disk/Node/yt-dlp). `vps_ip` wajib menerima target IP/domain publik eksplisit (menolak input kosong dengan HTTP `400` agar IP publik VPS tidak pernah bocor). Telemetri server hanya dapat dilihat oleh `owner` melalui `/owner` (`/api/owner/overview`).
 - **Maker (5)**: `iqc`, `tanyaustadz`, `sertifikat` (`/api/tools/maker`), `brat`, `fakeig` (canvas lokal).
 - **Tools (8)**: `qr` (`/api/tools/qr`), `removebg` (`/api/tools/removebg`), `enhancer` (`/api/tools/enhance`), `dev_json`, `dev_encode`, `calc`, `pwgen`, `morse`.
 - **External (4)**: `winquotesnew`, `fakeff`, `getcode`, `fotolink`.
@@ -152,8 +153,10 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
    - Isi 6 field Firebase di `.env.local` atau lewat `/owner`.
 2. **YouTube Downloader (`yt-dlp`)**:
    - Jika IP VPS terkena pembatasan anti-bot YouTube, simpan cookies Netscape lewat `/owner` (`data/yt-cookies.txt`, mode `0600`).
-3. **SSRF Protection (`lib/server/net-guard.ts`)**:
-   - Setiap route baru yang melakukan `fetch()` atau koneksi TCP ke URL/host input pengguna **wajib** memanggil `assertPublicHttpUrl()` atau `assertPublicHost()` agar IP loopback (`127.0.0.1`), metadata cloud (`169.254.169.254`), dan jaringan privat ditolak (HTTP `400`).
+3. **SSRF & Anti-Info-Leak Protection (`lib/server/net-guard.ts` & `next.config.ts`)**:
+   - Setiap route yang melakukan `fetch()` atau koneksi TCP ke URL/host input pengguna **wajib** memakai `safeFetchPublic()` (memvalidasi ulang setiap hop redirect agar redirect tidak mengarah ke loopback/metadata cloud), `assertPublicHttpUrl()`, atau `assertPublicHost()` sehingga IP loopback (`127.0.0.1`), metadata cloud (`169.254.169.254`), dan jaringan privat ditolak (HTTP `400`).
+   - `next.config.ts` menonaktifkan header `X-Powered-By` (`poweredByHeader: false`).
+   - Dilarang mengekspos informasi VPS/server (OS/kernel, versi Node.js, CPU/RAM/disk, uptime, IP publik VPS, path binary `/usr/local/bin/yt-dlp`, petunjuk `/owner`) di halaman, error, maupun API publik.
 
 ---
 

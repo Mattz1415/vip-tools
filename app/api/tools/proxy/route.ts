@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { assertPublicHttpUrl, safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,13 +11,12 @@ export async function GET(req: NextRequest) {
 
     const parsed = await assertPublicHttpUrl(rawUrl);
 
-    const upstream = await fetch(parsed.toString(), {
+    const { response: upstream } = await safeFetchPublic(parsed.toString(), {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
         Referer: `${parsed.protocol}//${parsed.hostname}/`,
       },
-      redirect: "follow",
       signal: AbortSignal.timeout(25000),
     });
 
@@ -40,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     return new NextResponse(upstream.body, { status: 200, headers });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Proxy media gagal.";
+    const msg = sanitizePublicError(err, "Proxy media gagal.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

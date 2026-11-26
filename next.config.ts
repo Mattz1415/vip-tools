@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   serverExternalPackages: ["sharp"],
   outputFileTracingIncludes: {
     "/api/tools/viral-maker": ["./lib/fonts/**/*"],

@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal mengonversi gambar di VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal mengonversi gambar.";
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

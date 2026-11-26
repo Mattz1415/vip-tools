@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePublicError } from "@/lib/server/net-guard";
 import {
   getEffectiveFirebaseConfig,
   isFirebaseReady,
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memuat konfigurasi publik.";
+    const msg = sanitizePublicError(err, "Gagal memuat konfigurasi publik.");
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

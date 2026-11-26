@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
           { signal: AbortSignal.timeout(8000) }
         ).then((r) => (r.ok ? r.json() : null)),
         fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`, {
-          headers: { "User-Agent": "MattzLM-VPS/2.0" },
+          headers: { "User-Agent": "MattzLM-Web/2.0" },
           signal: AbortSignal.timeout(8000),
         }).then((r) => (r.ok ? r.json() : null)),
       ]);
@@ -569,7 +569,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: false, error: `Action '${action}' tidak dikenal.` }, { status: 400 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memproses layanan live VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal memproses layanan live.";
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

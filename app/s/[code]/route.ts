@@ -15,7 +15,7 @@ export async function GET(
     });
 
     if (!target) {
-      return new NextResponse("Shortlink tidak ditemukan di MattzLM VPS.", {
+      return new NextResponse("Shortlink tidak ditemukan.", {
         status: 404,
         headers: { "Content-Type": "text/plain; charset=utf-8" },
       });

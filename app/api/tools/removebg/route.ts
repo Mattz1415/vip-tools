@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 
@@ -20,8 +20,7 @@ async function extractImageBuffer(req: NextRequest): Promise<{
       return { buffer: Buffer.from(await file.arrayBuffer()), tolerance };
     }
     if (url) {
-      const parsed = await assertPublicHttpUrl(url);
-      const res = await fetch(parsed.toString(), { signal: AbortSignal.timeout(12000) });
+      const { response: res } = await safeFetchPublic(url, { signal: AbortSignal.timeout(12000) });
       if (!res.ok) throw new Error(`Gagal mengunduh gambar (HTTP ${res.status}).`);
       const arr = await res.arrayBuffer();
       if (arr.byteLength > MAX_BYTES) throw new Error("Ukuran gambar melebihi 8MB.");
@@ -34,8 +33,7 @@ async function extractImageBuffer(req: NextRequest): Promise<{
   const url = String(body?.url || "").trim();
   const tolerance = Math.min(120, Math.max(8, Number(body?.tolerance || 42)));
   if (!url) throw new Error("URL gambar wajib diisi.");
-  const parsed = await assertPublicHttpUrl(url);
-  const res = await fetch(parsed.toString(), { signal: AbortSignal.timeout(12000) });
+  const { response: res } = await safeFetchPublic(url, { signal: AbortSignal.timeout(12000) });
   if (!res.ok) throw new Error(`Gagal mengunduh gambar (HTTP ${res.status}).`);
   const arr = await res.arrayBuffer();
   if (arr.byteLength > MAX_BYTES) throw new Error("Ukuran gambar melebihi 8MB.");
@@ -181,7 +179,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal menghapus latar belakang di VPS.";
+    const msg = sanitizePublicError(err, "Gagal menghapus latar belakang.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

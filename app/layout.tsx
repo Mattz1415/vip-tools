@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MattzLM | Web Tools & VPS",
-  description: "Kumpulan 75 web tools, pengunduh media, dan utilitas server VPS oleh MattzLM.",
+  title: "MattzLM | Web Tools Studio",
+  description: "Kumpulan 75 web tools, pengunduh media, dan utilitas jaringan oleh MattzLM.",
 };
 
 export const viewport: Viewport = {

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSessionUser } from "@/lib/server/auth";
-import { assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { assertPublicHttpUrl, sanitizePublicError } from "@/lib/server/net-guard";
 import { readStore, updateStore } from "@/lib/server/store";
 
 export async function GET() {
@@ -12,7 +12,7 @@ export async function GET() {
       shortLinks: store.shortLinks.slice(0, 20),
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memuat daftar shortlink.";
+    const msg = sanitizePublicError(err, "Gagal memuat daftar shortlink.");
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ ok: true, ...outcome }, { status: 201 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal membuat shortlink di VPS.";
+    const msg = sanitizePublicError(err, "Gagal membuat shortlink.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

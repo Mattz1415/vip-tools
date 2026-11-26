@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Owner Panel | MattzLM",
-  description: "Panel admin khusus Owner untuk mengatur akun, tools custom, Firebase Auth, dan konfigurasi VPS.",
+  description: "Panel admin khusus Owner untuk mengatur akun, tools custom, dan konfigurasi layanan.",
 };
 
 export default async function OwnerPage() {

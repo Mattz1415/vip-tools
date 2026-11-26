@@ -535,7 +535,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: false, error: `Action '${action}' tidak dikenal.` }, { status: 400 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memproses Creator Kit di VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal memproses Creator Kit.";
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

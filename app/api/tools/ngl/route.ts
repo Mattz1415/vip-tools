@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       detail: parsed,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal mengirim ke NGL lewat VPS.";
+    const msg = err instanceof Error ? err.message : "Gagal mengirim pesan ke NGL.";
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

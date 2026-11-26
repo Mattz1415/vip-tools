@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireXvipUser } from "@/lib/server/auth";
-import { assertPublicHttpUrl } from "@/lib/server/net-guard";
+import { safeFetchPublic, sanitizePublicError } from "@/lib/server/net-guard";
 
 export async function POST(req: NextRequest) {
   const { error } = await requireXvipUser();
@@ -13,15 +13,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "URL target wajib diisi." }, { status: 400 });
     }
 
-    const parsed = await assertPublicHttpUrl(rawUrl);
     const t0 = Date.now();
-    const upstream = await fetch(parsed.toString(), {
+    const { response: upstream, finalUrl } = await safeFetchPublic(rawUrl, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
         Accept: "text/html,application/xhtml+xml,text/css,application/javascript,*/*;q=0.8",
       },
-      redirect: "follow",
       signal: AbortSignal.timeout(12000),
     });
     const latencyMs = Date.now() - t0;
@@ -34,7 +32,7 @@ export async function POST(req: NextRequest) {
     const stylesheets: string[] = [];
     for (const m of html.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/gi)) {
       try {
-        stylesheets.push(new URL(m[1], upstream.url).toString());
+        stylesheets.push(new URL(m[1], finalUrl).toString());
       } catch {
         stylesheets.push(m[1]);
       }
@@ -43,7 +41,7 @@ export async function POST(req: NextRequest) {
     const scripts: string[] = [];
     for (const m of html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)) {
       try {
-        scripts.push(new URL(m[1], upstream.url).toString());
+        scripts.push(new URL(m[1], finalUrl).toString());
       } catch {
         scripts.push(m[1]);
       }
@@ -51,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      finalUrl: upstream.url,
+      finalUrl,
       status: upstream.status,
       contentType: upstream.headers.get("content-type") || "text/plain",
       latencyMs,
@@ -63,7 +61,7 @@ export async function POST(req: NextRequest) {
       html,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal mengekstrak source dari VPS.";
+    const msg = sanitizePublicError(err, "Gagal mengekstrak source code.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

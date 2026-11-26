@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentSessionUser } from "@/lib/server/auth";
+import { sanitizePublicError } from "@/lib/server/net-guard";
 import { readStore, updateStore } from "@/lib/server/store";
 
 export async function GET() {
@@ -18,7 +19,7 @@ export async function GET() {
       })),
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal memuat daftar paste.";
+    const msg = sanitizePublicError(err, "Gagal memuat daftar paste.");
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gagal menyimpan paste di VPS.";
+    const msg = sanitizePublicError(err, "Gagal menyimpan paste.");
     return NextResponse.json({ ok: false, error: msg }, { status: 400 });
   }
 }

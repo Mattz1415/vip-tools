@@ -46,7 +46,7 @@ export default async function PasteViewerPage(props: {
         <section className="owner-card">
           <div className="owner-card-head">
             <h2>
-              <i className="fas fa-file-code" aria-hidden="true" /> Konten Tersimpan di VPS
+              <i className="fas fa-file-code" aria-hidden="true" /> Konten Paste Tersimpan
             </h2>
             <span className="owner-pill">{paste.content.length} karakter</span>
           </div>
