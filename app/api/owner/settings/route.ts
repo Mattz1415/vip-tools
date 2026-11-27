@@ -43,6 +43,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, ...saved });
     }
 
+    if (action === "saveAiConfig") {
+      const baseUrl = String(body?.aiBaseUrl || "").trim();
+      const model = String(body?.aiModel || "").trim();
+      const apiKey = typeof body?.aiApiKey === "string" ? body.aiApiKey.trim() : "";
+      const clearApiKey = Boolean(body?.clearAiApiKey);
+
+      if (!/^https?:\/\/.+/i.test(baseUrl)) {
+        return NextResponse.json(
+          { ok: false, error: "URL Provider AI harus diawali http:// atau https://." },
+          { status: 400 }
+        );
+      }
+      if (!model || model.length > 120) {
+        return NextResponse.json(
+          { ok: false, error: "Nama model AI wajib diisi (maks 120 karakter)." },
+          { status: 400 }
+        );
+      }
+
+      const saved = updateStore((store) => {
+        store.settings.aiBaseUrl = baseUrl.replace(/\/+$/, "");
+        store.settings.aiModel = model;
+        if (clearApiKey) {
+          store.settings.aiApiKey = "";
+        } else if (apiKey) {
+          store.settings.aiApiKey = apiKey;
+        }
+        appendAuditLog(
+          store,
+          actor.username,
+          "OWNER_AI_CONFIG",
+          `Update AI base=${store.settings.aiBaseUrl}, model=${store.settings.aiModel}, key=${store.settings.aiApiKey ? "custom" : "auto-local"}`
+        );
+        return {
+          baseUrl: store.settings.aiBaseUrl,
+          model: store.settings.aiModel,
+          hasApiKey: Boolean((store.settings.aiApiKey || "").trim()),
+        };
+      });
+
+      return NextResponse.json({ ok: true, aiConfig: saved });
+    }
+
     if (action === "saveYtCookies") {
       const cookiesText = String(body?.cookiesText || "");
       saveYtCookies(cookiesText);

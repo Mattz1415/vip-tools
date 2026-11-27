@@ -77,6 +77,9 @@ export interface GlobalSettings {
   visits: number;
   telegramBotToken: string;
   telegramChatId: string;
+  aiBaseUrl?: string;
+  aiApiKey?: string;
+  aiModel?: string;
 }
 
 export interface AuditLogEntry {
@@ -321,6 +324,9 @@ function getDefaultSettings(): GlobalSettings {
     visits: 0,
     telegramBotToken: "",
     telegramChatId: "",
+    aiBaseUrl: "http://127.0.0.1:20128",
+    aiApiKey: "",
+    aiModel: "ag/gemini-3.8-flash",
   };
 }
 

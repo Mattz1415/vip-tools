@@ -4,6 +4,7 @@ import { promisify } from "node:util";
 import { NextResponse } from "next/server";
 import { requireXvipUser } from "@/lib/server/auth";
 import { sanitizePublicError } from "@/lib/server/net-guard";
+import { readStore } from "@/lib/server/store";
 
 const execFileAsync = promisify(execFile);
 
@@ -79,7 +80,9 @@ export async function POST(req: Request) {
     rawQuestion ||
     "Baca dan analisis seluruh isi foto ini, lalu berikan jawaban yang paling tepat dan jelas.";
 
-  const apiKey = await resolveNineRouterApiKey();
+  const store = readStore();
+  const customKey = (store.settings.aiApiKey || "").trim();
+  const apiKey = customKey || (await resolveNineRouterApiKey());
   if (!apiKey) {
     return NextResponse.json(
       { ok: false, error: "Konfigurasi API key penyedia AI belum tersedia." },
@@ -87,8 +90,18 @@ export async function POST(req: Request) {
     );
   }
 
-  const baseUrl = (process.env.NINEROUTER_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
-  const model = (process.env.NINEROUTER_MODEL || DEFAULT_MODEL).trim();
+  const baseUrl = (
+    store.settings.aiBaseUrl ||
+    process.env.NINEROUTER_BASE_URL ||
+    DEFAULT_BASE_URL
+  )
+    .trim()
+    .replace(/\/+$/, "");
+  const model = (
+    store.settings.aiModel ||
+    process.env.NINEROUTER_MODEL ||
+    DEFAULT_MODEL
+  ).trim();
 
   try {
     const upstream = await fetch(`${baseUrl}/v1/chat/completions`, {
@@ -154,7 +167,7 @@ export async function POST(req: Request) {
       ok: true,
       answer,
       provider: "9router",
-      model: "gemini-3.8-flash",
+      model: model.replace(/^ag\//, ""),
     });
   } catch (err) {
     return NextResponse.json(

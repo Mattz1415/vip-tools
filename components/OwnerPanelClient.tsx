@@ -90,6 +90,12 @@ interface OverviewData {
     homeRotate: number;
     visits: number;
   };
+  aiConfig?: {
+    baseUrl: string;
+    model: string;
+    hasApiKey: boolean;
+    apiKeyMask: string;
+  };
   firebaseConfig: {
     apiKey: string;
     authDomain: string;
@@ -218,6 +224,12 @@ export default function OwnerPanelClient({
   const [bgVideoUrl, setBgVideoUrl] = useState("");
   const [homeRotate, setHomeRotate] = useState(0);
 
+  const [aiBaseUrl, setAiBaseUrl] = useState("http://127.0.0.1:20128");
+  const [aiModel, setAiModel] = useState("ag/gemini-3.8-flash");
+  const [aiApiKey, setAiApiKey] = useState("");
+  const [aiHasKey, setAiHasKey] = useState(false);
+  const [aiKeyMask, setAiKeyMask] = useState("");
+
   const flash = useCallback((type: "ok" | "err", text: string) => {
     setNotice({ type, text });
   }, []);
@@ -244,6 +256,11 @@ export default function OwnerPanelClient({
       setMaintenanceMode(Boolean(json.settings?.maintenanceMode));
       setBgVideoUrl(json.settings?.bgVideoUrl || "");
       setHomeRotate(Number(json.settings?.homeRotate || 0));
+      setAiBaseUrl(json.aiConfig?.baseUrl || "http://127.0.0.1:20128");
+      setAiModel(json.aiConfig?.model || "ag/gemini-3.8-flash");
+      setAiHasKey(Boolean(json.aiConfig?.hasApiKey));
+      setAiKeyMask(json.aiConfig?.apiKeyMask || "");
+      setAiApiKey("");
     } catch (e) {
       flash("err", e instanceof Error ? e.message : "Gagal terhubung ke VPS.");
     } finally {
@@ -1312,6 +1329,96 @@ export default function OwnerPanelClient({
                   >
                     <i className="fas fa-check" aria-hidden="true" /> Simpan Pengaturan
                   </button>
+
+                  <hr style={{ border: "none", borderTop: "1px solid var(--border-color)", margin: "22px 0" }} />
+
+                  <div className="owner-card-head" style={{ marginBottom: "10px" }}>
+                    <h2>
+                      <i className="fas fa-camera" aria-hidden="true" /> AI Auto Jawab (9router)
+                    </h2>
+                    <span className="owner-pill">{aiHasKey ? `Custom Key (${aiKeyMask})` : "Auto Lokal 9router"}</span>
+                  </div>
+
+                  <label htmlFor="ownAiBaseUrl" className="v-label">
+                    Base URL Provider 9router
+                  </label>
+                  <input
+                    id="ownAiBaseUrl"
+                    type="url"
+                    className="v-input"
+                    value={aiBaseUrl}
+                    onChange={(e) => setAiBaseUrl(e.target.value)}
+                    placeholder="http://127.0.0.1:20128"
+                  />
+
+                  <label htmlFor="ownAiModel" className="v-label">
+                    Model AI Vision
+                  </label>
+                  <input
+                    id="ownAiModel"
+                    type="text"
+                    className="v-input"
+                    value={aiModel}
+                    onChange={(e) => setAiModel(e.target.value)}
+                    placeholder="ag/gemini-3.8-flash"
+                  />
+
+                  <label htmlFor="ownAiApiKey" className="v-label">
+                    API Key 9router (Opsional)
+                  </label>
+                  <input
+                    id="ownAiApiKey"
+                    type="password"
+                    className="v-input"
+                    value={aiApiKey}
+                    onChange={(e) => setAiApiKey(e.target.value)}
+                    placeholder={
+                      aiHasKey
+                        ? `Tersimpan (${aiKeyMask}) - isi untuk mengganti`
+                        : "Kosong = otomatis pakai key lokal 9router"
+                    }
+                  />
+
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      className="v-btn"
+                      onClick={() =>
+                        postOwner(
+                          "/api/owner/settings",
+                          {
+                            action: "saveAiConfig",
+                            aiBaseUrl,
+                            aiModel,
+                            aiApiKey,
+                          },
+                          "Konfigurasi AI Auto Jawab (9router) berhasil disimpan."
+                        )
+                      }
+                    >
+                      <i className="fas fa-check" aria-hidden="true" /> Simpan AI Config
+                    </button>
+                    {aiHasKey && (
+                      <button
+                        type="button"
+                        className="v-btn v-btn-secondary"
+                        onClick={() =>
+                          postOwner(
+                            "/api/owner/settings",
+                            {
+                              action: "saveAiConfig",
+                              aiBaseUrl,
+                              aiModel,
+                              clearAiApiKey: true,
+                            },
+                            "API Key AI dikembalikan ke mode otomatis lokal 9router."
+                          )
+                        }
+                      >
+                        <i className="fas fa-rotate-left" aria-hidden="true" /> Reset ke Auto Lokal
+                      </button>
+                    )}
+                  </div>
                 </section>
 
                 <section className="owner-card">

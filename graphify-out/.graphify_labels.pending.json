@@ -1,7 +1,11 @@
 {
   "0": "store.ts",
   "8": "package.json",
-  "12": "updateStore",
-  "13": "readStore",
-  "16": "auth.ts"
+  "10": "OwnerPanelClient",
+  "12": "OwnerPanelClient.tsx",
+  "13": "dependencies",
+  "15": "stalk-social/route.ts",
+  "16": "VipToolsApp.tsx",
+  "18": "scripts",
+  "19": "vip-tools-client.js"
 }

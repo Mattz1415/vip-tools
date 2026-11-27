@@ -13,6 +13,13 @@ import {
 
 const execFileAsync = promisify(execFile);
 
+function maskSecret(val?: string): string {
+  const s = String(val || "").trim();
+  if (!s) return "";
+  if (s.length <= 8) return "*".repeat(s.length);
+  return `${s.slice(0, 6)}...${s.slice(-4)}`;
+}
+
 async function safeExec(cmd: string, args: string[]): Promise<string> {
   try {
     const { stdout } = await execFileAsync(cmd, args, { timeout: 3000 });
@@ -84,7 +91,16 @@ export async function GET() {
         createdAt: p.createdAt,
         length: p.content.length,
       })),
-      settings: store.settings,
+      settings: {
+        ...store.settings,
+        aiApiKey: "",
+      },
+      aiConfig: {
+        baseUrl: (store.settings.aiBaseUrl || "http://127.0.0.1:20128").trim(),
+        model: (store.settings.aiModel || "ag/gemini-3.8-flash").trim(),
+        hasApiKey: Boolean((store.settings.aiApiKey || "").trim()),
+        apiKeyMask: maskSecret(store.settings.aiApiKey),
+      },
       firebaseConfig: fbCfg,
       auditLogs: store.auditLogs.slice(0, 50),
     });
