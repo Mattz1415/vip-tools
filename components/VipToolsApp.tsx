@@ -125,7 +125,7 @@ export default function VipToolsApp() {
                 <span className="brand-monogram">MLM</span>
               </div>
             </div>
-            <span className="auth-meta-pill">77 MODUL WEB AKTIF</span>
+            <span className="auth-meta-pill">78 MODUL WEB AKTIF</span>
             <h1 className="auth-brand-title" id="authHeading">
               MattzLM
             </h1>
@@ -589,7 +589,7 @@ export default function VipToolsApp() {
                   </div>
                   <div className="dossier-stats-grid" aria-label="Ringkasan katalog">
                     <div className="stat-glass-chip">
-                      <span className="stat-glass-val">77</span>
+                      <span className="stat-glass-val">78</span>
                       <span className="stat-glass-lbl">Modul Aktif</span>
                     </div>
                     <div className="stat-glass-chip">

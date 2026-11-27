@@ -1,3 +1,7 @@
 {
-  "8": "package.json"
+  "0": "store.ts",
+  "8": "package.json",
+  "12": "updateStore",
+  "13": "readStore",
+  "16": "auth.ts"
 }

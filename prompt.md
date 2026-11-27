@@ -1,6 +1,6 @@
 # Panduan Handoff AI & Operasional Proyek MattzLM (`/root/vip-tools`)
 
-Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **77 modul tools** (termasuk YTMP3 Downloader, Music Downloader Realtime, dan 30 fitur jaman sekarang), integrasi `graphify`, dependensi VPS, aturan desain Glassmorphism + 3D, serta perintah verifikasi wajib.
+Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung memahami arsitektur aplikasi, pembagian role (`owner`, `admin`, `xvip`, `member`), peta lengkap **78 modul tools** (termasuk AI Auto Jawab 9router, YTMP3 Downloader, Music Downloader Realtime, dan 30 fitur jaman sekarang), integrasi `graphify`, dependensi VPS, aturan desain Glassmorphism + 3D, serta perintah verifikasi wajib.
 
 ---
 
@@ -9,7 +9,7 @@ Dokumen ini menjadi acuan utama bagi AI atau developer berikutnya agar langsung 
 - **Aplikasi**: MattzLM Web Tools & VPS Suite
 - **Lokasi repo**: `/root/vip-tools`
 - **Stack**: Next.js 16 (App Router, React 19, TypeScript) + Backend API Route di VPS Linux
-- **Total modul aktif**: **77 modul tools** (45 modul bawaan + 32 modul modern termasuk YTMP3 Downloader & Music Downloader Realtime)
+- **Total modul aktif**: **78 modul tools** (46 modul bawaan + 32 modul modern termasuk AI Auto Jawab, YTMP3 Downloader & Music Downloader Realtime)
 - **Autentikasi & Sesi**:
   - Login lokal (`username` + `password` PBKDF2-SHA256) dengan cookie `HttpOnly` bertanda tangan HMAC (`vip_session_token`).
   - Login Google via Firebase Auth (`/api/auth/google`, verifikasi `idToken` di server via Identity Toolkit API).
@@ -231,7 +231,7 @@ ss -ltnp | grep 3099 || echo "Port 3099 bersih"
 
 ### C. File Kunci yang Perlu Dicek Saat Mengembangkan Fitur Baru
 - `lib/vip-tools-extra-ui.js`: Katalog & renderer UI 32 fitur modern (termasuk `dl_ytmp3` & `dl_music_dl`).
-- `lib/vip-tools-client.js`: State utama, auth, katalog gabungan 77 tools, gerbang `xvip`, engine partikel + 3D glass tilt, dan renderer 45 fitur bawaan.
+- `lib/vip-tools-client.js`: State utama, auth, katalog gabungan 78 tools, gerbang `xvip` (termasuk `xvip_aijawab` -> `/api/tools/ai-jawab` via 9router `ag/gemini-3.8-flash`), engine partikel + 3D glass tilt, dan renderer 46 fitur bawaan.
 - `lib/server/auth.ts` & `lib/server/store.ts`: Session HMAC, role `UserRole`, `requireXvipUser()`, `requireOwnerUser()`, dan penyimpanan `data/store.json`.
 - `lib/server/net-guard.ts`: Validasi URL publik anti-SSRF.
 - `app/api/tools/*`: Semua backend API tools (`viral-maker`, `creator-kit`, `live-hub`, `download`, `proxy`, `vps-net`, `vps-status`, `shortlink`, `paste`, `qr`, `maker`, `imgconv`, `removebg`, `enhance`, `source`, `ngl`, `stalk-game`, `stalk-social`).
