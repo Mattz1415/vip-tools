@@ -169,6 +169,10 @@ export function getStorageMode(): StorageMode {
   return resolveStorage().mode;
 }
 
+export function getStorageDir(): string | null {
+  return resolveStorage().dir;
+}
+
 function getStorePath(): string | null {
   const { dir } = resolveStorage();
   return dir ? path.join(dir, "store.json") : null;
@@ -257,8 +261,8 @@ export function getSessionSecret(): string {
   const seed =
     process.env.VERCEL_PROJECT_ID ||
     process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_GIT_REPO_ID ||
     process.env.VERCEL_URL ||
-    process.env.HOSTNAME ||
     "mattzlm-vip-tools-local";
   runtimeState.cachedSessionSecret = crypto
     .createHmac("sha256", "mattzlm-vip-tools-session-fallback-v2")

@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { signInWithGoogleFirebase, signOutFirebaseQuietly } from "@/lib/firebase-client";
+import {
+  AI_MODEL_OPTIONS,
+  DEFAULT_AI_BASE_URL,
+  DEFAULT_AI_MODEL,
+} from "@/lib/ai-secrets-logic";
+import {
+  getFirebaseOwnerSession,
+  signInWithGoogleFirebase,
+  signOutFirebaseQuietly,
+} from "@/lib/firebase-client";
 
 interface PublicUser {
   username: string;
@@ -97,6 +106,14 @@ interface OverviewData {
     hasApiKey: boolean;
     apiKeyMask: string;
     source?: string;
+    hasOwnerKey?: boolean;
+    hasEnvFallback?: boolean;
+    hasLocalRouter?: boolean;
+    updatedAtMs?: number | null;
+    encryptionReady?: boolean;
+    cloudVaultReady?: boolean;
+    cloudSynced?: boolean;
+    storageMode?: string;
   };
   firebaseConfig: {
     apiKey: string;
@@ -166,6 +183,7 @@ const BUILTIN_TOOL_IDS = [
   { id: "live_weather", name: "Prakiraan Cuaca Kota RI" },
   { id: "live_islami", name: "Jadwal Sholat & Al-Quran RI" },
   { id: "live_crypto", name: "Harga Kripto & Kurs IDR Live" },
+  { id: "xvip_aijawab", name: "XVIP AI Auto Jawab" },
   { id: "xvip_unband", name: "XVIP Unban WA" },
   { id: "xvip_getcode", name: "XVIP Get HTML/CSS/JS" },
   { id: "xvip_nglspam", name: "XVIP NGL Sender" },
@@ -226,21 +244,53 @@ export default function OwnerPanelClient({
   const [bgVideoUrl, setBgVideoUrl] = useState("");
   const [homeRotate, setHomeRotate] = useState(0);
 
-  const [aiBaseUrl, setAiBaseUrl] = useState("http://165.245.190.115:20128");
-  const [aiModel, setAiModel] = useState("ag/gemini-3.8-flash");
+  const [aiBaseUrl, setAiBaseUrl] = useState(DEFAULT_AI_BASE_URL);
+  const [aiModel, setAiModel] = useState(DEFAULT_AI_MODEL);
+  const [aiCustomModelMode, setAiCustomModelMode] = useState(false);
   const [aiApiKey, setAiApiKey] = useState("");
+  const [aiShowKey, setAiShowKey] = useState(false);
   const [aiHasKey, setAiHasKey] = useState(false);
+  const [aiHasOwnerKey, setAiHasOwnerKey] = useState(false);
   const [aiKeyMask, setAiKeyMask] = useState("");
   const [aiSource, setAiSource] = useState("none");
+  const [aiCloudReady, setAiCloudReady] = useState(false);
+  const [aiCloudSynced, setAiCloudSynced] = useState(false);
+  const [aiUpdatedAtMs, setAiUpdatedAtMs] = useState<number | null>(null);
+  const [aiSaving, setAiSaving] = useState(false);
+  const [aiTesting, setAiTesting] = useState(false);
+  const [aiClearing, setAiClearing] = useState(false);
+  const [aiConfirmClear, setAiConfirmClear] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const flash = useCallback((type: "ok" | "err", text: string) => {
     setNotice({ type, text });
   }, []);
 
+  const syncAiConfigState = useCallback((cfg?: OverviewData["aiConfig"]) => {
+    const nextBase = cfg?.baseUrl || DEFAULT_AI_BASE_URL;
+    const nextModel = cfg?.model || DEFAULT_AI_MODEL;
+    const isPreset = AI_MODEL_OPTIONS.some((opt) => opt.value === nextModel);
+    setAiBaseUrl(nextBase);
+    setAiModel(nextModel);
+    setAiCustomModelMode(!isPreset);
+    setAiHasKey(Boolean(cfg?.hasApiKey));
+    setAiHasOwnerKey(Boolean(cfg?.hasOwnerKey));
+    setAiKeyMask(cfg?.apiKeyMask || "");
+    setAiSource(cfg?.source || "none");
+    setAiCloudReady(Boolean(cfg?.cloudVaultReady));
+    setAiCloudSynced(Boolean(cfg?.cloudSynced));
+    setAiUpdatedAtMs(typeof cfg?.updatedAtMs === "number" ? cfg.updatedAtMs : null);
+  }, []);
+
   const loadOverview = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/owner/overview", { cache: "no-store" });
+      const headers: Record<string, string> = {};
+      const fbSession = await getFirebaseOwnerSession();
+      if (fbSession?.idToken) {
+        headers["X-Firebase-Id-Token"] = fbSession.idToken;
+      }
+      const res = await fetch("/api/owner/overview", { cache: "no-store", headers });
       const json = await res.json();
       if (!res.ok || !json.ok) {
         flash("err", json.error || "Gagal memuat data Owner Panel.");
@@ -259,18 +309,14 @@ export default function OwnerPanelClient({
       setMaintenanceMode(Boolean(json.settings?.maintenanceMode));
       setBgVideoUrl(json.settings?.bgVideoUrl || "");
       setHomeRotate(Number(json.settings?.homeRotate || 0));
-      setAiBaseUrl(json.aiConfig?.baseUrl || "http://165.245.190.115:20128");
-      setAiModel(json.aiConfig?.model || "ag/gemini-3.8-flash");
-      setAiHasKey(Boolean(json.aiConfig?.hasApiKey));
-      setAiKeyMask(json.aiConfig?.apiKeyMask || "");
-      setAiSource(json.aiConfig?.source || "none");
+      syncAiConfigState(json.aiConfig);
       setAiApiKey("");
     } catch (e) {
       flash("err", e instanceof Error ? e.message : "Gagal terhubung ke VPS.");
     } finally {
       setLoading(false);
     }
-  }, [flash]);
+  }, [flash, syncAiConfigState]);
 
   useEffect(() => {
     try {
@@ -366,6 +412,158 @@ export default function OwnerPanelClient({
       return false;
     }
   }
+
+  async function buildAiHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const fbSession = await getFirebaseOwnerSession(data?.firebaseConfig ?? null);
+    if (fbSession?.idToken) {
+      headers["X-Firebase-Id-Token"] = fbSession.idToken;
+    }
+    return headers;
+  }
+
+  async function handleSaveAiSecret() {
+    if (aiSaving || aiTesting || aiClearing) return;
+    setAiFeedback(null);
+    setNotice(null);
+    setAiSaving(true);
+    try {
+      const headers = await buildAiHeaders();
+      const res = await fetch("/api/owner/settings", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          action: "saveAiConfig",
+          aiBaseUrl: aiBaseUrl.trim(),
+          aiModel: aiModel.trim(),
+          aiApiKey: aiApiKey.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setAiFeedback({ type: "err", text: json.error || "Gagal menyimpan Secret AI." });
+        return;
+      }
+      if (json.aiConfig) syncAiConfigState(json.aiConfig);
+      setAiApiKey("");
+      setAiShowKey(false);
+      setAiConfirmClear(false);
+      const syncMsg = json.cloudSynced
+        ? " Terenkripsi AES-256-GCM dan tersinkron ke Cloud Vault Firestore."
+        : " Terenkripsi AES-256-GCM di Runtime Vault & cookie terenkripsi.";
+      setAiFeedback({
+        type: "ok",
+        text: "Konfigurasi AI Auto Jawab berhasil disimpan." + syncMsg,
+      });
+      await loadOverview();
+    } catch (err) {
+      setAiFeedback({
+        type: "err",
+        text: err instanceof Error ? err.message : "Gagal menyimpan Secret AI.",
+      });
+    } finally {
+      setAiSaving(false);
+    }
+  }
+
+  async function handleTestAiConnection() {
+    if (aiSaving || aiTesting || aiClearing) return;
+    setAiFeedback(null);
+    setAiTesting(true);
+    try {
+      const headers = await buildAiHeaders();
+      const res = await fetch("/api/owner/settings", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          action: "testAiConfig",
+          aiBaseUrl: aiBaseUrl.trim(),
+          aiModel: aiModel.trim(),
+          aiApiKey: aiApiKey.trim(),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setAiFeedback({
+          type: "err",
+          text: json.error || "Uji koneksi ke provider AI gagal.",
+        });
+        return;
+      }
+      const preview = json.replyPreview ? ` Balasan: "${json.replyPreview}".` : "";
+      setAiFeedback({
+        type: "ok",
+        text: (json.message || "Koneksi provider AI berhasil.") + preview,
+      });
+    } catch (err) {
+      setAiFeedback({
+        type: "err",
+        text: err instanceof Error ? err.message : "Uji koneksi AI gagal.",
+      });
+    } finally {
+      setAiTesting(false);
+    }
+  }
+
+  async function handleConfirmClearAiSecret() {
+    if (aiSaving || aiTesting || aiClearing) return;
+    setAiFeedback(null);
+    setNotice(null);
+    setAiClearing(true);
+    try {
+      const headers = await buildAiHeaders();
+      const res = await fetch("/api/owner/settings", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ action: "clearAiConfig" }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setAiFeedback({
+          type: "err",
+          text: json.error || "Gagal menghapus kunci custom AI.",
+        });
+        return;
+      }
+      if (json.aiConfig) syncAiConfigState(json.aiConfig);
+      setAiApiKey("");
+      setAiShowKey(false);
+      setAiConfirmClear(false);
+      setAiFeedback({
+        type: "ok",
+        text: "Kunci API kustom Owner dihapus. Fallback environment atau 9router lokal aktif bila tersedia.",
+      });
+      await loadOverview();
+    } catch (err) {
+      setAiFeedback({
+        type: "err",
+        text: err instanceof Error ? err.message : "Gagal menghapus kunci custom AI.",
+      });
+    } finally {
+      setAiClearing(false);
+    }
+  }
+
+  const aiSourceLabel =
+    aiSource === "owner-cloud"
+      ? "Aktif · Cloud Vault"
+      : aiSource === "owner-vault"
+        ? "Aktif · Owner Vault"
+        : aiSource === "owner-cookie"
+          ? "Aktif · Cookie Vault"
+          : aiSource === "env"
+            ? "Aktif · Env Server"
+            : aiSource === "local-9router"
+              ? "Aktif · Auto Lokal"
+              : "Belum Dikonfigurasi";
+
+  const aiPersistenceLabel = aiCloudSynced
+    ? "AES-256-GCM · Cloud Vault Firestore"
+    : data?.vps.storageMode === "vps-disk"
+      ? "AES-256-GCM · Disk VPS & Cookie"
+      : aiCloudReady
+        ? "AES-256-GCM · Serverless + Firebase Siap"
+        : "AES-256-GCM · Memory Vault & Cookie";
 
   // ===== UNAUTHENTICATED OR NON-OWNER GATE =====
   if (!user || user.role !== "owner") {
@@ -1341,19 +1539,64 @@ export default function OwnerPanelClient({
 
                   <div className="owner-card-head" style={{ marginBottom: "10px" }}>
                     <h2>
-                      <i className="fas fa-camera" aria-hidden="true" /> AI Auto Jawab (9router)
+                      <i className="fas fa-key" aria-hidden="true" /> AI Auto Jawab &amp; Secret Vault (9router)
                     </h2>
-                    <span className="owner-pill">
-                      {aiHasKey
-                        ? `${aiSource === "env" ? "Env" : aiSource === "local-9router" ? "Auto Lokal" : "Aktif"} (${aiKeyMask})`
-                        : "Belum Ada Key"}
+                    <span
+                      className={`owner-pill ${aiHasKey ? "owner-ai-pill-ok" : "owner-ai-pill-warn"}`}
+                    >
+                      {aiSourceLabel}
                     </span>
                   </div>
 
-                  {data.vps.storageMode && data.vps.storageMode !== "vps-disk" && (
-                    <p style={{ color: "var(--status-warn)", fontSize: "0.82rem", marginBottom: "12px", lineHeight: 1.5 }}>
-                      Mode serverless ({data.vps.storageMode}): key yang disimpan di sini aktif untuk browser ini lewat cookie terenkripsi. Untuk berlaku global bagi semua user XVIP di Vercel, set juga <code>NINEROUTER_API_KEY</code> di Environment Variables Vercel.
+                  <p className="owner-sub" style={{ marginBottom: "12px" }}>
+                    Simpan kredensial 9router sekali untuk mengaktifkan modul <strong>AI Auto Jawab</strong> (XVIP). Kunci dienkripsi AES-256-GCM (<code>enc:v1</code>) dan tidak pernah dikirim ulang ke browser dalam bentuk mentah.
+                  </p>
+
+                  <div className="owner-ai-meta-grid">
+                    <div className="owner-kv">
+                      <span>Preview Kunci Aktif</span>
+                      <strong>{aiKeyMask || "Belum ada kunci"}</strong>
+                    </div>
+                    <div className="owner-kv">
+                      <span>Model AI Aktif</span>
+                      <strong>{aiModel || DEFAULT_AI_MODEL}</strong>
+                    </div>
+                    <div className="owner-kv">
+                      <span>Persistensi Enkripsi</span>
+                      <strong>{aiPersistenceLabel}</strong>
+                    </div>
+                  </div>
+
+                  {aiUpdatedAtMs && (
+                    <p className="owner-sub" style={{ marginBottom: "12px", fontSize: "0.76rem" }}>
+                      Terakhir diperbarui:{" "}
+                      {new Date(aiUpdatedAtMs).toLocaleString("id-ID", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
+                  )}
+
+                  {data.vps.storageMode && data.vps.storageMode !== "vps-disk" && (
+                    <div className="owner-ai-note">
+                      <strong>Mode Serverless ({data.vps.storageMode}):</strong> Kunci tersimpan terenkripsi di Runtime Vault (<code>globalThis</code>) dan <code>HttpOnly</code> cookie <code>vip_ai_cfg</code>. Agar selalu aktif untuk semua user XVIP di instance baru Vercel, set <code>NINEROUTER_API_KEY</code> di Environment Variables Vercel atau hubungkan Firebase Cloud Vault di tab <strong>Firebase &amp; Cookies</strong>.
+                    </div>
+                  )}
+
+                  {aiFeedback && (
+                    <div
+                      className={`owner-ai-feedback ${aiFeedback.type === "err" ? "is-err" : "is-ok"}`}
+                      role={aiFeedback.type === "err" ? "alert" : "status"}
+                    >
+                      <i
+                        className={`fas ${aiFeedback.type === "err" ? "fa-triangle-exclamation" : "fa-circle-check"}`}
+                        aria-hidden="true"
+                      />
+                      <span>{aiFeedback.text}</span>
+                    </div>
                   )}
 
                   <label htmlFor="ownAiBaseUrl" className="v-label">
@@ -1365,77 +1608,142 @@ export default function OwnerPanelClient({
                     className="v-input"
                     value={aiBaseUrl}
                     onChange={(e) => setAiBaseUrl(e.target.value)}
-                    placeholder="http://165.245.190.115:20128"
+                    placeholder={DEFAULT_AI_BASE_URL}
                   />
 
-                  <label htmlFor="ownAiModel" className="v-label">
+                  <label htmlFor="ownAiModelSelect" className="v-label">
                     Model AI Vision
                   </label>
-                  <input
-                    id="ownAiModel"
-                    type="text"
+                  <select
+                    id="ownAiModelSelect"
                     className="v-input"
-                    value={aiModel}
-                    onChange={(e) => setAiModel(e.target.value)}
-                    placeholder="ag/gemini-3.8-flash"
-                  />
+                    value={aiCustomModelMode ? "__custom__" : aiModel}
+                    onChange={(e) => {
+                      if (e.target.value === "__custom__") {
+                        setAiCustomModelMode(true);
+                      } else {
+                        setAiCustomModelMode(false);
+                        setAiModel(e.target.value);
+                      }
+                    }}
+                  >
+                    {AI_MODEL_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                    <option value="__custom__">Model Custom (ketik manual)...</option>
+                  </select>
+
+                  {aiCustomModelMode && (
+                    <>
+                      <label htmlFor="ownAiModel" className="v-label">
+                        ID Model Custom
+                      </label>
+                      <input
+                        id="ownAiModel"
+                        type="text"
+                        className="v-input"
+                        value={aiModel}
+                        onChange={(e) => setAiModel(e.target.value)}
+                        placeholder={DEFAULT_AI_MODEL}
+                      />
+                    </>
+                  )}
 
                   <label htmlFor="ownAiApiKey" className="v-label">
-                    API Key 9router (Opsional)
+                    API Key 9router
                   </label>
-                  <input
-                    id="ownAiApiKey"
-                    type="password"
-                    className="v-input"
-                    value={aiApiKey}
-                    onChange={(e) => setAiApiKey(e.target.value)}
-                    placeholder={
-                      aiHasKey
-                        ? `Tersimpan (${aiKeyMask}) - isi untuk mengganti`
-                        : "Kosong = otomatis pakai key lokal 9router"
-                    }
-                  />
+                  <div className="owner-secret-input-wrap">
+                    <input
+                      id="ownAiApiKey"
+                      type={aiShowKey ? "text" : "password"}
+                      className="v-input"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={aiApiKey}
+                      onChange={(e) => setAiApiKey(e.target.value)}
+                      placeholder={
+                        aiHasOwnerKey
+                          ? `Tersimpan (${aiKeyMask}) - kosongkan untuk ubah model saja`
+                          : aiHasKey
+                            ? `Aktif dari ${aiSourceLabel} (${aiKeyMask}) - isi untuk override`
+                            : "Tempel API Key 9router (sk-...)"
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="owner-secret-eye-btn"
+                      onClick={() => setAiShowKey((prev) => !prev)}
+                      aria-label={aiShowKey ? "Sembunyikan API Key" : "Tampilkan API Key"}
+                    >
+                      <i
+                        className={`fas ${aiShowKey ? "fa-eye-slash" : "fa-eye"}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
 
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <div className="owner-ai-actions">
                     <button
                       type="button"
                       className="v-btn"
-                      onClick={() =>
-                        postOwner(
-                          "/api/owner/settings",
-                          {
-                            action: "saveAiConfig",
-                            aiBaseUrl,
-                            aiModel,
-                            aiApiKey,
-                          },
-                          "Konfigurasi AI Auto Jawab (9router) berhasil disimpan."
-                        )
-                      }
+                      disabled={aiSaving || aiTesting || aiClearing}
+                      onClick={handleSaveAiSecret}
                     >
-                      <i className="fas fa-check" aria-hidden="true" /> Simpan AI Config
+                      <i
+                        className={`fas ${aiSaving ? "fa-spinner spin" : "fa-shield-halved"}`}
+                        aria-hidden="true"
+                      />{" "}
+                      {aiSaving ? "Menyimpan..." : "Simpan Secret AI"}
                     </button>
-                    {aiHasKey && (
+
+                    <button
+                      type="button"
+                      className="v-btn v-btn-secondary"
+                      disabled={aiSaving || aiTesting || aiClearing}
+                      onClick={handleTestAiConnection}
+                    >
+                      <i
+                        className={`fas ${aiTesting ? "fa-spinner spin" : "fa-plug"}`}
+                        aria-hidden="true"
+                      />{" "}
+                      {aiTesting ? "Menguji..." : "Uji Koneksi AI"}
+                    </button>
+
+                    {aiHasOwnerKey && !aiConfirmClear && (
                       <button
                         type="button"
                         className="v-btn v-btn-secondary"
-                        onClick={() =>
-                          postOwner(
-                            "/api/owner/settings",
-                            {
-                              action: "saveAiConfig",
-                              aiBaseUrl,
-                              aiModel,
-                              clearAiApiKey: true,
-                            },
-                            "API Key AI dikembalikan ke mode otomatis lokal 9router."
-                          )
-                        }
+                        disabled={aiSaving || aiTesting || aiClearing}
+                        onClick={() => setAiConfirmClear(true)}
                       >
-                        <i className="fas fa-rotate-left" aria-hidden="true" /> Reset ke Auto Lokal
+                        <i className="fas fa-trash" aria-hidden="true" /> Hapus Kunci Custom
                       </button>
                     )}
                   </div>
+
+                  {aiConfirmClear && (
+                    <div className="owner-ai-confirm-row" role="alert">
+                      <span>Hapus API Key custom dari vault &amp; cookie?</span>
+                      <button
+                        type="button"
+                        className="owner-mini-btn is-danger"
+                        disabled={aiClearing}
+                        onClick={handleConfirmClearAiSecret}
+                      >
+                        {aiClearing ? "Menghapus..." : "Ya, Hapus"}
+                      </button>
+                      <button
+                        type="button"
+                        className="owner-mini-btn"
+                        disabled={aiClearing}
+                        onClick={() => setAiConfirmClear(false)}
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  )}
                 </section>
 
                 <section className="owner-card">

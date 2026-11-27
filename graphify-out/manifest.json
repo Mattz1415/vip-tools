@@ -54,15 +54,15 @@
     "semantic_hash": "593e331cb48e156e44b1ef7ebcd211cf"
   },
   "app/api/owner/overview/route.ts": {
-    "mtime": 1795739404.2870798,
-    "seen": 1795739498.6290765,
-    "ast_hash": "72cb6861d5418826613ca966f60a8173",
+    "mtime": 1795760837.1274207,
+    "seen": 1795761311.9955907,
+    "ast_hash": "2eeca5142a7db60831b74bd64de712fb",
     "semantic_hash": ""
   },
   "app/api/owner/settings/route.ts": {
-    "mtime": 1795739404.183071,
-    "seen": 1795739498.6290793,
-    "ast_hash": "cdd794e9ac31666aa02cd8a5997cfe92",
+    "mtime": 1795761218.0617864,
+    "seen": 1795761311.9955945,
+    "ast_hash": "9a91c1bec1ff7c616a7ed533b8fbdcbe",
     "semantic_hash": ""
   },
   "app/api/owner/tools/route.ts": {
@@ -234,9 +234,9 @@
     "semantic_hash": "a245ef549a9afd6caf37091ac8e4ee4d"
   },
   "components/OwnerPanelClient.tsx": {
-    "mtime": 1795739437.1538537,
-    "seen": 1795739498.6291387,
-    "ast_hash": "8c8d5039ac1b744f3626b7bc0a60e8a9",
+    "mtime": 1795760986.640923,
+    "seen": 1795761311.9957037,
+    "ast_hash": "d802ea8da39497498426732edc31b669",
     "semantic_hash": ""
   },
   "components/VipToolsApp.tsx": {
@@ -246,10 +246,10 @@
     "semantic_hash": ""
   },
   "lib/firebase-client.ts": {
-    "mtime": 1795644924.922781,
-    "seen": 1795697430.5788333,
-    "ast_hash": "a1f47e98b9dbbfe108e15b918d11e7c9",
-    "semantic_hash": "a1f47e98b9dbbfe108e15b918d11e7c9"
+    "mtime": 1795760878.243136,
+    "seen": 1795761311.995715,
+    "ast_hash": "f0bdc9a83faa03ee7f8b109d088448f4",
+    "semantic_hash": ""
   },
   "lib/server/auth.ts": {
     "mtime": 1795644924.9187806,
@@ -264,9 +264,9 @@
     "semantic_hash": "416b8f58811230ec04f213b4c674c75e"
   },
   "lib/server/store.ts": {
-    "mtime": 1795739196.113736,
-    "seen": 1795739243.8142514,
-    "ast_hash": "dc2ab70dc0564fd6d89d9c2d46040aed",
+    "mtime": 1795740238.3710883,
+    "seen": 1795761311.9957323,
+    "ast_hash": "933b53a10ffc868dc10050030ddeb092",
     "semantic_hash": ""
   },
   "lib/server/svg-render.ts": {
@@ -318,9 +318,9 @@
     "semantic_hash": "7812948e6a56e4d25877be0d4202bf05"
   },
   "prompt.md": {
-    "mtime": 1795738270.8505003,
-    "seen": 1795738286.2352166,
-    "ast_hash": "c8132bb3cfd301bb1acff7b42912e5a5",
+    "mtime": 1795761004.6705499,
+    "seen": 1795761311.995768,
+    "ast_hash": "69797bf8cb67aa3f6632a9eba7791797",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -330,15 +330,27 @@
     "semantic_hash": ""
   },
   "app/api/tools/ai-jawab/route.ts": {
-    "mtime": 1795739404.1910717,
-    "seen": 1795739498.6290863,
-    "ast_hash": "155d5f9841719f5cbd619d9612491cba",
+    "mtime": 1795760823.0981524,
+    "seen": 1795761311.9956064,
+    "ast_hash": "034234bd0dabb34e492ba3a33c5bd0c1",
     "semantic_hash": ""
   },
   "lib/server/ai-config.ts": {
-    "mtime": 1795739386.5735884,
-    "seen": 1795739498.629145,
-    "ast_hash": "aeb22da80ae07041ef65dab2798ce487",
+    "mtime": 1795761195.1717243,
+    "seen": 1795761311.9957185,
+    "ast_hash": "69382255d78e558822018482a23b6ae4",
+    "semantic_hash": ""
+  },
+  "lib/ai-secrets-logic.ts": {
+    "mtime": 1795740246.543804,
+    "seen": 1795761311.9957116,
+    "ast_hash": "8e38b76562727ca077d3a2e8de2c8683",
+    "semantic_hash": ""
+  },
+  "lib/server/ai-crypto.ts": {
+    "mtime": 1795760742.2988439,
+    "seen": 1795761311.9957216,
+    "ast_hash": "6d59bbf1ff81fc9f348fb49f2114a32b",
     "semantic_hash": ""
   },
   "package-lock.json": {

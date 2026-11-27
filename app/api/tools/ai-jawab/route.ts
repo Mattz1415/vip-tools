@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { resolveEffectiveAiConfig } from "@/lib/server/ai-config";
+import { extractAssistantText, resolveEffectiveAiConfig } from "@/lib/server/ai-config";
 import { requireXvipUser } from "@/lib/server/auth";
 import { sanitizePublicError } from "@/lib/server/net-guard";
 import { readStore } from "@/lib/server/store";
+
+export const dynamic = "force-dynamic";
 
 const MAX_IMAGE_DATA_URL_LEN = 8 * 1024 * 1024;
 
@@ -98,6 +100,17 @@ export async function POST(req: Request) {
       parsed = null;
     }
 
+    if (upstream.status === 401 || upstream.status === 403) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "API key penyedia AI ditolak (401/403). Periksa dan uji ulang API key di /owner -> Pengaturan.",
+        },
+        { status: 502 }
+      );
+    }
+
     if (!upstream.ok || !parsed) {
       return NextResponse.json(
         {
@@ -111,8 +124,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const content = parsed.choices?.[0]?.message?.content;
-    const answer = typeof content === "string" ? content.trim() : "";
+    const answer = extractAssistantText(parsed.choices?.[0]?.message?.content);
     if (!answer) {
       return NextResponse.json(
         { ok: false, error: "AI tidak mengembalikan jawaban untuk gambar ini." },
@@ -120,12 +132,15 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      answer,
-      provider: "9router",
-      model: model.replace(/^ag\//, ""),
-    });
+    return NextResponse.json(
+      {
+        ok: true,
+        answer,
+        provider: "9router",
+        model: (parsed.model || model).replace(/^ag\//, ""),
+      },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (err) {
     return NextResponse.json(
       { ok: false, error: sanitizePublicError(err, "Koneksi ke layanan AI gagal.") },

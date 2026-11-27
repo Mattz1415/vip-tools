@@ -233,6 +233,7 @@ ss -ltnp | grep 3099 || echo "Port 3099 bersih"
 - `lib/vip-tools-extra-ui.js`: Katalog & renderer UI 32 fitur modern (termasuk `dl_ytmp3` & `dl_music_dl`).
 - `lib/vip-tools-client.js`: State utama, auth, katalog gabungan 78 tools, gerbang `xvip` (termasuk `xvip_aijawab` -> `/api/tools/ai-jawab` via 9router `ag/gemini-3.8-flash`), engine partikel + 3D glass tilt, dan renderer 46 fitur bawaan.
 - `lib/server/auth.ts` & `lib/server/store.ts`: Session HMAC, role `UserRole`, `requireXvipUser()`, `requireOwnerUser()`, dan penyimpanan `data/store.json`.
+- `lib/ai-secrets-logic.ts`, `lib/server/ai-crypto.ts`, & `lib/server/ai-config.ts`: Secret vault AI terenkripsi AES-256-GCM (`enc:v1:`), cache `globalThis` + `data/ai-secrets.json`, sinkronisasi opsional Firestore Cloud Runtime Vault (`aiRuntimeSecrets/{vaultId}`), `HttpOnly` cookie `vip_ai_cfg`, fallback `NINEROUTER_API_KEY`/9router lokal, dan uji koneksi live (`testAiConfig`).
 - `lib/server/net-guard.ts`: Validasi URL publik anti-SSRF.
 - `app/api/tools/*`: Semua backend API tools (`viral-maker`, `creator-kit`, `live-hub`, `download`, `proxy`, `vps-net`, `vps-status`, `shortlink`, `paste`, `qr`, `maker`, `imgconv`, `removebg`, `enhance`, `source`, `ngl`, `stalk-game`, `stalk-social`).
 - `components/VipToolsApp.tsx` & `components/OwnerPanelClient.tsx`: Markup SSR halaman utama dan panel `/owner`.

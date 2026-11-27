@@ -105,3 +105,48 @@ export async function signOutFirebaseQuietly() {
     // ignore
   }
 }
+
+export async function getFirebaseOwnerSession(
+  knownCfg?: PublicFirebaseConfig | null
+): Promise<{ idToken: string; uid: string } | null> {
+  if (typeof window === "undefined") return null;
+  try {
+    const cfg =
+      knownCfg && knownCfg.apiKey && knownCfg.projectId && knownCfg.appId
+        ? knownCfg
+        : cachedApp
+          ? null
+          : await fetchFirebaseWebConfig();
+
+    if (!cachedAuth && cfg && cfg.apiKey && cfg.authDomain && cfg.projectId && cfg.appId) {
+      const [{ getApps, initializeApp }, { getAuth }] = await Promise.all([
+        import("firebase/app"),
+        import("firebase/auth"),
+      ]);
+      if (!cachedApp || cachedProjectId !== cfg.projectId) {
+        const existing = getApps().find((a) => a.name === `mattzlm-${cfg.projectId}`);
+        cachedApp = existing || initializeApp(cfg, `mattzlm-${cfg.projectId}`);
+        cachedAuth = getAuth(cachedApp);
+        cachedProjectId = cfg.projectId;
+      }
+    }
+
+    if (!cachedAuth) return null;
+
+    let currentUser = cachedAuth.currentUser;
+    if (!currentUser && typeof cachedAuth.authStateReady === "function") {
+      await Promise.race([
+        cachedAuth.authStateReady(),
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+      ]);
+      currentUser = cachedAuth.currentUser;
+    }
+
+    if (!currentUser) return null;
+    const idToken = await currentUser.getIdToken();
+    if (!idToken) return null;
+    return { idToken, uid: currentUser.uid };
+  } catch {
+    return null;
+  }
+}

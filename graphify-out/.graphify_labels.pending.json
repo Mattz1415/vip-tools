@@ -1,7 +1,12 @@
 {
   "0": "store.ts",
+  "3": "dependencies",
   "8": "package.json",
   "10": "OwnerPanelClient.tsx",
   "12": "ai-config.ts",
-  "15": "requireXvipUser"
+  "13": "OwnerPanelClient",
+  "15": "requireXvipUser",
+  "16": "firebase-client.ts",
+  "18": "VipToolsApp.tsx",
+  "19": "scripts"
 }

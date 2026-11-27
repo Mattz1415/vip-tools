@@ -1,9 +1,13 @@
 import { execFile } from "node:child_process";
 import os from "node:os";
 import { promisify } from "node:util";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveEffectiveAiConfig } from "@/lib/server/ai-config";
-import { requireOwnerUser, sanitizePublicUser } from "@/lib/server/auth";
+import {
+  requireOwnerUser,
+  sanitizePublicUser,
+  verifyFirebaseIdToken,
+} from "@/lib/server/auth";
 import {
   getEffectiveFirebaseConfig,
   getStorageMode,
@@ -11,6 +15,8 @@ import {
   isFirebaseReady,
   readStore,
 } from "@/lib/server/store";
+
+export const dynamic = "force-dynamic";
 
 const execFileAsync = promisify(execFile);
 
@@ -23,14 +29,28 @@ async function safeExec(cmd: string, args: string[]): Promise<string> {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { error } = await requireOwnerUser();
     if (error) return error;
 
     const store = readStore();
     const fbCfg = getEffectiveFirebaseConfig(store);
-    const aiCfg = await resolveEffectiveAiConfig(store);
+
+    let ownerIdToken: string | undefined;
+    let ownerUid: string | undefined;
+    const rawFbToken = (req.headers.get("x-firebase-id-token") || "").trim();
+    if (rawFbToken && isFirebaseReady(fbCfg)) {
+      try {
+        const verified = await verifyFirebaseIdToken(rawFbToken, fbCfg.projectId);
+        ownerIdToken = rawFbToken;
+        ownerUid = verified.uid;
+      } catch {
+        // Ignore invalid optional Firebase token; local owner session already authenticated
+      }
+    }
+
+    const aiCfg = await resolveEffectiveAiConfig(store, ownerIdToken, ownerUid);
 
     const [ytDlpVersion, dfOut] = await Promise.all([
       safeExec("/usr/local/bin/yt-dlp", ["--version"]),
@@ -96,10 +116,20 @@ export async function GET() {
         hasApiKey: aiCfg.hasApiKey,
         apiKeyMask: aiCfg.apiKeyMask,
         source: aiCfg.source,
+        hasOwnerKey: aiCfg.status.hasOwnerKey,
+        hasEnvFallback: aiCfg.status.hasEnvFallback,
+        hasLocalRouter: aiCfg.status.hasLocalRouter,
+        updatedAtMs: aiCfg.status.updatedAtMs,
+        encryptionReady: aiCfg.status.encryptionReady,
+        cloudVaultReady: aiCfg.status.cloudVaultReady,
+        cloudSynced: aiCfg.status.cloudSynced,
+        storageMode: aiCfg.status.storageMode,
       },
       firebaseConfig: fbCfg,
       auditLogs: store.auditLogs.slice(0, 50),
-    });
+    },
+    { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Gagal memuat data Owner Panel.";
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
