@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import os from "node:os";
 import { promisify } from "node:util";
 import { NextResponse } from "next/server";
+import { resolveEffectiveAiConfig } from "@/lib/server/ai-config";
 import { requireOwnerUser, sanitizePublicUser } from "@/lib/server/auth";
 import {
   getEffectiveFirebaseConfig,
@@ -12,13 +13,6 @@ import {
 } from "@/lib/server/store";
 
 const execFileAsync = promisify(execFile);
-
-function maskSecret(val?: string): string {
-  const s = String(val || "").trim();
-  if (!s) return "";
-  if (s.length <= 8) return "*".repeat(s.length);
-  return `${s.slice(0, 6)}...${s.slice(-4)}`;
-}
 
 async function safeExec(cmd: string, args: string[]): Promise<string> {
   try {
@@ -36,6 +30,7 @@ export async function GET() {
 
     const store = readStore();
     const fbCfg = getEffectiveFirebaseConfig(store);
+    const aiCfg = await resolveEffectiveAiConfig(store);
 
     const [ytDlpVersion, dfOut] = await Promise.all([
       safeExec("/usr/local/bin/yt-dlp", ["--version"]),
@@ -96,10 +91,11 @@ export async function GET() {
         aiApiKey: "",
       },
       aiConfig: {
-        baseUrl: (store.settings.aiBaseUrl || "http://165.245.190.115:20128").trim(),
-        model: (store.settings.aiModel || "ag/gemini-3.8-flash").trim(),
-        hasApiKey: Boolean((store.settings.aiApiKey || "").trim()),
-        apiKeyMask: maskSecret(store.settings.aiApiKey),
+        baseUrl: aiCfg.baseUrl,
+        model: aiCfg.model,
+        hasApiKey: aiCfg.hasApiKey,
+        apiKeyMask: aiCfg.apiKeyMask,
+        source: aiCfg.source,
       },
       firebaseConfig: fbCfg,
       auditLogs: store.auditLogs.slice(0, 50),

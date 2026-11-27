@@ -71,6 +71,7 @@ interface OverviewData {
     memTotalMb: number;
     memPercent: number;
     diskSummary: string;
+    storageMode?: string;
     ytDlpVersion: string;
     hasYtCookies: boolean;
     firebaseReady: boolean;
@@ -95,6 +96,7 @@ interface OverviewData {
     model: string;
     hasApiKey: boolean;
     apiKeyMask: string;
+    source?: string;
   };
   firebaseConfig: {
     apiKey: string;
@@ -229,6 +231,7 @@ export default function OwnerPanelClient({
   const [aiApiKey, setAiApiKey] = useState("");
   const [aiHasKey, setAiHasKey] = useState(false);
   const [aiKeyMask, setAiKeyMask] = useState("");
+  const [aiSource, setAiSource] = useState("none");
 
   const flash = useCallback((type: "ok" | "err", text: string) => {
     setNotice({ type, text });
@@ -260,6 +263,7 @@ export default function OwnerPanelClient({
       setAiModel(json.aiConfig?.model || "ag/gemini-3.8-flash");
       setAiHasKey(Boolean(json.aiConfig?.hasApiKey));
       setAiKeyMask(json.aiConfig?.apiKeyMask || "");
+      setAiSource(json.aiConfig?.source || "none");
       setAiApiKey("");
     } catch (e) {
       flash("err", e instanceof Error ? e.message : "Gagal terhubung ke VPS.");
@@ -1322,8 +1326,11 @@ export default function OwnerPanelClient({
                           maintenanceMode,
                           bgVideoUrl,
                           homeRotate,
+                          aiBaseUrl,
+                          aiModel,
+                          aiApiKey,
                         },
-                        "Pengaturan global berhasil disimpan ke VPS."
+                        "Pengaturan global berhasil disimpan."
                       )
                     }
                   >
@@ -1336,8 +1343,18 @@ export default function OwnerPanelClient({
                     <h2>
                       <i className="fas fa-camera" aria-hidden="true" /> AI Auto Jawab (9router)
                     </h2>
-                    <span className="owner-pill">{aiHasKey ? `Custom Key (${aiKeyMask})` : "Auto Lokal 9router"}</span>
+                    <span className="owner-pill">
+                      {aiHasKey
+                        ? `${aiSource === "env" ? "Env" : aiSource === "local-9router" ? "Auto Lokal" : "Aktif"} (${aiKeyMask})`
+                        : "Belum Ada Key"}
+                    </span>
                   </div>
+
+                  {data.vps.storageMode && data.vps.storageMode !== "vps-disk" && (
+                    <p style={{ color: "var(--status-warn)", fontSize: "0.82rem", marginBottom: "12px", lineHeight: 1.5 }}>
+                      Mode serverless ({data.vps.storageMode}): key yang disimpan di sini aktif untuk browser ini lewat cookie terenkripsi. Untuk berlaku global bagi semua user XVIP di Vercel, set juga <code>NINEROUTER_API_KEY</code> di Environment Variables Vercel.
+                    </p>
+                  )}
 
                   <label htmlFor="ownAiBaseUrl" className="v-label">
                     Base URL Provider 9router

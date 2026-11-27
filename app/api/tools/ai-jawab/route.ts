@@ -1,43 +1,10 @@
-import { execFile } from "node:child_process";
-import fs from "node:fs";
-import { promisify } from "node:util";
 import { NextResponse } from "next/server";
+import { resolveEffectiveAiConfig } from "@/lib/server/ai-config";
 import { requireXvipUser } from "@/lib/server/auth";
 import { sanitizePublicError } from "@/lib/server/net-guard";
 import { readStore } from "@/lib/server/store";
 
-const execFileAsync = promisify(execFile);
-
 const MAX_IMAGE_DATA_URL_LEN = 8 * 1024 * 1024;
-const DEFAULT_BASE_URL = "http://165.245.190.115:20128";
-const DEFAULT_MODEL = "ag/gemini-3.8-flash";
-const LOCAL_ROUTER_DB = "/root/.9router/db/data.sqlite";
-
-let cachedRouterKey: string | null = null;
-
-async function resolveNineRouterApiKey(): Promise<string> {
-  const envKey = (process.env.NINEROUTER_API_KEY || process.env.AI_ROUTER_API_KEY || "").trim();
-  if (envKey) return envKey;
-  if (cachedRouterKey) return cachedRouterKey;
-  if (!fs.existsSync(LOCAL_ROUTER_DB)) return "";
-
-  try {
-    const { stdout } = await execFileAsync(
-      "python3",
-      [
-        "-c",
-        'import sqlite3,sys; conn=sqlite3.connect(sys.argv[1]); cur=conn.cursor(); cur.execute("SELECT key FROM apiKeys WHERE isActive = 1 ORDER BY createdAt DESC LIMIT 1"); row=cur.fetchone(); print(row[0] if row and row[0] else "")',
-        LOCAL_ROUTER_DB,
-      ],
-      { timeout: 4000 }
-    );
-    const key = String(stdout || "").trim();
-    if (key) cachedRouterKey = key;
-    return key;
-  } catch {
-    return "";
-  }
-}
 
 function buildSystemPrompt(mode: string): string {
   if (mode === "ringkas") {
@@ -81,27 +48,17 @@ export async function POST(req: Request) {
     "Baca dan analisis seluruh isi foto ini, lalu berikan jawaban yang paling tepat dan jelas.";
 
   const store = readStore();
-  const customKey = (store.settings.aiApiKey || "").trim();
-  const apiKey = customKey || (await resolveNineRouterApiKey());
+  const { baseUrl, model, apiKey } = await resolveEffectiveAiConfig(store);
   if (!apiKey) {
     return NextResponse.json(
-      { ok: false, error: "Konfigurasi API key penyedia AI belum tersedia." },
+      {
+        ok: false,
+        error:
+          "Konfigurasi API key penyedia AI belum tersedia. Simpan API key di /owner -> Pengaturan atau set NINEROUTER_API_KEY di environment server.",
+      },
       { status: 503 }
     );
   }
-
-  const baseUrl = (
-    store.settings.aiBaseUrl ||
-    process.env.NINEROUTER_BASE_URL ||
-    DEFAULT_BASE_URL
-  )
-    .trim()
-    .replace(/\/+$/, "");
-  const model = (
-    store.settings.aiModel ||
-    process.env.NINEROUTER_MODEL ||
-    DEFAULT_MODEL
-  ).trim();
 
   try {
     const upstream = await fetch(`${baseUrl}/v1/chat/completions`, {

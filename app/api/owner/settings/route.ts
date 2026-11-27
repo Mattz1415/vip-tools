@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  attachAiConfigCookie,
+  clearAiConfigCookie,
+  DEFAULT_AI_BASE_URL,
+  DEFAULT_AI_MODEL,
+  readAiConfigCookie,
+  resolveEffectiveAiConfig,
+} from "@/lib/server/ai-config";
 import { requireOwnerUser } from "@/lib/server/auth";
 import {
   appendAuditLog,
   getEffectiveFirebaseConfig,
   hasYtCookies,
   isFirebaseReady,
+  readStore,
   saveYtCookies,
   updateStore,
   type ThemeKey,
@@ -44,9 +53,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "saveAiConfig") {
-      const baseUrl = String(body?.aiBaseUrl || "").trim();
-      const model = String(body?.aiModel || "").trim();
-      const apiKey = typeof body?.aiApiKey === "string" ? body.aiApiKey.trim() : "";
+      const baseUrl = String(body?.aiBaseUrl || DEFAULT_AI_BASE_URL).trim();
+      const model = String(body?.aiModel || DEFAULT_AI_MODEL).trim();
+      const incomingKey = typeof body?.aiApiKey === "string" ? body.aiApiKey.trim() : "";
       const clearApiKey = Boolean(body?.clearAiApiKey);
 
       if (!/^https?:\/\/.+/i.test(baseUrl)) {
@@ -62,28 +71,54 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const saved = updateStore((store) => {
-        store.settings.aiBaseUrl = baseUrl.replace(/\/+$/, "");
+      const existingCookie = await readAiConfigCookie();
+      const normalizedBase = baseUrl.replace(/\/+$/, "");
+
+      const updatedStore = updateStore((store) => {
+        store.settings.aiBaseUrl = normalizedBase;
         store.settings.aiModel = model;
         if (clearApiKey) {
           store.settings.aiApiKey = "";
-        } else if (apiKey) {
-          store.settings.aiApiKey = apiKey;
+        } else if (incomingKey) {
+          store.settings.aiApiKey = incomingKey;
+        } else if (!store.settings.aiApiKey && existingCookie?.apiKey) {
+          store.settings.aiApiKey = existingCookie.apiKey;
         }
         appendAuditLog(
           store,
           actor.username,
           "OWNER_AI_CONFIG",
-          `Update AI base=${store.settings.aiBaseUrl}, model=${store.settings.aiModel}, key=${store.settings.aiApiKey ? "custom" : "auto-local"}`
+          `Update AI base=${store.settings.aiBaseUrl}, model=${store.settings.aiModel}, key=${store.settings.aiApiKey ? "custom" : "auto"}`
         );
-        return {
-          baseUrl: store.settings.aiBaseUrl,
-          model: store.settings.aiModel,
-          hasApiKey: Boolean((store.settings.aiApiKey || "").trim()),
-        };
+        return store;
       });
 
-      return NextResponse.json({ ok: true, aiConfig: saved });
+      const effectiveKey = clearApiKey
+        ? ""
+        : incomingKey || (updatedStore.settings.aiApiKey || "").trim() || existingCookie?.apiKey || "";
+
+      const eff = await resolveEffectiveAiConfig(updatedStore);
+      const res = NextResponse.json({
+        ok: true,
+        aiConfig: {
+          baseUrl: normalizedBase,
+          model,
+          hasApiKey: clearApiKey ? eff.hasApiKey : Boolean(effectiveKey || eff.hasApiKey),
+          apiKeyMask: clearApiKey ? eff.apiKeyMask : eff.apiKeyMask,
+          source: clearApiKey ? eff.source : effectiveKey ? "owner-store" : eff.source,
+        },
+      });
+
+      if (clearApiKey) {
+        clearAiConfigCookie(res);
+      } else {
+        attachAiConfigCookie(res, {
+          baseUrl: normalizedBase,
+          model,
+          apiKey: effectiveKey,
+        });
+      }
+      return res;
     }
 
     if (action === "saveYtCookies") {
@@ -99,6 +134,11 @@ export async function POST(req: NextRequest) {
       });
       return NextResponse.json({ ok: true, hasYtCookies: hasYtCookies() });
     }
+
+    const existingCookie = await readAiConfigCookie();
+    const incomingAiBase = typeof body?.aiBaseUrl === "string" ? body.aiBaseUrl.trim() : "";
+    const incomingAiModel = typeof body?.aiModel === "string" ? body.aiModel.trim() : "";
+    const incomingAiKey = typeof body?.aiApiKey === "string" ? body.aiApiKey.trim() : "";
 
     const saved = updateStore((store) => {
       if (body?.defaultTheme && VALID_THEMES.includes(body.defaultTheme)) {
@@ -116,16 +156,34 @@ export async function POST(req: NextRequest) {
       if (typeof body?.homeRotate === "number" && [0, 90, 180, 270].includes(body.homeRotate)) {
         store.settings.homeRotate = body.homeRotate;
       }
+      if (incomingAiBase && /^https?:\/\/.+/i.test(incomingAiBase)) {
+        store.settings.aiBaseUrl = incomingAiBase.replace(/\/+$/, "");
+      }
+      if (incomingAiModel && incomingAiModel.length <= 120) {
+        store.settings.aiModel = incomingAiModel;
+      }
+      if (incomingAiKey) {
+        store.settings.aiApiKey = incomingAiKey;
+      }
       appendAuditLog(
         store,
         actor.username,
         "OWNER_SETTINGS_SAVE",
         `Tema=${store.settings.defaultTheme}, maintenance=${store.settings.maintenanceMode}`
       );
-      return store.settings;
+      return { ...store.settings, aiApiKey: "" };
     });
 
-    return NextResponse.json({ ok: true, settings: saved });
+    const res = NextResponse.json({ ok: true, settings: saved });
+    if (incomingAiBase || incomingAiModel || incomingAiKey) {
+      const storeNow = readStore();
+      attachAiConfigCookie(res, {
+        baseUrl: (storeNow.settings.aiBaseUrl || DEFAULT_AI_BASE_URL).trim(),
+        model: (storeNow.settings.aiModel || DEFAULT_AI_MODEL).trim(),
+        apiKey: incomingAiKey || (storeNow.settings.aiApiKey || "").trim() || existingCookie?.apiKey || "",
+      });
+    }
+    return res;
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Gagal menyimpan pengaturan.";
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
