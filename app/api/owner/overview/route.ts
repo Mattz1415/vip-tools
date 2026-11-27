@@ -96,7 +96,7 @@ export async function GET() {
         aiApiKey: "",
       },
       aiConfig: {
-        baseUrl: (store.settings.aiBaseUrl || "http://127.0.0.1:20128").trim(),
+        baseUrl: (store.settings.aiBaseUrl || "http://165.245.190.115:20128").trim(),
         model: (store.settings.aiModel || "ag/gemini-3.8-flash").trim(),
         hasApiKey: Boolean((store.settings.aiApiKey || "").trim()),
         apiKeyMask: maskSecret(store.settings.aiApiKey),

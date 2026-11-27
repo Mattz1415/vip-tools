@@ -224,7 +224,7 @@ export default function OwnerPanelClient({
   const [bgVideoUrl, setBgVideoUrl] = useState("");
   const [homeRotate, setHomeRotate] = useState(0);
 
-  const [aiBaseUrl, setAiBaseUrl] = useState("http://127.0.0.1:20128");
+  const [aiBaseUrl, setAiBaseUrl] = useState("http://165.245.190.115:20128");
   const [aiModel, setAiModel] = useState("ag/gemini-3.8-flash");
   const [aiApiKey, setAiApiKey] = useState("");
   const [aiHasKey, setAiHasKey] = useState(false);
@@ -256,7 +256,7 @@ export default function OwnerPanelClient({
       setMaintenanceMode(Boolean(json.settings?.maintenanceMode));
       setBgVideoUrl(json.settings?.bgVideoUrl || "");
       setHomeRotate(Number(json.settings?.homeRotate || 0));
-      setAiBaseUrl(json.aiConfig?.baseUrl || "http://127.0.0.1:20128");
+      setAiBaseUrl(json.aiConfig?.baseUrl || "http://165.245.190.115:20128");
       setAiModel(json.aiConfig?.model || "ag/gemini-3.8-flash");
       setAiHasKey(Boolean(json.aiConfig?.hasApiKey));
       setAiKeyMask(json.aiConfig?.apiKeyMask || "");
@@ -1348,7 +1348,7 @@ export default function OwnerPanelClient({
                     className="v-input"
                     value={aiBaseUrl}
                     onChange={(e) => setAiBaseUrl(e.target.value)}
-                    placeholder="http://127.0.0.1:20128"
+                    placeholder="http://165.245.190.115:20128"
                   />
 
                   <label htmlFor="ownAiModel" className="v-label">

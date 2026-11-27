@@ -9,7 +9,7 @@ import { readStore } from "@/lib/server/store";
 const execFileAsync = promisify(execFile);
 
 const MAX_IMAGE_DATA_URL_LEN = 8 * 1024 * 1024;
-const DEFAULT_BASE_URL = "http://127.0.0.1:20128";
+const DEFAULT_BASE_URL = "http://165.245.190.115:20128";
 const DEFAULT_MODEL = "ag/gemini-3.8-flash";
 const LOCAL_ROUTER_DB = "/root/.9router/db/data.sqlite";
 

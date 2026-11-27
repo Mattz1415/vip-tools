@@ -324,7 +324,7 @@ function getDefaultSettings(): GlobalSettings {
     visits: 0,
     telegramBotToken: "",
     telegramChatId: "",
-    aiBaseUrl: "http://127.0.0.1:20128",
+    aiBaseUrl: "http://165.245.190.115:20128",
     aiApiKey: "",
     aiModel: "ag/gemini-3.8-flash",
   };
